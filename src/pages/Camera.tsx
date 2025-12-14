@@ -3,6 +3,42 @@ import { useNavigate } from 'react-router-dom';
 import { Camera as CapacitorCamera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { useAppStore } from '../stores/useAppStore';
 
+// Resize image to max 1024px while maintaining aspect ratio
+const resizeImage = (base64: string, maxSize: number = 1024): Promise<string> => {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      let { width, height } = img;
+
+      // Calculate new dimensions
+      if (width > height && width > maxSize) {
+        height = (height * maxSize) / width;
+        width = maxSize;
+      } else if (height > maxSize) {
+        width = (width * maxSize) / height;
+        height = maxSize;
+      }
+
+      // If image is already small enough, return original
+      if (width === img.width && height === img.height) {
+        resolve(base64);
+        return;
+      }
+
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx?.drawImage(img, 0, 0, width, height);
+
+      // Convert to JPEG with 85% quality for smaller file size
+      resolve(canvas.toDataURL('image/jpeg', 0.85));
+    };
+    img.onerror = () => resolve(base64); // Return original on error
+    img.src = base64;
+  });
+};
+
 export default function Camera() {
   const navigate = useNavigate();
   const { setUserPhoto } = useAppStore();
@@ -22,8 +58,9 @@ export default function Camera() {
 
       if (image.base64String) {
         const base64Image = `data:image/jpeg;base64,${image.base64String}`;
-        setPreviewUrl(base64Image);
-        setUserPhoto(base64Image);
+        const resizedImage = await resizeImage(base64Image, 1024);
+        setPreviewUrl(resizedImage);
+        setUserPhoto(resizedImage);
       }
     } catch (error) {
       console.error('Camera error:', error);
@@ -45,8 +82,9 @@ export default function Camera() {
 
       if (image.base64String) {
         const base64Image = `data:image/jpeg;base64,${image.base64String}`;
-        setPreviewUrl(base64Image);
-        setUserPhoto(base64Image);
+        const resizedImage = await resizeImage(base64Image, 1024);
+        setPreviewUrl(resizedImage);
+        setUserPhoto(resizedImage);
       }
     } catch (error) {
       console.error('Gallery error:', error);
@@ -56,14 +94,18 @@ export default function Camera() {
     }
   };
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      setIsLoading(true);
       const reader = new FileReader();
-      reader.onloadend = () => {
+      reader.onloadend = async () => {
         const base64 = reader.result as string;
-        setPreviewUrl(base64);
-        setUserPhoto(base64);
+        // Resize large images to prevent API failures
+        const resizedImage = await resizeImage(base64, 1024);
+        setPreviewUrl(resizedImage);
+        setUserPhoto(resizedImage);
+        setIsLoading(false);
       };
       reader.readAsDataURL(file);
     }

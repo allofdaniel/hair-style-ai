@@ -111,6 +111,7 @@ export const generateHairStyle = async (
     }
 
     console.log('Calling Gemini Image Generation API...');
+    console.log('Image size (base64 length):', base64Data.length);
 
     // Try with a simpler, more direct prompt
     const simplePrompt = `Edit this photo to give the person this hairstyle: ${style.nameKo} (${style.name}).
