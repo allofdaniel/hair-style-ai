@@ -4,8 +4,13 @@ import { useAppStore } from '../stores/useAppStore';
 
 export default function Settings() {
   const navigate = useNavigate();
-  const { credits, history } = useAppStore();
+  const { credits, history, setCredits } = useAppStore();
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+
+  // Reset credits (for testing)
+  const handleResetCredits = () => {
+    setCredits(99);
+  };
 
   const handleClearHistory = () => {
     localStorage.removeItem('hair-style-history');
@@ -63,10 +68,10 @@ export default function Settings() {
               </div>
             </div>
             <button
-              onClick={handleWatchAd}
-              className="px-4 py-2 bg-[var(--color-bg-input)] rounded-xl text-[var(--color-primary)] text-sm font-medium"
+              onClick={handleResetCredits}
+              className="px-4 py-2 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] rounded-xl text-white text-sm font-medium"
             >
-              + Get More
+              🎁 Free 99
             </button>
           </div>
         </section>
