@@ -161,7 +161,7 @@ export const useAppStore = create<AppState>()(
         })),
 
       // Credits
-      credits: 3, // Free tier starts with 3 credits
+      credits: 99, // Increased for testing - change to 3 for production
       setCredits: (credits) => set({ credits }),
       useCredit: () => {
         const { credits, subscriptionPlan } = get();
