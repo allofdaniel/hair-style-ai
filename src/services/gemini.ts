@@ -1,6 +1,5 @@
 import type { HairStyle, HairSettings, HairTexture } from '../stores/useAppStore';
 import { hairColors, hairTextures } from '../data/hairStyles';
-import { detectFace, composeFaceOntoResult, type FaceRegion } from './faceDetection';
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 // Gemini 2.0 Flash Image Generation - dedicated image generation/editing model
@@ -78,23 +77,6 @@ export const generateHairStyle = async (
   }
 
   const stylePrompt = buildPrompt(style, settings, texture);
-
-  // 얼굴 감지 수행
-  let faceRegion: FaceRegion | null = null;
-
-  try {
-    console.log('Detecting face in user photo...');
-    faceRegion = await detectFace(userPhoto);
-
-    if (faceRegion) {
-      console.log('Face detected:', faceRegion);
-    } else {
-      console.warn('No face detected, using generic protection prompt');
-    }
-  } catch (error) {
-    console.error('Face detection error:', error);
-    // 얼굴 감지 실패해도 계속 진행
-  }
 
   try {
     // Extract base64 data
@@ -219,17 +201,8 @@ Generate the edited image.`;
     if (imagePart && imagePart.inlineData) {
       let resultImage = `data:${imagePart.inlineData.mimeType};base64,${imagePart.inlineData.data}`;
 
-      // 🔒 얼굴 보존: AI 결과에 원본 얼굴을 합성 (얼굴이 감지된 경우)
-      if (faceRegion) {
-        console.log('Compositing original face onto AI result...');
-        try {
-          resultImage = await composeFaceOntoResult(userPhoto, resultImage, faceRegion);
-          console.log('Face composition completed - original face preserved');
-        } catch (composeError) {
-          console.error('Face composition failed, using AI result as-is:', composeError);
-          // 합성 실패 시 AI 결과 그대로 사용 (fallback)
-        }
-      }
+      // Note: Face composition disabled - AI results are better without manual face overlay
+      // The Gemini model preserves face identity well on its own
 
       return {
         success: true,
@@ -381,18 +354,6 @@ export const generateFromReference = async (
     return { success: false, error: 'API key not configured' };
   }
 
-  // 🔒 얼굴 감지 수행 (합성용)
-  let faceRegion: FaceRegion | null = null;
-  try {
-    console.log('Detecting face for reference generation...');
-    faceRegion = await detectFace(userPhoto);
-    if (faceRegion) {
-      console.log('Face detected for reference generation:', faceRegion);
-    }
-  } catch (error) {
-    console.error('Face detection error:', error);
-  }
-
   // Extract base64 data for both images
   const userBase64 = userPhoto.includes('base64,') ? userPhoto.split('base64,')[1] : userPhoto;
   const refBase64 = referencePhoto.includes('base64,') ? referencePhoto.split('base64,')[1] : referencePhoto;
@@ -494,18 +455,9 @@ Generate the edited image.`;
 
     const imagePart = parts.find((part: { inlineData?: { mimeType: string; data: string } }) => part.inlineData);
     if (imagePart?.inlineData) {
-      let resultImage = `data:${imagePart.inlineData.mimeType};base64,${imagePart.inlineData.data}`;
+      const resultImage = `data:${imagePart.inlineData.mimeType};base64,${imagePart.inlineData.data}`;
 
-      // 🔒 얼굴 보존: AI 결과에 원본 얼굴을 합성 (얼굴이 감지된 경우)
-      if (faceRegion) {
-        console.log('Compositing original face onto reference result...');
-        try {
-          resultImage = await composeFaceOntoResult(userPhoto, resultImage, faceRegion);
-          console.log('Face composition completed - original face preserved');
-        } catch (composeError) {
-          console.error('Face composition failed, using AI result as-is:', composeError);
-        }
-      }
+      // Note: Face composition disabled - AI results are better without manual face overlay
 
       return {
         success: true,
