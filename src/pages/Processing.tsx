@@ -97,20 +97,16 @@ export default function Processing() {
           navigate('/result');
         } else {
           console.error('Generation failed:', result.error);
-          alert(result.error || 'Failed to generate hairstyle. Please try again.');
+          // Show detailed error for debugging
+          const errorDetail = result.error || 'Unknown error';
+          alert(`Generation failed:\n\n${errorDetail}\n\nTry:\n• Different photo (clear face, good lighting)\n• Different hairstyle\n• Smaller image size`);
           navigate('/style-select');
         }
       } catch (error) {
         console.error('Processing error:', error);
         const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-        // Show more user-friendly error message
-        if (errorMessage.includes('API')) {
-          alert('AI service is temporarily unavailable. Please try again later.');
-        } else if (errorMessage.includes('network') || errorMessage.includes('fetch')) {
-          alert('Network error. Please check your internet connection.');
-        } else {
-          alert('Failed to generate hairstyle. Please try a different photo or style.');
-        }
+        // Show detailed error for debugging
+        alert(`Error:\n\n${errorMessage}\n\nPlease try again or use a different photo.`);
         navigate('/style-select');
       } finally {
         setIsProcessing(false);
