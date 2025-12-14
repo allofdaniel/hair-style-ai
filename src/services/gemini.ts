@@ -3,8 +3,8 @@ import { hairColors, hairTextures } from '../data/hairStyles';
 import { detectFace, composeFaceOntoResult, type FaceRegion } from './faceDetection';
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-// Gemini 2.0 Flash for image generation
-const GEMINI_IMAGE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent';
+// Gemini 2.5 Flash Image - stable image generation model
+const GEMINI_IMAGE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent';
 
 interface GenerateHairStyleParams {
   userPhoto: string;
