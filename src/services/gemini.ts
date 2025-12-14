@@ -95,18 +95,22 @@ export const generateHairStyle = async (
     console.log('Calling Gemini Image Generation API...');
     console.log('Image size (base64 length):', base64Data.length);
 
-    // Try with a simpler, more direct prompt
-    const simplePrompt = `Edit this photo to give the person this hairstyle: ${style.nameKo} (${style.name}).
+    // Strong prompt to preserve face identity and ONLY change hair
+    const simplePrompt = `You are a professional hair stylist photo editor. Your ONLY job is to change the HAIR in this photo.
 
-Style details: ${stylePrompt}
+TARGET HAIRSTYLE: ${style.nameKo} (${style.name})
+STYLE DETAILS: ${stylePrompt}
 
-CRITICAL RULES:
-1. Keep the person's face EXACTLY the same - same eyes, nose, mouth, skin
-2. ONLY change the hair - style, shape, and volume
-3. Make it look like a real photo, not AI-generated
-4. Keep the same background, clothing, and lighting
+ABSOLUTE RULES - VIOLATION IS NOT ALLOWED:
+1. DO NOT change the face AT ALL - eyes, nose, mouth, eyebrows, skin tone, face shape, facial features must be 100% IDENTICAL to the original
+2. DO NOT change the person's identity - they must be recognizable as the SAME person
+3. DO NOT change body, clothing, background, lighting, or pose
+4. ONLY modify the hair: hairstyle, hair shape, hair volume, hair length
+5. The result must look like the SAME person just got a new haircut at a salon
 
-Generate the edited image.`;
+Think of this as a "virtual haircut" - the person walks into a salon and walks out with new hair, but they are still the EXACT same person.
+
+Generate the photo with ONLY the hair changed to match the target hairstyle.`;
 
     const response = await fetch(`${GEMINI_IMAGE_URL}?key=${GEMINI_API_KEY}`, {
       method: 'POST',
@@ -371,22 +375,25 @@ export const generateFromReference = async (
   try {
     console.log('Generating from reference...');
 
-    // Simpler prompt for reference-based generation
-    const simpleRefPrompt = `I have two images:
-1. FIRST IMAGE: The person whose hair I want to change
-2. SECOND IMAGE: The hairstyle I want to copy
+    // Strong prompt for reference-based generation - preserve face identity
+    const simpleRefPrompt = `You are a professional hair stylist photo editor. Your ONLY job is to copy the HAIRSTYLE from the reference photo.
 
-Please edit the FIRST image to have the same hairstyle as shown in the SECOND image.
+TWO IMAGES PROVIDED:
+- FIRST IMAGE: The person (CLIENT) - their face must NOT change at all
+- SECOND IMAGE: The hairstyle to copy (REFERENCE)
 
-${colorPrompt ? `Also apply this hair color: ${colorPrompt}` : ''}
+${colorPrompt ? `ALSO APPLY HAIR COLOR: ${colorPrompt}` : ''}
 
-IMPORTANT:
-- Keep the person's face EXACTLY the same
-- ONLY change the hair to match the reference hairstyle
-- Make it look natural and realistic
-- Keep same background and lighting
+ABSOLUTE RULES - VIOLATION IS NOT ALLOWED:
+1. The CLIENT's face must remain 100% IDENTICAL - same eyes, nose, mouth, eyebrows, skin tone, face shape
+2. The CLIENT must be recognizable as the EXACT SAME PERSON after the edit
+3. DO NOT blend or morph faces - keep the CLIENT's face completely unchanged
+4. DO NOT change body, clothing, background, lighting, or pose
+5. ONLY copy the HAIR from the reference: hairstyle shape, volume, length, styling
 
-Generate the edited image.`;
+Think of this as a hairdresser showing "this is how you would look with this hairstyle" - the person stays the same, only their hair changes.
+
+Generate the CLIENT's photo with ONLY the hair changed to match the REFERENCE hairstyle.`;
 
     const response = await fetch(`${GEMINI_IMAGE_URL}?key=${GEMINI_API_KEY}`, {
       method: 'POST',
