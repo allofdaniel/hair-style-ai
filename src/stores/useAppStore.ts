@@ -153,12 +153,19 @@ export const useAppStore = create<AppState>()(
       processingProgress: 0,
       setProcessingProgress: (progress) => set({ processingProgress: progress }),
 
-      // History
+      // History - limit to 5 items to prevent localStorage quota exceeded
       history: [],
-      addToHistory: (item) =>
-        set((state) => ({
-          history: [{ ...item, date: new Date() }, ...state.history].slice(0, 20),
-        })),
+      addToHistory: (item) => {
+        try {
+          set((state) => ({
+            history: [{ ...item, date: new Date() }, ...state.history].slice(0, 5),
+          }));
+        } catch (e) {
+          // If localStorage is full, clear old history and try again
+          console.warn('Storage quota exceeded, clearing old history');
+          set({ history: [{ ...item, date: new Date() }] });
+        }
+      },
 
       // Credits
       credits: 99, // Increased for testing - change to 3 for production
@@ -198,8 +205,7 @@ export const useAppStore = create<AppState>()(
     {
       name: 'hair-style-ai-storage',
       partialize: (state) => ({
-        // Only persist these fields
-        history: state.history,
+        // Only persist these fields - NO history (too large with base64 images)
         credits: state.credits,
         subscriptionPlan: state.subscriptionPlan,
         gender: state.gender,

@@ -4,10 +4,10 @@ import { useAppStore } from '../stores/useAppStore';
 import { generateHairStyle, generateFromReference } from '../services/gemini';
 
 const processingSteps = [
-  { id: 1, text: 'Analyzing your photo...', textKo: '사진 분석 중...', duration: 2000 },
-  { id: 2, text: 'Detecting facial features...', textKo: '얼굴 특성 감지 중...', duration: 2500 },
-  { id: 3, text: 'AI processing hairstyle...', textKo: 'AI 헤어스타일 처리 중...', duration: 4000 },
-  { id: 4, text: 'Final rendering...', textKo: '최종 렌더링 중...', duration: 3500 },
+  { id: 1, text: 'Uploading photo...', textKo: '사진 업로드 중...', progress: 10 },
+  { id: 2, text: 'AI analyzing face...', textKo: 'AI 얼굴 분석 중...', progress: 30 },
+  { id: 3, text: 'Generating hairstyle...', textKo: '헤어스타일 생성 중...', progress: 70 },
+  { id: 4, text: 'Almost done...', textKo: '거의 완료...', progress: 90 },
 ];
 
 export default function Processing() {
@@ -33,24 +33,23 @@ export default function Processing() {
     const processImage = async () => {
       setIsProcessing(true);
 
-      for (let i = 0; i < processingSteps.length; i++) {
-        if (isCancelled) return;
-        setCurrentStep(i);
-
-        const stepDuration = processingSteps[i].duration;
-        const stepProgress = ((i + 1) / processingSteps.length) * 100;
-        const startProgress = (i / processingSteps.length) * 100;
-        const progressIncrement = (stepProgress - startProgress) / (stepDuration / 50);
-
-        for (let p = startProgress; p < stepProgress; p += progressIncrement) {
-          if (isCancelled) return;
-          setProgress(Math.min(p, stepProgress));
-          await new Promise((resolve) => setTimeout(resolve, 50));
-        }
-      }
+      // Start with step 0
+      setCurrentStep(0);
+      setProgress(10);
 
       try {
         let result;
+
+        // Update to step 1 - analyzing
+        setCurrentStep(1);
+        setProgress(30);
+
+        // Small delay to show the step change
+        await new Promise(r => setTimeout(r, 300));
+
+        // Update to step 2 - generating
+        setCurrentStep(2);
+        setProgress(50);
 
         if (useReferenceMode && referencePhoto) {
           // Use reference photo mode
@@ -73,7 +72,13 @@ export default function Processing() {
 
         if (isCancelled) return;
 
+        // Update to step 3 - almost done
+        setCurrentStep(3);
+        setProgress(90);
+
         if (result.success && result.resultImage) {
+          // Complete!
+          setProgress(100);
           const creditUsed = useCredit();
           if (!creditUsed) {
             navigate('/style-select');
