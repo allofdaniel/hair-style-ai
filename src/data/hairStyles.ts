@@ -31,7 +31,7 @@ export const hairStyles: HairStyle[] = [
     description: '이마에 자연스럽게 떨어지는 쉼표 모양 앞머리',
     celebrities: ['박보검', '차은우', 'BTS V'],
     prompt: 'Korean male comma hair style with soft curved bangs falling naturally like a comma shape on forehead, medium length textured hair on top sweeping to one side, clean tapered sides, elegant K-pop idol style',
-    thumbnail: 'https://images.unsplash.com/photo-1618886614638-80e3c103d31a?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://gatsby.sg/img/men-lifestyle/11-trendy-korean-hairstyles-for-men-in-2024/comma_hair.jpg',
   },
   {
     id: 'm-gail-perm',
@@ -42,7 +42,7 @@ export const hairStyles: HairStyle[] = [
     description: '부드럽게 아래로 떨어지는 자연스러운 웨이브',
     celebrities: ['정해인', '송강'],
     prompt: 'Korean male gail perm with natural soft S-waves falling down gracefully, medium-long length on top with gentle waves, sophisticated gentleman look',
-    thumbnail: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://gatsby.sg/img/men-lifestyle/8-top-korean-perm-men-hairstyles-in-2024/Gail-Perm.jpg',
   },
   {
     id: 'm-pomade-down',
@@ -53,7 +53,7 @@ export const hairStyles: HairStyle[] = [
     description: '깔끔하게 뒤로 넘긴 슬릭백 스타일',
     celebrities: ['현빈', '조인성'],
     prompt: 'Korean male pomade slick back style with hair swept back smoothly and neatly, wet glossy finish, professional refined gentleman look',
-    thumbnail: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://gatsby.sg/img/men-lifestyle/11-trendy-korean-hairstyles-for-men-in-2024/neat_comb_back.jpg',
   },
   {
     id: 'm-natural-down',
@@ -64,7 +64,7 @@ export const hairStyles: HairStyle[] = [
     description: '가볍게 내린 자연스러운 스타일',
     celebrities: ['공유', '이동욱'],
     prompt: 'Korean male natural down perm with effortless natural fall, soft textured hair falling loosely, casual elegant relaxed style',
-    thumbnail: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://gatsby.sg/img/men-lifestyle/11-trendy-korean-hairstyles-for-men-in-2024/natural_flow.jpg',
   },
 
   // Two Block (투블럭)
@@ -77,7 +77,7 @@ export const hairStyles: HairStyle[] = [
     description: '옆과 뒤는 짧고 위는 볼륨있게',
     celebrities: ['이종석', '박서준'],
     prompt: 'Korean male dandy cut two-block style with short trimmed sides and back, volume and texture on top styled upward, classic gentleman professional look',
-    thumbnail: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://gatsby.sg/img/men-lifestyle/11-trendy-korean-hairstyles-for-men-in-2024/two_block_haircut_with_air_bangs.jpg',
   },
   {
     id: 'm-undercut',
@@ -88,7 +88,7 @@ export const hairStyles: HairStyle[] = [
     description: '옆면을 확실히 밀고 위는 길게',
     celebrities: ['지드래곤', 'BTS 정국'],
     prompt: 'Korean male undercut style with dramatically shaved sides disconnected from longer textured top hair, edgy modern trendy K-pop look',
-    thumbnail: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://cdn.shopify.com/s/files/1/0029/0868/4397/files/two-block-undercut-hairstyle-men.webp?v=1759148335',
   },
   {
     id: 'm-two-block-basic',
@@ -99,7 +99,7 @@ export const hairStyles: HairStyle[] = [
     description: '클래식한 투블럭 스타일',
     celebrities: ['이민호', '김수현'],
     prompt: 'Korean male classic two-block cut with clean buzzed sides and textured medium-length top, versatile modern Korean style',
-    thumbnail: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://cdn.shopify.com/s/files/1/0029/0868/4397/files/two-block-comma-hair-men.webp?v=1759148336',
   },
   {
     id: 'm-mohawk-two-block',
@@ -110,7 +110,7 @@ export const hairStyles: HairStyle[] = [
     description: '중앙에 볼륨을 준 모히칸 스타일',
     celebrities: ['빅뱅 탑', 'EXO 카이'],
     prompt: 'Korean male mohawk style two-block with volume and height concentrated in center strip, sides very short, bold edgy statement look',
-    thumbnail: 'https://images.unsplash.com/photo-1504257432389-52343af06ae3?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://cdn.shopify.com/s/files/1/0029/0868/4397/files/two-block-mullet-hairstyle-men.webp?v=1759148335',
   },
 
   // Perm (펌)
@@ -123,7 +123,7 @@ export const hairStyles: HairStyle[] = [
     description: '자연스러운 S컬 웨이브 펌',
     celebrities: ['이민호', '김수현'],
     prompt: 'Korean male ash perm with natural S-wave curls throughout medium length hair, added volume and soft texture, romantic sophisticated look',
-    thumbnail: 'https://images.unsplash.com/photo-1531891437562-4301cf35b7e4?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://gatsby.sg/img/men-lifestyle/8-top-korean-perm-men-hairstyles-in-2024/Soft-Wavy-Perm.jpg',
   },
   {
     id: 'm-garma-perm',
@@ -134,7 +134,7 @@ export const hairStyles: HairStyle[] = [
     description: '가르마를 중심으로 양쪽으로 웨이브',
     celebrities: ['송중기', '남주혁'],
     prompt: 'Korean male garma perm with center or side part, soft waves flowing elegantly to both sides, sophisticated wavy gentleman style',
-    thumbnail: 'https://images.unsplash.com/photo-1463453091185-61582044d556?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://gatsby.sg/img/men-lifestyle/8-top-korean-perm-men-hairstyles-in-2024/Middle-Part-Perm.jpg',
   },
   {
     id: 'm-regent-perm',
@@ -145,7 +145,7 @@ export const hairStyles: HairStyle[] = [
     description: '뒤로 넘기며 볼륨감 있는 스타일',
     celebrities: ['원빈', '장동건'],
     prompt: 'Korean male regent perm with hair swept back with volume and elegant waves, classic Hollywood movie star style',
-    thumbnail: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://gatsby.sg/img/men-lifestyle/11-trendy-korean-hairstyles-for-men-in-2024/permed_crop_with_high_fade_60-40_part_with_down_perm.jpg',
   },
   {
     id: 'm-scurl-perm',
@@ -156,7 +156,7 @@ export const hairStyles: HairStyle[] = [
     description: '부드러운 S자 곡선의 웨이브',
     celebrities: ['이준기', '김재욱'],
     prompt: 'Korean male S-curl perm with soft flowing S-shaped waves throughout medium length hair, romantic gentle artistic look',
-    thumbnail: 'https://images.unsplash.com/photo-1548372290-8d01b6c8e78c?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://gatsby.sg/img/men-lifestyle/11-trendy-korean-hairstyles-for-men-in-2024/s-shaped_fringe.jpg',
   },
   {
     id: 'm-hippy-perm',
@@ -167,7 +167,7 @@ export const hairStyles: HairStyle[] = [
     description: '자유로운 느낌의 큰 웨이브',
     celebrities: ['정용화', '이홍기'],
     prompt: 'Korean male hippie perm with loose large waves, free-spirited bohemian style, medium to long flowing length',
-    thumbnail: 'https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://gatsby.sg/img/men-lifestyle/11-trendy-korean-hairstyles-for-men-in-2024/long_curtain_hair.jpg',
   },
 
   // Long Hair (장발)
@@ -180,7 +180,7 @@ export const hairStyles: HairStyle[] = [
     description: '레이어드가 많이 들어간 샤기한 스타일',
     celebrities: ['BTS 뷔', 'Stray Kids 현진'],
     prompt: 'Korean male wolf cut with heavy choppy layers and shaggy texture, mullet-inspired longer back, trendy K-pop idol style',
-    thumbnail: 'https://images.unsplash.com/photo-1605462863863-10d9e47e15ee?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://cdn.shopify.com/s/files/1/0029/0868/4397/files/korean-wolf-cut-men.webp?v=1761209100',
   },
   {
     id: 'm-long-layered',
@@ -191,7 +191,7 @@ export const hairStyles: HairStyle[] = [
     description: '어깨 길이의 레이어드 컷',
     celebrities: ['장근석', '김희철'],
     prompt: 'Korean male long layered hair reaching shoulders, soft flowing layers for movement, artistic sophisticated rock star look',
-    thumbnail: 'https://images.unsplash.com/photo-1503443207922-dff7d543fd0e?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://cdn.shopify.com/s/files/1/0029/0868/4397/files/korean-mullet-haircut.webp?v=1761209100',
   },
   {
     id: 'm-man-bun',
@@ -202,7 +202,7 @@ export const hairStyles: HairStyle[] = [
     description: '뒤로 묶은 번 스타일',
     celebrities: ['강동원', '이진욱'],
     prompt: 'Korean male man bun style with long hair tied back in a neat bun at crown, clean sophisticated trendy look',
-    thumbnail: 'https://images.unsplash.com/photo-1480429370612-a8747d801252?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://gatsby.sg/img/men-lifestyle/8-top-korean-perm-men-hairstyles-in-2024/Permed-Mullet.jpg',
   },
 
   // Short (짧은머리)
@@ -215,7 +215,7 @@ export const hairStyles: HairStyle[] = [
     description: '군인 스타일의 짧은 머리',
     celebrities: ['현빈', '손흥민'],
     prompt: 'Korean male crew cut with very short buzzed sides and slightly longer textured top, clean military-inspired athletic style',
-    thumbnail: 'https://images.unsplash.com/photo-1557862921-37829c790f19?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://gatsby.sg/img/men-lifestyle/8-top-korean-perm-men-hairstyles-in-2024/Short-Hair-Perm.jpg',
   },
   {
     id: 'm-ivy-league',
@@ -226,7 +226,7 @@ export const hairStyles: HairStyle[] = [
     description: '깔끔하고 단정한 클래식 스타일',
     celebrities: ['유재석', '강호동'],
     prompt: 'Korean male ivy league cut with short tapered sides and neat combable parted top, classic preppy professional clean style',
-    thumbnail: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://gatsby.sg/img/men-lifestyle/11-trendy-korean-hairstyles-for-men-in-2024/korean_mash.jpg',
   },
   {
     id: 'm-buzz-cut',
@@ -237,7 +237,7 @@ export const hairStyles: HairStyle[] = [
     description: '전체적으로 짧게 민 스타일',
     celebrities: ['유아인', '하정우'],
     prompt: 'Korean male buzz cut with uniformly very short hair all around the head, bold minimalist clean athletic look',
-    thumbnail: 'https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://cdn.shopify.com/s/files/1/0029/0868/4397/files/french-crop-two-block-haircut-men.webp?v=1759148335',
   },
 
   // Fade (페이드)
@@ -250,7 +250,7 @@ export const hairStyles: HairStyle[] = [
     description: '귀 아래에서 시작하는 낮은 페이드',
     celebrities: ['박재범', 'Crush'],
     prompt: 'Korean male low fade haircut with gradual taper starting below ear level, textured styled top, modern clean barbershop style',
-    thumbnail: 'https://images.unsplash.com/photo-1583195764036-6dc248ac07d9?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://cdn.shopify.com/s/files/1/0029/0868/4397/files/korean-drop-fade-haircut-men.webp?v=1761209100',
   },
   {
     id: 'm-mid-fade',
@@ -261,7 +261,7 @@ export const hairStyles: HairStyle[] = [
     description: '중간 높이에서 시작하는 페이드',
     celebrities: ['사이먼 도미닉', 'Gray'],
     prompt: 'Korean male mid fade haircut with taper at temple level, versatile modern textured top, sharp barbershop style',
-    thumbnail: 'https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://gatsby.sg/img/men-lifestyle/11-trendy-korean-hairstyles-for-men-in-2024/shadow_perm.jpg',
   },
   {
     id: 'm-high-fade',
@@ -272,7 +272,7 @@ export const hairStyles: HairStyle[] = [
     description: '높은 위치에서 시작하는 강한 페이드',
     celebrities: ['빈지노', 'Zico'],
     prompt: 'Korean male high fade haircut with dramatic taper starting high on head near crown, bold urban street hip-hop style',
-    thumbnail: 'https://images.unsplash.com/photo-1567894340315-735d7c361db0?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://gatsby.sg/img/men-lifestyle/11-trendy-korean-hairstyles-for-men-in-2024/permed_crop_with_high_fade.jpg',
   },
   {
     id: 'm-skin-fade',
@@ -283,7 +283,7 @@ export const hairStyles: HairStyle[] = [
     description: '피부가 보일 정도로 깔끔한 페이드',
     celebrities: ['로꼬', 'BewhY'],
     prompt: 'Korean male skin fade with seamless blend down to bare skin, ultra clean sharp precise barbershop look',
-    thumbnail: 'https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://cdn.shopify.com/s/files/1/0029/0868/4397/files/korean-textured-fringe-hairstyle-men.webp?v=1761209100',
   },
 
   // ===== FEMALE STYLES =====
@@ -298,7 +298,7 @@ export const hairStyles: HairStyle[] = [
     description: '귀여운 요정 같은 짧은 머리',
     celebrities: ['고준희', '한예슬'],
     prompt: 'Korean female pixie cut with cropped short sides and back, playful textured wispy pieces on top, cute elfin chic trendy style',
-    thumbnail: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://hairstylebuddy.com/wp-content/uploads/2024/09/Soft-Pixie-Cut-673x1024.jpg',
   },
   {
     id: 'f-bob-cut',
@@ -309,7 +309,7 @@ export const hairStyles: HairStyle[] = [
     description: '턱선에서 깔끔하게 자른 단발',
     celebrities: ['고윤정', '수지'],
     prompt: 'Korean female bob cut at jaw length with clean blunt straight ends, sleek elegant sophisticated minimalist style',
-    thumbnail: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://hairstylebuddy.com/wp-content/uploads/2024/09/Classic-Chin-Length-Bob-673x1024.jpg',
   },
   {
     id: 'f-hush-cut',
@@ -320,7 +320,7 @@ export const hairStyles: HairStyle[] = [
     description: '레이어드가 많이 들어간 숏컷',
     celebrities: ['고윤정', '김고은'],
     prompt: 'Korean female hush cut with heavy face-framing layers around cheeks and chin, textured wispy ends, trendy effortless chic style',
-    thumbnail: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://uploads.dailyvanity.sg/wp-content/uploads/2023/12/Korean-Hair-Trends-2024-Hush-Cut.png',
   },
   {
     id: 'f-short-wolf',
@@ -331,7 +331,7 @@ export const hairStyles: HairStyle[] = [
     description: '짧은 버전의 울프컷',
     celebrities: ['박신혜', '한소희'],
     prompt: 'Korean female short wolf cut with choppy shaggy layers and wispy face-framing pieces, edgy modern trendy K-style',
-    thumbnail: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://web.rupa.ai/wp-content/uploads/2023/07/Aruna_A_young_Korean_woman_sporting_a_Shaggy_Cut_hairstyle_her__5c479dbc-b89b-446c-8cca-e6b0277bacd5.png',
   },
 
   // Mid Length (중단발)
@@ -344,7 +344,7 @@ export const hairStyles: HairStyle[] = [
     description: '끝이 안쪽으로 말린 C자 컬',
     celebrities: ['김유정', 'IU'],
     prompt: 'Korean female C-curl perm with ends curling inward in C-shape framing the face, sweet natural feminine look',
-    thumbnail: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://hairstylebuddy.com/wp-content/uploads/2024/09/Airy-Short-C-Curl-Bob-673x1024.jpg',
   },
   {
     id: 'f-lob-cut',
@@ -355,7 +355,7 @@ export const hairStyles: HairStyle[] = [
     description: '어깨 길이의 긴 보브',
     celebrities: ['전지현', '송혜교'],
     prompt: 'Korean female lob long bob cut at shoulder length with blunt or slightly textured ends, sleek versatile sophisticated style',
-    thumbnail: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://web.rupa.ai/wp-content/uploads/2023/07/Aruna_A_Korean_woman_looking_chic_and_casual_with_her_Layered_B_d8a4bd0d-4afc-4d98-b80a-0b2955b9d6f1.png',
   },
   {
     id: 'f-wave-perm',
@@ -366,7 +366,7 @@ export const hairStyles: HairStyle[] = [
     description: '자연스러운 물결 웨이브',
     celebrities: ['신민아', '박민영'],
     prompt: 'Korean female wave perm with natural flowing soft ocean-like S-waves throughout mid-length hair, romantic feminine style',
-    thumbnail: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://hairstylebuddy.com/wp-content/uploads/2024/09/Tousled-Short-Waves-673x1024.jpg',
   },
   {
     id: 'f-layered-mid',
@@ -377,7 +377,7 @@ export const hairStyles: HairStyle[] = [
     description: '레이어드가 들어간 중간 길이',
     celebrities: ['한지민', '손예진'],
     prompt: 'Korean female layered mid-length cut with soft face-framing layers for movement and volume, elegant feminine style',
-    thumbnail: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://hairstylebuddy.com/wp-content/uploads/2024/09/Layered-Short-Bob-673x1024.jpg',
   },
 
   // Long Hair (긴머리)
@@ -390,7 +390,7 @@ export const hairStyles: HairStyle[] = [
     description: '윤기있는 긴 생머리',
     celebrities: ['수지', '윤아'],
     prompt: 'Korean female long straight silky hair reaching mid-back, sleek glossy healthy-looking goddess hair, elegant classic beauty',
-    thumbnail: 'https://images.unsplash.com/photo-1515023115689-589c33041d3c?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://uploads.dailyvanity.sg/wp-content/uploads/2023/12/Korean-Hair-Trends-2024-Straight-and-Sleek-Liquid-hair-1.png',
   },
   {
     id: 'f-long-layered',
@@ -401,7 +401,7 @@ export const hairStyles: HairStyle[] = [
     description: '풍성한 레이어드가 들어간 긴 머리',
     celebrities: ['김태희', '이나영'],
     prompt: 'Korean female long layered hair with flowing face-framing layers throughout for movement and volume, romantic feminine style',
-    thumbnail: 'https://images.unsplash.com/photo-1526510747491-58f928ec870f?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://uploads.dailyvanity.sg/wp-content/uploads/2023/12/Korean-Hair-Trends-2024-Layers-1.png',
   },
   {
     id: 'f-s-curl-long',
@@ -412,7 +412,7 @@ export const hairStyles: HairStyle[] = [
     description: '길게 흐르는 S자 웨이브',
     celebrities: ['제시카', '태연'],
     prompt: 'Korean female long S-curl perm with flowing elegant S-shaped waves from mid-length down, glamorous feminine K-beauty style',
-    thumbnail: 'https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://hairstylebuddy.com/wp-content/uploads/2024/09/Short-Curly-Perm-673x1024.jpg',
   },
   {
     id: 'f-goddess-waves',
@@ -423,7 +423,7 @@ export const hairStyles: HairStyle[] = [
     description: '큰 웨이브의 화려한 긴 머리',
     celebrities: ['전지현', '김희선'],
     prompt: 'Korean female goddess waves with large luxurious bouncy waves throughout long hair, glamorous red carpet movie star style',
-    thumbnail: 'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://hairstylebuddy.com/wp-content/uploads/2024/09/Wavy-Pixie-Bob-673x1024.jpg',
   },
 
   // Bangs (앞머리)
@@ -436,7 +436,7 @@ export const hairStyles: HairStyle[] = [
     description: '가볍게 이마가 비치는 앞머리',
     celebrities: ['IU', '태연'],
     prompt: 'Korean female see-through bangs with light wispy thin strands showing forehead underneath, airy cute youthful K-idol style',
-    thumbnail: 'https://images.unsplash.com/photo-1496440737103-cd596325d314?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://hairstylebuddy.com/wp-content/uploads/2024/09/Blunt-Bob-with-Bangs-673x1024.jpg',
   },
   {
     id: 'f-full-bangs',
@@ -447,7 +447,7 @@ export const hairStyles: HairStyle[] = [
     description: '이마를 덮는 통통한 앞머리',
     celebrities: ['수지', '아이린'],
     prompt: 'Korean female full bangs covering forehead completely with thick blunt straight cut bangs, doll-like cute youthful style',
-    thumbnail: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://uploads.dailyvanity.sg/wp-content/uploads/2023/12/Korean-Hair-Trends-2024-Hime-Cut.png',
   },
   {
     id: 'f-curtain-bangs',
@@ -458,7 +458,7 @@ export const hairStyles: HairStyle[] = [
     description: '양쪽으로 가르마 탄 앞머리',
     celebrities: ['송혜교', '박신혜'],
     prompt: 'Korean female curtain bangs parted in center with pieces flowing to each side framing face, 70s retro elegant feminine style',
-    thumbnail: 'https://images.unsplash.com/photo-1464863979621-258859e62245?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://uploads.dailyvanity.sg/wp-content/uploads/2023/12/Korean-Hair-Trends-2024-Curtain-Hair-for-Men.png',
   },
   {
     id: 'f-side-bangs',
@@ -469,7 +469,7 @@ export const hairStyles: HairStyle[] = [
     description: '옆으로 넘긴 앞머리',
     celebrities: ['김태희', '한가인'],
     prompt: 'Korean female side swept bangs brushed elegantly to one side across forehead, sophisticated feminine mature style',
-    thumbnail: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://hairstylebuddy.com/wp-content/uploads/2024/09/Feathered-Bob-673x1024.jpg',
   },
 
   // Perm (펌)
@@ -482,7 +482,7 @@ export const hairStyles: HairStyle[] = [
     description: '큰 웨이브로 볼륨감 있게',
     celebrities: ['고소영', '이영애'],
     prompt: 'Korean female body perm with large loose waves adding volume and body throughout long hair, glamorous full bouncy style',
-    thumbnail: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://cdn2.stylecraze.com/wp-content/uploads/2015/06/Layered-Bob-1.jpg.webp',
   },
   {
     id: 'f-build-perm',
@@ -493,7 +493,7 @@ export const hairStyles: HairStyle[] = [
     description: '뿌리부터 볼륨을 준 펌',
     celebrities: ['한예슬', '공효진'],
     prompt: 'Korean female build perm with volume and texture starting from roots, bouncy full-bodied movement throughout hair',
-    thumbnail: 'https://images.unsplash.com/photo-1507152927562-88543dcd2f2e?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://cdn2.stylecraze.com/wp-content/uploads/2015/06/Shag.jpg.webp',
   },
   {
     id: 'f-glam-perm',
@@ -504,7 +504,7 @@ export const hairStyles: HairStyle[] = [
     description: '화려하고 섹시한 큰 컬',
     celebrities: ['이효리', '엄정화'],
     prompt: 'Korean female glam perm with large glamorous bouncy curls, sexy Hollywood-style waves, luxurious red carpet look',
-    thumbnail: 'https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://cdn2.stylecraze.com/wp-content/uploads/2015/06/Asymmetrical-Bob-1.jpg.webp',
   },
   {
     id: 'f-hippie-perm',
@@ -515,7 +515,7 @@ export const hairStyles: HairStyle[] = [
     description: '자유로운 보헤미안 웨이브',
     celebrities: ['한지민', '손담비'],
     prompt: 'Korean female hippie perm with loose bohemian natural waves, free-spirited effortless romantic style',
-    thumbnail: 'https://images.unsplash.com/photo-1504439904031-93ded9f93e4e?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://cdn2.stylecraze.com/wp-content/uploads/2015/06/90s-Classic-Bob.jpg.webp',
   },
 
   // Updo (업스타일)
@@ -528,7 +528,7 @@ export const hairStyles: HairStyle[] = [
     description: '목덜미에 낮게 올린 번',
     celebrities: ['김태희', '송혜교'],
     prompt: 'Korean female low bun elegantly gathered at nape of neck, sophisticated sleek clean chignon style',
-    thumbnail: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://uploads.dailyvanity.sg/wp-content/uploads/2023/12/Korean-Hair-Trends-2024-Ribbons-and-Bows.png',
   },
   {
     id: 'f-high-ponytail',
@@ -539,7 +539,7 @@ export const hairStyles: HairStyle[] = [
     description: '높게 묶은 포니테일',
     celebrities: ['제니', '아이린'],
     prompt: 'Korean female high ponytail tied at crown with sleek pulled back sides, youthful energetic athletic style',
-    thumbnail: 'https://images.unsplash.com/photo-1500917293891-ef795e70e1f6?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://web.rupa.ai/wp-content/uploads/2023/07/Aruna_A_Korean_girl_with_a_sleek_and_modern_Blunt_Bob_hairstyle_33f564fa-1f86-4881-83ca-e8225fff90c5.png',
   },
   {
     id: 'f-half-up',
@@ -550,7 +550,7 @@ export const hairStyles: HairStyle[] = [
     description: '위쪽 머리만 묶은 스타일',
     celebrities: ['수지', '윤아'],
     prompt: 'Korean female half-up half-down style with top section tied back while rest flows down, romantic feminine sweet style',
-    thumbnail: 'https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://cdn2.stylecraze.com/wp-content/uploads/2015/06/Concave-Bob.jpg.webp',
   },
   {
     id: 'f-messy-bun',
@@ -561,7 +561,7 @@ export const hairStyles: HairStyle[] = [
     description: '자연스럽게 흐트러진 번',
     celebrities: ['공효진', '한지민'],
     prompt: 'Korean female messy bun with loose face-framing strands and relaxed texture, effortless chic casual elegant style',
-    thumbnail: 'https://images.unsplash.com/photo-1506863530036-1efeddceb993?w=400&h=500&fit=crop&crop=faces',
+    thumbnail: 'https://cdn2.stylecraze.com/wp-content/uploads/2015/06/Layered-Pixie-Cut.jpg.webp',
   },
 ];
 
