@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../stores/useAppStore';
-import { generateHairStyle, generateFromReference } from '../services/gemini';
+import { generateHairStyleWithInpainting, generateFromReferenceWithInpainting } from '../services/stabilityAI';
 
 const processingSteps = [
   { id: 1, text: 'Uploading photo...', textKo: '사진 업로드 중...', progress: 10 },
-  { id: 2, text: 'AI analyzing face...', textKo: 'AI 얼굴 분석 중...', progress: 30 },
-  { id: 3, text: 'Generating hairstyle...', textKo: '헤어스타일 생성 중...', progress: 70 },
-  { id: 4, text: 'Almost done...', textKo: '거의 완료...', progress: 90 },
+  { id: 2, text: 'Creating hair mask...', textKo: '헤어 마스크 생성 중...', progress: 30 },
+  { id: 3, text: 'Applying new hairstyle...', textKo: '새 헤어스타일 적용 중...', progress: 70 },
+  { id: 4, text: 'Finishing touches...', textKo: '마무리 중...', progress: 90 },
 ];
 
 export default function Processing() {
@@ -52,15 +52,15 @@ export default function Processing() {
         setProgress(50);
 
         if (useReferenceMode && referencePhoto) {
-          // Use reference photo mode
-          result = await generateFromReference({
+          // Use reference photo mode with inpainting
+          result = await generateFromReferenceWithInpainting({
             userPhoto,
             referencePhoto,
             settings: hairSettings,
           });
         } else if (selectedStyle) {
-          // Use preset style mode
-          result = await generateHairStyle({
+          // Use preset style mode with inpainting
+          result = await generateHairStyleWithInpainting({
             userPhoto,
             style: selectedStyle,
             settings: hairSettings,
