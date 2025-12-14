@@ -18,7 +18,6 @@ export default function Settings() {
   };
 
   const handleRateApp = () => {
-    // Play Store URL - 출시 후 실제 URL로 변경
     window.open('https://play.google.com/store/apps/details?id=com.allofdaniel.hairstyleai', '_blank');
   };
 
@@ -27,19 +26,11 @@ export default function Settings() {
   };
 
   const handlePrivacy = () => {
-    // 개인정보 처리방침 페이지
     window.open('https://hairstyleai.app/privacy', '_blank');
   };
 
   const handleTerms = () => {
-    // 이용약관 페이지
     window.open('https://hairstyleai.app/terms', '_blank');
-  };
-
-  // 광고 시청으로 크레딧 받기 (추후 AdMob 연동)
-  const handleWatchAd = () => {
-    // TODO: AdMob Rewarded Ad 연동
-    alert('Coming soon! Watch ads to get free credits.');
   };
 
   return (
