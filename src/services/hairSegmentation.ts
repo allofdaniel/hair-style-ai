@@ -195,9 +195,11 @@ function createFallbackMaskCanvas(ctx: CanvasRenderingContext2D, width: number, 
 
 /**
  * Composite new hair onto original image using mask
- * - originalImage: The user's photo
- * - generatedImage: AI-generated image with new hairstyle (full image)
+ * - originalImage: The user's photo (FACE stays from here)
+ * - generatedImage: AI-generated image with new hairstyle (HAIR comes from here)
  * - hairMask: Mask where white = hair area to replace
+ *
+ * Result: Original photo with ONLY the hair area replaced from generated image
  */
 export async function compositeHairOntoOriginal(
   originalImage: string,
@@ -218,31 +220,69 @@ export async function compositeHairOntoOriginal(
     };
 
     const performComposite = () => {
-      // Use original image dimensions
+      const width = original.width;
+      const height = original.height;
+
+      // Main canvas - final result
       const canvas = document.createElement('canvas');
-      canvas.width = original.width;
-      canvas.height = original.height;
+      canvas.width = width;
+      canvas.height = height;
       const ctx = canvas.getContext('2d')!;
 
-      // Step 1: Draw original image as base
-      ctx.drawImage(original, 0, 0);
+      // Step 1: Draw ORIGINAL image as base (this keeps the face!)
+      ctx.drawImage(original, 0, 0, width, height);
 
-      // Step 2: Create a temporary canvas for masking
-      const tempCanvas = document.createElement('canvas');
-      tempCanvas.width = original.width;
-      tempCanvas.height = original.height;
-      const tempCtx = tempCanvas.getContext('2d')!;
+      // Step 2: Get pixel data from all images
+      // Create temp canvases to read pixel data
+      const origCanvas = document.createElement('canvas');
+      origCanvas.width = width;
+      origCanvas.height = height;
+      const origCtx = origCanvas.getContext('2d')!;
+      origCtx.drawImage(original, 0, 0, width, height);
+      const origData = origCtx.getImageData(0, 0, width, height);
 
-      // Draw generated image
-      tempCtx.drawImage(generated, 0, 0, original.width, original.height);
+      const genCanvas = document.createElement('canvas');
+      genCanvas.width = width;
+      genCanvas.height = height;
+      const genCtx = genCanvas.getContext('2d')!;
+      genCtx.drawImage(generated, 0, 0, width, height);
+      const genData = genCtx.getImageData(0, 0, width, height);
 
-      // Apply mask (only keep hair area from generated image)
-      tempCtx.globalCompositeOperation = 'destination-in';
-      tempCtx.drawImage(mask, 0, 0, original.width, original.height);
+      const maskCanvas = document.createElement('canvas');
+      maskCanvas.width = width;
+      maskCanvas.height = height;
+      const maskCtx = maskCanvas.getContext('2d')!;
+      maskCtx.drawImage(mask, 0, 0, width, height);
+      const maskData = maskCtx.getImageData(0, 0, width, height);
 
-      // Step 3: Overlay masked generated hair onto original
-      ctx.drawImage(tempCanvas, 0, 0);
+      // Step 3: Pixel-by-pixel compositing
+      // Where mask is WHITE (hair) -> use generated pixel
+      // Where mask is BLACK (face/body) -> use original pixel
+      const resultData = ctx.getImageData(0, 0, width, height);
 
+      for (let i = 0; i < resultData.data.length; i += 4) {
+        // Mask value (0-255, where 255 = white = hair area)
+        const maskValue = maskData.data[i]; // R channel of mask
+
+        if (maskValue > 128) {
+          // Hair area - use generated image pixels
+          resultData.data[i] = genData.data[i];         // R
+          resultData.data[i + 1] = genData.data[i + 1]; // G
+          resultData.data[i + 2] = genData.data[i + 2]; // B
+          resultData.data[i + 3] = 255;                  // A
+        } else {
+          // Face/body area - use original image pixels (UNCHANGED!)
+          resultData.data[i] = origData.data[i];         // R
+          resultData.data[i + 1] = origData.data[i + 1]; // G
+          resultData.data[i + 2] = origData.data[i + 2]; // B
+          resultData.data[i + 3] = 255;                  // A
+        }
+      }
+
+      // Step 4: Put the composited pixels back
+      ctx.putImageData(resultData, 0, 0);
+
+      console.log('Compositing complete - face from original, hair from generated');
       resolve(canvas.toDataURL('image/png'));
     };
 
