@@ -26,6 +26,43 @@ interface GenerateHairStyleResponse {
   error?: string;
 }
 
+// Clean hairstyle prompt - remove mannequin references and use directly
+const cleanHairStylePrompt = (prompt: string): string => {
+  // If prompt is already clean and detailed (no mannequin), use it directly
+  if (!prompt.toLowerCase().includes('mannequin') &&
+      !prompt.toLowerCase().includes('bust') &&
+      prompt.length > 30) {
+    return prompt;
+  }
+
+  // Remove mannequin-related content
+  let cleaned = prompt
+    .replace(/A (high-quality |vertical |premium |portrait )*\d*:?\d* ?(portrait|photograph)? of a (single )?white plastic (male |female )?mannequin bust[^.]*\./gi, '')
+    .replace(/The mannequin[^.]*\./gi, '')
+    .replace(/mannequin/gi, '')
+    .replace(/Environment:[^.]*\./gi, '')
+    .replace(/Minimalist white studio background[^.]*\./gi, '')
+    .replace(/professional (soft )?lighting[^.]*\./gi, '')
+    .replace(/(wearing a |It wears a )?(premium )?navy blue knit sweater[^.]*\./gi, '')
+    .replace(/against a clean studio white background[^.]*\./gi, '')
+    .replace(/\*\*/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  // Try to extract Hair Style section
+  const hairStyleMatch = cleaned.match(/Hair Style:\s*([^.]+(?:\.[^.]+)*)/i);
+  if (hairStyleMatch) {
+    return hairStyleMatch[1].trim();
+  }
+
+  // If we have a reasonable description, use it
+  if (cleaned.length > 20 && cleaned.length < 500) {
+    return cleaned;
+  }
+
+  return '';
+};
+
 // Build the AI prompt based on selected options
 export const buildPrompt = (
   style: HairStyle,
@@ -34,8 +71,16 @@ export const buildPrompt = (
 ): string => {
   const parts: string[] = [];
 
-  // Base style prompt
-  parts.push(style.prompt);
+  // Use the clean hairstyle description from the prompt
+  const cleanedStylePrompt = cleanHairStylePrompt(style.prompt);
+
+  // If we have a good description, use it
+  if (cleanedStylePrompt && cleanedStylePrompt.length > 20) {
+    parts.push(cleanedStylePrompt);
+  } else {
+    // Fallback: generate description from style name
+    parts.push(`${style.name} hairstyle (Korean: ${style.nameKo})`);
+  }
 
   // Hair color
   const colorOption = hairColors.find((c) => c.id === settings.color);

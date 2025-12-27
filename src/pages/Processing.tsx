@@ -8,17 +8,16 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../stores/useAppStore';
-import { useBackgroundTaskStore } from '../stores/useBackgroundTaskStore';
 import { applyHairOverlay } from '../services/hairOverlayService';
 import { hairStyles } from '../data/hairStyles';
 import { saveHistory, compressImage } from '../services/storage';
 import { useI18n } from '../i18n/useI18n';
-import IOSButton from '../components/IOSButton';
 
 interface ProcessingResult {
   styleId: string;
   styleName: string;
   resultImage: string;
+  backViewImage?: string;  // 뒷머리 이미지
 }
 
 // AI 생성 중 표시할 팁들
@@ -34,14 +33,12 @@ export default function Processing() {
   const navigate = useNavigate();
   const { t } = useI18n();
   const { userPhoto, hairSettings, setResultImage, setIsProcessing, selectedStyle } = useAppStore();
-  const { addTask } = useBackgroundTaskStore();
 
   const [progress, setProgress] = useState(0);
   const [currentStyleIndex, setCurrentStyleIndex] = useState(0);
   const [currentStyleName, setCurrentStyleName] = useState('');
   const [totalStyles, setTotalStyles] = useState(1);
   const [currentTip, setCurrentTip] = useState(0);
-  const [showBackgroundOption, setShowBackgroundOption] = useState(false);
   const processingRef = useRef(false);
 
   // 팁 로테이션
@@ -52,13 +49,6 @@ export default function Processing() {
     return () => clearInterval(tipInterval);
   }, []);
 
-  // 10초 후 백그라운드 옵션 표시
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowBackgroundOption(true);
-    }, 10000);
-    return () => clearTimeout(timer);
-  }, []);
 
   useEffect(() => {
     if (!userPhoto || processingRef.current) {
@@ -119,7 +109,12 @@ export default function Processing() {
           setProgress(baseProgress + 95);
 
           if (result.success && result.resultImage) {
-            processedResults.push({ styleId: style.id, styleName: style.nameKo, resultImage: result.resultImage });
+            processedResults.push({
+              styleId: style.id,
+              styleName: style.nameKo,
+              resultImage: result.resultImage,
+              backViewImage: result.backViewImage,  // 뒷머리 이미지 추가
+            });
 
             try {
               const compressedOriginal = await compressImage(userPhoto, 600, 0.8);
@@ -161,31 +156,6 @@ export default function Processing() {
     return () => { isCancelled = true; };
   }, []);
 
-  // 백그라운드로 전환
-  const handleMoveToBackground = () => {
-    const savedStyleIds = localStorage.getItem('selectedStyleIds');
-    let styleIds: string[] = [];
-    if (savedStyleIds) {
-      try { styleIds = JSON.parse(savedStyleIds); } catch { styleIds = []; }
-    }
-
-    // 현재 작업을 백그라운드 태스크로 등록
-    if (styleIds[currentStyleIndex]) {
-      const style = hairStyles.find(s => s.id === styleIds[currentStyleIndex]);
-      if (style) {
-        addTask({
-          type: 'hair_generation',
-          styleName: style.name,
-          styleNameKo: style.nameKo,
-          styleId: style.id,
-          userPhoto: userPhoto || '',
-        });
-      }
-    }
-
-    // 홈으로 이동
-    navigate('/');
-  };
 
   return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center px-6 safe-area-top safe-area-bottom">
@@ -279,54 +249,10 @@ export default function Processing() {
         )}
       </div>
 
-      {/* 백그라운드 전환 옵션 */}
-      {showBackgroundOption && (
-        <div className="fixed bottom-8 left-4 right-4 animate-slide-up">
-          <div className="bg-white rounded-2xl shadow-xl shadow-black/10 p-4 border border-[#f2f4f6]">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-full bg-[#3182f6]/10 flex items-center justify-center">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3182f6" strokeWidth="2">
-                  <rect x="3" y="3" width="18" height="18" rx="2"/>
-                  <path d="M9 3v18M15 3v18"/>
-                </svg>
-              </div>
-              <div className="flex-1">
-                <p className="text-[14px] font-semibold text-[#191f28]">
-                  백그라운드에서 계속할까요?
-                </p>
-                <p className="text-[12px] text-[#8b95a1]">
-                  다른 작업을 하면서 기다릴 수 있어요
-                </p>
-              </div>
-            </div>
-            <div className="flex gap-2">
-              <IOSButton
-                variant="secondary"
-                size="md"
-                fullWidth
-                onClick={() => setShowBackgroundOption(false)}
-              >
-                여기서 대기
-              </IOSButton>
-              <IOSButton
-                variant="primary"
-                size="md"
-                fullWidth
-                onClick={handleMoveToBackground}
-              >
-                백그라운드로
-              </IOSButton>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* 하단 안내 */}
-      {!showBackgroundOption && (
-        <p className="absolute bottom-8 text-[13px] text-[#b0b8c1]">
-          {t('please_wait') || '잠시만 기다려주세요...'}
-        </p>
-      )}
+      <p className="absolute bottom-8 text-[13px] text-[#b0b8c1]">
+        {t('please_wait') || '잠시만 기다려주세요...'}
+      </p>
     </div>
   );
 }

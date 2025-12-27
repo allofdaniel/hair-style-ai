@@ -38,6 +38,7 @@ interface MultiResult {
   styleName: string;
   resultImage: string;
   backImage?: string;
+  backViewImage?: string;  // Processing에서 전달되는 이름
 }
 
 export default function Result() {
@@ -86,16 +87,18 @@ export default function Result() {
   }, [resultImage]);
 
   const currentResult = results[currentIndex];
-  const displayImage = hairView === 'back' && currentResult?.backImage
-    ? currentResult.backImage
+  // backViewImage (Processing에서 미리 생성된 것) 또는 backImage (Result에서 온디맨드 생성) 사용
+  const backViewImg = currentResult?.backViewImage || currentResult?.backImage;
+  const displayImage = hairView === 'back' && backViewImg
+    ? backViewImg
     : currentResult?.resultImage;
 
   // 뒷머리 생성 함수
   const handleGenerateBack = async () => {
     if (!currentResult || isGeneratingBack) return;
 
-    // 이미 뒷머리가 있으면 그냥 전환
-    if (currentResult.backImage) {
+    // 이미 뒷머리가 있으면 (Processing에서 생성했거나 온디맨드로 생성한 경우) 그냥 전환
+    if (currentResult.backViewImage || currentResult.backImage) {
       setHairView('back');
       return;
     }
@@ -324,7 +327,7 @@ export default function Result() {
                   <path d="M20 21c0-4.4-3.6-8-8-8s-8 3.6-8 8"/>
                   <path d="M12 3v2"/>
                 </svg>
-                {texts.backView} {currentResult?.backImage ? '' : texts.generate}
+                {texts.backView} {(currentResult?.backViewImage || currentResult?.backImage) ? '' : texts.generate}
               </>
             )}
           </button>

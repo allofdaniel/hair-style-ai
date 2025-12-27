@@ -3,33 +3,38 @@
  *
  * OpenAI가 얼굴 보존을 잘 하므로 마스크 블렌딩 제거
  * AI 결과를 그대로 사용
+ * 앞머리 + 뒷머리 동시 생성 지원
  */
 
 import type { HairStyle, HairSettings } from '../stores/useAppStore';
-import { generateHairStyle, generateFromReference } from './openai';
+import { generateHairStyle, generateFromReference, generateBackView } from './openai';
 
 interface GenerateResult {
   success: boolean;
   resultImage?: string;
+  backViewImage?: string;  // 뒷머리 이미지
   error?: string;
 }
 
 /**
  * 메인 함수 - OpenAI GPT-Image-1.5 직접 사용
+ * 앞머리 + 뒷머리 동시 생성
  */
 export async function applyHairOverlay(params: {
   userPhoto: string;
   style: HairStyle;
   settings: HairSettings;
   hairMask?: string;
+  generateBackView?: boolean;  // 뒷머리도 생성할지 여부
 }): Promise<GenerateResult> {
-  const { userPhoto, style, settings } = params;
+  const { userPhoto, style, settings, generateBackView: shouldGenerateBackView = true } = params;
 
   try {
     console.log('=== Hair Generation with OpenAI GPT-Image-1.5 ===');
     console.log('Style:', style.name);
+    console.log('Generate back view:', shouldGenerateBackView);
 
-    // OpenAI API 호출
+    // 1. 앞머리 (정면) 생성
     const openaiResult = await generateHairStyle({
       userPhoto,
       style,
@@ -40,11 +45,35 @@ export async function applyHairOverlay(params: {
       return { success: false, error: openaiResult.error || 'Failed to generate hairstyle' };
     }
 
-    // AI 결과 직접 사용 (마스크 블렌딩 제거)
-    const finalResult = await addWatermark(openaiResult.resultImage);
+    // AI 결과에 워터마크 추가
+    const frontResult = await addWatermark(openaiResult.resultImage);
+
+    // 2. 뒷머리 생성 (옵션)
+    let backResult: string | undefined;
+    if (shouldGenerateBackView) {
+      console.log('=== Generating Back View ===');
+      const backViewResult = await generateBackView({
+        userPhoto,
+        frontResultImage: openaiResult.resultImage,
+        style,
+        settings,
+      });
+
+      if (backViewResult.success && backViewResult.resultImage) {
+        backResult = await addWatermark(backViewResult.resultImage);
+        console.log('Back view generated successfully');
+      } else {
+        console.warn('Failed to generate back view:', backViewResult.error);
+        // 뒷머리 실패해도 앞머리는 반환
+      }
+    }
 
     console.log('=== Success! ===');
-    return { success: true, resultImage: finalResult };
+    return {
+      success: true,
+      resultImage: frontResult,
+      backViewImage: backResult,
+    };
 
   } catch (error) {
     console.error('Error:', error);

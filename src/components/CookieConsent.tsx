@@ -330,9 +330,9 @@ export default function CookieConsent() {
   if (!showBanner) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center p-4 pointer-events-none">
+    <div className="fixed bottom-0 left-0 right-0 z-50 flex items-end justify-center p-4 safe-area-bottom">
       <div
-        className="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 pointer-events-auto animate-slide-up"
+        className="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 animate-slide-up"
         role="dialog"
         aria-labelledby="cookie-consent-title"
         aria-describedby="cookie-consent-description"
