@@ -1,14 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace = "com.allofdaniel.hairstyleai"
+    namespace = "com.looksim.app"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.allofdaniel.hairstyleai"
+        applicationId "com.looksim.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -19,9 +19,9 @@ android {
     signingConfigs {
         release {
             storeFile file('release.keystore')
-            storePassword 'hairstyle123'
+            storePassword 'looksim2024!'
             keyAlias 'hairstyleai'
-            keyPassword 'hairstyle123'
+            keyPassword 'looksim2024!'
         }
     }
     buildTypes {
