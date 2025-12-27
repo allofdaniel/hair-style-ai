@@ -2,15 +2,196 @@
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💇</text></svg>" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
-    <meta name="theme-color" content="#0F0F1A" />
+
+    <!-- 보안 메타태그 -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob:; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: blob: https:; connect-src 'self' https://generativelanguage.googleapis.com https://api.openai.com https://*.vercel.app; font-src 'self' data: https://cdn.jsdelivr.net; media-src 'self' blob:; worker-src 'self' blob:;" />
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+
+    <!-- 기본 메타태그 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no, maximum-scale=1.0" />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="color-scheme" content="light" />
+
+    <!-- SEO 메타태그 -->
+    <title>LookSim - AI 외모 시뮬레이션</title>
+    <meta name="description" content="AI로 헤어스타일, 체중 변화, 피부 시술, 운동 효과 등 외모 변화를 미리 시뮬레이션해보세요. 퍼스널컬러 진단, 얼굴 나이 분석도 가능합니다." />
+    <meta name="keywords" content="헤어스타일 시뮬레이션, AI 외모, 체중 변화, 피부 시술, 퍼스널컬러, 얼굴 진단, 그루밍, 운동 효과" />
+    <meta name="author" content="LookSim" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Open Graph / 소셜 미디어 -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="LookSim - AI 외모 시뮬레이션" />
+    <meta property="og:description" content="AI로 헤어스타일, 체중 변화, 피부 시술 등 외모 변화를 미리 시뮬레이션해보세요." />
+    <meta property="og:image" content="/og-image.png" />
+    <meta property="og:locale" content="ko_KR" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="LookSim - AI 외모 시뮬레이션" />
+    <meta name="twitter:description" content="AI로 헤어스타일, 체중 변화, 피부 시술 등 외모 변화를 미리 시뮬레이션해보세요." />
+
+    <!-- PWA 설정 -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <title>헤어스타일 AI</title>
+    <meta name="apple-mobile-web-app-title" content="LookSim" />
+
+    <!-- 파비콘 -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✨</text></svg>" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- 프리로드 -->
+    <link rel="preconnect" href="https://generativelanguage.googleapis.com" />
+    <link rel="preconnect" href="https://api.openai.com" />
+    <link rel="dns-prefetch" href="https://generativelanguage.googleapis.com" />
+    <link rel="dns-prefetch" href="https://api.openai.com" />
+
+    <!-- Pretendard 폰트 (토스 스타일) -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet" />
+
+    <!-- 스플래시 스크린 스타일 - 토스 스타일 -->
+    <style>
+      html, body, #root {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #ffffff;
+        font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      /* 토스 스타일 로딩 스플래시 */
+      #splash {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: #ffffff;
+        z-index: 9999;
+        transition: opacity 0.3s ease-out;
+      }
+
+      #splash.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      #splash-logo {
+        width: 72px;
+        height: 72px;
+        background: linear-gradient(135deg, #3182f6 0%, #6b5ce7 100%);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 36px;
+        box-shadow: 0 8px 24px rgba(49, 130, 246, 0.25);
+      }
+
+      #splash-text {
+        margin-top: 20px;
+        font-family: 'Pretendard Variable', Pretendard, sans-serif;
+        font-size: 22px;
+        font-weight: 700;
+        color: #191f28;
+        letter-spacing: -0.3px;
+      }
+
+      #splash-loading {
+        margin-top: 28px;
+        width: 32px;
+        height: 32px;
+        border: 3px solid #f2f4f6;
+        border-top-color: #3182f6;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+    </style>
   </head>
   <body>
+    <!-- 스플래시 스크린 - 토스 스타일 -->
+    <div id="splash">
+      <div id="splash-logo">💇</div>
+      <div id="splash-text">LookSim</div>
+      <div id="splash-loading"></div>
+    </div>
+
     <div id="root"></div>
+
     <script type="module" src="/src/main.tsx"></script>
+
+    <!-- 스플래시 숨기기 스크립트 -->
+    <script>
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          var splash = document.getElementById('splash');
+          if (splash) {
+            splash.classList.add('hidden');
+            setTimeout(function() {
+              splash.remove();
+            }, 300);
+          }
+        }, 500);
+      });
+    </script>
+
+    <!-- Service Worker 등록 -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('/sw.js')
+            .then(function(registration) {
+              console.log('SW registered:', registration.scope);
+            })
+            .catch(function(error) {
+              console.log('SW registration failed:', error);
+            });
+        });
+      }
+    </script>
+
+    <!-- 오프라인 감지 -->
+    <script>
+      window.addEventListener('online', function() {
+        document.body.classList.remove('offline');
+      });
+      window.addEventListener('offline', function() {
+        document.body.classList.add('offline');
+      });
+    </script>
+
+    <!-- 개발자 도구 방지 (프로덕션에서만) -->
+    <script>
+      if (window.location.hostname !== 'localhost') {
+        document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+        document.addEventListener('keydown', function(e) {
+          if (e.key === 'F12' ||
+              (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
+              (e.ctrlKey && e.key === 'U')) {
+            e.preventDefault();
+          }
+        });
+      }
+    </script>
   </body>
 </html>

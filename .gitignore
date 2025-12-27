@@ -29,3 +29,15 @@ dist-ssr
 *.sw?
 
 .vercel
+
+# Test files with secrets
+test-openai.cjs
+test-openai.js
+test-inpainting-apis.js
+test-replicate.js
+test-hairfastgan.js
+test-openai-api.js
+*.keystore
+keystore_base64.txt
+.playwright-mcp/
+temp-*/

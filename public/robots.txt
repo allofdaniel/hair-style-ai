@@ -1,0 +1,16 @@
+# robots.txt for LookSim
+
+User-agent: *
+Allow: /
+
+# Disallow private/dynamic pages
+Disallow: /api/
+Disallow: /result
+Disallow: /processing
+Disallow: /processing-custom
+
+# Sitemap location
+Sitemap: https://looksim.app/sitemap.xml
+
+# Crawl delay (optional, for politeness)
+Crawl-delay: 1

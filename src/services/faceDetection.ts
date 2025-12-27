@@ -201,8 +201,13 @@ Any change to facial features will make this transformation FAILED.`;
 };
 
 /**
- * 원본 얼굴을 AI 생성 이미지에 합성
- * AI가 생성한 머리 + 원본 얼굴 = 최종 이미지
+ * 원본 얼굴을 유지하고 AI 머리만 합성 (역방향 합성)
+ *
+ * 핵심 원리:
+ * 1. 원본 이미지를 BASE로 사용 (얼굴 100% 보존!)
+ * 2. AI 이미지에서 머리 영역만 원본 위에 덮어씌움
+ * 3. 얼굴 영역은 원본 그대로 유지
+ * => 얼굴은 원본, 머리만 AI!
  */
 export const composeFaceOntoResult = async (
   originalImage: string,
@@ -213,99 +218,209 @@ export const composeFaceOntoResult = async (
   const aiImg = await createImageElement(aiGeneratedImage);
 
   const canvas = document.createElement('canvas');
-  canvas.width = originalImg.width;
-  canvas.height = originalImg.height;
+  const width = originalImg.width;
+  const height = originalImg.height;
+  canvas.width = width;
+  canvas.height = height;
   const ctx = canvas.getContext('2d')!;
 
-  // 1. AI 생성 이미지를 배경으로 그리기 (머리 부분)
-  // AI 이미지 크기를 원본에 맞게 조정
-  ctx.drawImage(aiImg, 0, 0, originalImg.width, originalImg.height);
+  // 1. 원본 이미지를 베이스로 사용 (얼굴 보존!)
+  ctx.drawImage(originalImg, 0, 0, width, height);
 
-  // 2. 얼굴 영역 마스크 생성 (부드러운 경계를 위한 그라디언트)
+  // 2. AI 이미지 캔버스 준비 (크기 맞춤)
+  const aiCanvas = document.createElement('canvas');
+  aiCanvas.width = width;
+  aiCanvas.height = height;
+  const aiCtx = aiCanvas.getContext('2d')!;
+  aiCtx.drawImage(aiImg, 0, 0, width, height);
+
+  // 3. 얼굴 중심과 크기 계산 (보호 영역)
+  let faceCenterX = faceRegion.x + faceRegion.width / 2;
+  let faceCenterY = faceRegion.y + faceRegion.height / 2;
+  let faceRadiusX = faceRegion.width / 2;
+  let faceRadiusY = faceRegion.height / 2;
+
   if (faceRegion.landmarks) {
-    // 클리핑 영역 설정 (얼굴 윤곽)
-    ctx.save();
-    ctx.beginPath();
-
     const jawLine = faceRegion.landmarks.jawLine;
-    const leftEyebrow = faceRegion.landmarks.leftEyebrow;
-    const rightEyebrow = faceRegion.landmarks.rightEyebrow;
+    const nose = faceRegion.landmarks.nose;
+    const leftEye = faceRegion.landmarks.leftEye;
+    const rightEye = faceRegion.landmarks.rightEye;
 
-    // 이마 위쪽으로 확장 (머리카락과 자연스럽게 연결)
-    const foreheadExtension = faceRegion.height * 0.15;
+    // 얼굴 중심: 코 중앙, 눈~턱 중간
+    faceCenterX = nose[3].x;
 
-    // 왼쪽 눈썹 시작점 위에서 시작
-    ctx.moveTo(leftEyebrow[0].x - 10, leftEyebrow[0].y - foreheadExtension);
+    // 눈 위치 ~ 턱 중간점 (눈썹 위는 머리로 처리)
+    const eyeY = (leftEye[0].y + rightEye[0].y) / 2;
+    const jawBottomY = Math.max(...jawLine.map(p => p.y));
+    faceCenterY = (eyeY + jawBottomY) / 2;
 
-    // 이마 라인 (눈썹 위로)
-    const eyebrowTop = Math.min(
-      ...leftEyebrow.map(p => p.y),
-      ...rightEyebrow.map(p => p.y)
-    ) - foreheadExtension;
+    // 얼굴 폭: 턱 라인 기준 (좁게)
+    const faceLeft = Math.min(...jawLine.map(p => p.x));
+    const faceRight = Math.max(...jawLine.map(p => p.x));
+    faceRadiusX = (faceRight - faceLeft) / 2 * 0.85; // 더 좁게
 
-    // 왼쪽에서 오른쪽으로 이마 라인
-    ctx.lineTo(leftEyebrow[0].x - 10, eyebrowTop);
-    ctx.lineTo(rightEyebrow[rightEyebrow.length - 1].x + 10, eyebrowTop);
-    ctx.lineTo(rightEyebrow[rightEyebrow.length - 1].x + 10, rightEyebrow[rightEyebrow.length - 1].y - foreheadExtension);
-
-    // 오른쪽 눈썹 끝에서 턱 라인으로
-    ctx.lineTo(jawLine[jawLine.length - 1].x + 5, jawLine[jawLine.length - 1].y);
-
-    // 턱 라인을 따라 (역순)
-    for (let i = jawLine.length - 1; i >= 0; i--) {
-      ctx.lineTo(jawLine[i].x, jawLine[i].y);
-    }
-
-    // 왼쪽 턱에서 시작점으로
-    ctx.lineTo(jawLine[0].x - 5, jawLine[0].y);
-
-    ctx.closePath();
-    ctx.clip();
-
-    // 3. 클리핑된 영역에 원본 이미지 (얼굴) 그리기
-    ctx.drawImage(originalImg, 0, 0);
-
-    ctx.restore();
-
-    // 4. 경계 부드럽게 처리 (페더링 효과)
-    await applyFeathering(ctx, faceRegion, originalImg);
-  } else {
-    // 랜드마크가 없으면 타원형으로 얼굴 영역 사용
-    ctx.save();
-    ctx.beginPath();
-
-    const padding = faceRegion.width * 0.05;
-    ctx.ellipse(
-      faceRegion.x + faceRegion.width / 2,
-      faceRegion.y + faceRegion.height / 2,
-      faceRegion.width / 2 + padding,
-      faceRegion.height / 2 + padding,
-      0,
-      0,
-      Math.PI * 2
-    );
-    ctx.clip();
-    ctx.drawImage(originalImg, 0, 0);
-    ctx.restore();
+    // 얼굴 높이: 눈 ~ 턱 (눈썹 위는 머리!)
+    faceRadiusY = (jawBottomY - eyeY) / 2 * 0.95; // 더 짧게
   }
+
+  // 4. 블렌딩 크기 (얼굴 크기에 비례) - 넓게 설정하여 자연스러운 전환
+  const blendSize = Math.min(faceRadiusX, faceRadiusY) * 0.4;
+
+  // 5. 픽셀 데이터 가져오기
+  // ctx에는 현재 원본 이미지가 있음
+  const originalData = ctx.getImageData(0, 0, width, height);
+  const aiData = aiCtx.getImageData(0, 0, width, height);
+  const resultData = ctx.createImageData(width, height);
+
+  // 6. 픽셀 단위로 합성 - 원본을 베이스로, 머리만 AI
+  // 핵심: 얼굴 내부 = 원본 100%, 얼굴 외부(머리) = AI 100%
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const idx = (y * width + x) * 4;
+
+      // 타원 방정식: (x-cx)²/rx² + (y-cy)²/ry² <= 1 이면 내부
+      const normalizedX = (x - faceCenterX) / faceRadiusX;
+      const normalizedY = (y - faceCenterY) / faceRadiusY;
+      const ellipseValue = normalizedX * normalizedX + normalizedY * normalizedY;
+
+      // 원본 가중치 (얼굴 영역에서 1, 머리 영역에서 0)
+      let originalWeight = 0;
+
+      if (ellipseValue <= 1.0) {
+        // 타원 내부: 원본 얼굴 100%
+        originalWeight = 1.0;
+      } else {
+        // 타원 외부: 블렌딩 영역 계산
+        const distFromEllipse = Math.sqrt(ellipseValue) - 1.0;
+        const normalizedBlend = blendSize / Math.min(faceRadiusX, faceRadiusY);
+
+        if (distFromEllipse < normalizedBlend) {
+          // 블렌딩 영역: 부드럽게 전환 (원본 → AI)
+          const t = distFromEllipse / normalizedBlend;
+          originalWeight = 1.0 - (t * t * (3 - 2 * t)); // smoothstep
+        }
+        // else: originalWeight = 0 (머리 영역 = AI 이미지 100%)
+      }
+
+      const aiWeight = 1 - originalWeight;
+
+      // 픽셀 합성
+      resultData.data[idx] = Math.round(
+        originalData.data[idx] * originalWeight + aiData.data[idx] * aiWeight
+      );
+      resultData.data[idx + 1] = Math.round(
+        originalData.data[idx + 1] * originalWeight + aiData.data[idx + 1] * aiWeight
+      );
+      resultData.data[idx + 2] = Math.round(
+        originalData.data[idx + 2] * originalWeight + aiData.data[idx + 2] * aiWeight
+      );
+      resultData.data[idx + 3] = 255;
+    }
+  }
+
+  // 7. 결과 이미지 적용
+  ctx.putImageData(resultData, 0, 0);
 
   return canvas.toDataURL('image/jpeg', 0.95);
 };
 
 /**
- * 경계 부드럽게 처리 (페더링)
- * 현재는 단순히 컴포지트 모드만 설정 - 추후 가우시안 블러 등 추가 가능
+ * 얼굴 위치를 맞춰서 합성 (AI 이미지의 얼굴 위치가 다른 경우)
+ *
+ * 핵심 원리:
+ * 1. 원본과 AI 이미지에서 각각 얼굴 위치 감지
+ * 2. AI 이미지의 머리 부분을 원본 얼굴 위치에 맞게 변환
+ * 3. 원본 얼굴은 그대로 유지, 머리만 AI에서 가져옴
  */
-const applyFeathering = async (
-  ctx: CanvasRenderingContext2D,
-  faceRegion: FaceRegion,
-  _originalImg: HTMLImageElement
-): Promise<void> => {
-  if (!faceRegion.landmarks) return;
+export const composeFaceWithAlignment = async (
+  originalImage: string,
+  aiGeneratedImage: string,
+  originalFace: FaceRegion,
+  _aiFace?: FaceRegion // AI 얼굴 위치 (향후 위치 맞춤에 사용)
+): Promise<string> => {
+  const originalImg = await createImageElement(originalImage);
+  const aiImg = await createImageElement(aiGeneratedImage);
 
-  // 원본 이미지의 측면 부분을 살짝 블렌딩
-  // TODO: 추후 가우시안 블러나 페더링 효과 구현
-  ctx.globalCompositeOperation = 'source-over';
+  const canvas = document.createElement('canvas');
+  const width = originalImg.width;
+  const height = originalImg.height;
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d')!;
+
+  // 1. 원본 이미지를 베이스로 사용 (얼굴 100% 보존)
+  ctx.drawImage(originalImg, 0, 0, width, height);
+
+  // 2. 얼굴 중심 위치 계산
+  const originalCenterY = originalFace.y + originalFace.height / 2;
+
+  // 5. 머리 영역에 대해서만 AI 이미지를 합성
+  // 얼굴 보호 영역 계산 (원본 기준)
+  let faceCenterY = originalCenterY;
+  let faceRadiusY = originalFace.height / 2 * 0.8;
+
+  if (originalFace.landmarks) {
+    const leftEye = originalFace.landmarks.leftEye;
+    const rightEye = originalFace.landmarks.rightEye;
+    const jawLine = originalFace.landmarks.jawLine;
+
+    const eyeY = (leftEye[0].y + rightEye[0].y) / 2;
+    const jawBottomY = Math.max(...jawLine.map(p => p.y));
+    faceCenterY = (eyeY + jawBottomY) / 2;
+    faceRadiusY = (jawBottomY - eyeY) / 2 * 1.1;
+  }
+
+  // 6. 픽셀 데이터로 합성
+  const originalData = ctx.getImageData(0, 0, width, height);
+  const resultData = ctx.createImageData(width, height);
+
+  // AI 이미지를 원본 크기로 스케일링
+  const aiScaledCanvas = document.createElement('canvas');
+  aiScaledCanvas.width = width;
+  aiScaledCanvas.height = height;
+  const aiScaledCtx = aiScaledCanvas.getContext('2d')!;
+  aiScaledCtx.drawImage(aiImg, 0, 0, width, height);
+  const aiData = aiScaledCtx.getImageData(0, 0, width, height);
+
+  // 머리 영역 경계 (원본 이미지 기준)
+  const hairBoundaryY = faceCenterY - faceRadiusY * 0.5; // 눈 위쪽부터 AI 머리
+  const blendHeight = faceRadiusY * 0.4; // 블렌딩 영역
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const idx = (y * width + x) * 4;
+
+      // 머리 영역인지 판단 (y가 hairBoundaryY보다 위)
+      let aiWeight = 0;
+
+      if (y < hairBoundaryY - blendHeight) {
+        // 머리 영역: AI 100%
+        aiWeight = 1.0;
+      } else if (y < hairBoundaryY + blendHeight) {
+        // 블렌딩 영역: 부드럽게 전환
+        const t = (y - (hairBoundaryY - blendHeight)) / (blendHeight * 2);
+        aiWeight = 1.0 - (t * t * (3 - 2 * t)); // smoothstep (AI에서 원본으로)
+      }
+      // else: 얼굴 영역: 원본 100%
+
+      const originalWeight = 1 - aiWeight;
+
+      // 픽셀 합성
+      resultData.data[idx] = Math.round(
+        originalData.data[idx] * originalWeight + aiData.data[idx] * aiWeight
+      );
+      resultData.data[idx + 1] = Math.round(
+        originalData.data[idx + 1] * originalWeight + aiData.data[idx + 1] * aiWeight
+      );
+      resultData.data[idx + 2] = Math.round(
+        originalData.data[idx + 2] * originalWeight + aiData.data[idx + 2] * aiWeight
+      );
+      resultData.data[idx + 3] = 255;
+    }
+  }
+
+  ctx.putImageData(resultData, 0, 0);
+  return canvas.toDataURL('image/jpeg', 0.95);
 };
 
 /**

@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">䴤�| AI</string>
-    <string name="title_activity_main">䴤�| AI</string>
-    <string name="package_name">com.allofdaniel.hairstyleai</string>
-    <string name="custom_url_scheme">com.allofdaniel.hairstyleai</string>
+    <string name="app_name">LookSim</string>
+    <string name="title_activity_main">LookSim</string>
+    <string name="package_name">com.looksim.app</string>
+    <string name="custom_url_scheme">com.looksim.app</string>
 </resources>

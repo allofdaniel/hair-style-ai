@@ -1,0 +1,29 @@
+{
+  "name": "LookSim - AI 외모 시뮬레이션",
+  "short_name": "LookSim",
+  "description": "AI로 헤어스타일, 체중 변화, 피부 시술 등 외모 변화를 미리 시뮬레이션해보세요.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0F0F1A",
+  "theme_color": "#0F0F1A",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["beauty", "lifestyle", "utilities"],
+  "lang": "ko",
+  "dir": "ltr",
+  "prefer_related_applications": false
+}

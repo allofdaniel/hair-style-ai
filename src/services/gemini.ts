@@ -2,8 +2,9 @@ import type { HairStyle, HairSettings, HairTexture } from '../stores/useAppStore
 import { hairColors, hairTextures } from '../data/hairStyles';
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-// Gemini 2.0 Flash Image Generation - dedicated image generation/editing model
-const GEMINI_IMAGE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent';
+// Gemini 2.5 Flash Image - production-ready image generation model (Dec 2025)
+// Best for: fast generation, multi-image fusion, character consistency, local edits
+const GEMINI_IMAGE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-generation:generateContent';
 
 interface GenerateHairStyleParams {
   userPhoto: string;
@@ -95,22 +96,39 @@ export const generateHairStyle = async (
     console.log('Calling Gemini Image Generation API...');
     console.log('Image size (base64 length):', base64Data.length);
 
+    // Get color information for explicit mention in prompt
+    const colorOption = hairColors.find((c) => c.id === settings.color);
+    const hasCustomColor = colorOption && colorOption.id !== 'natural';
+
+    // Build color instruction - make it very prominent and specific
+    let colorInstruction = '';
+    let colorReminder = '';
+    if (hasCustomColor) {
+      colorInstruction = `
+
+★★★ MANDATORY HAIR COLOR CHANGE ★★★
+The hair MUST be dyed to: ${colorOption.nameKo} (${colorOption.prompt})
+This is NOT optional - the final result MUST show this hair color.
+Do NOT keep the original hair color - CHANGE IT to ${colorOption.prompt}.`;
+      colorReminder = ` The hair color MUST be ${colorOption.prompt} - this is the most important requirement after preserving the face.`;
+    }
+
     // Strong prompt to preserve face identity and ONLY change hair
-    const simplePrompt = `You are a professional hair stylist photo editor. Your ONLY job is to change the HAIR in this photo.
+    const simplePrompt = `You are a professional hair stylist and colorist photo editor. Your job is to change the HAIR in this photo.
 
 TARGET HAIRSTYLE: ${style.nameKo} (${style.name})
-STYLE DETAILS: ${stylePrompt}
+STYLE DETAILS: ${stylePrompt}${colorInstruction}
 
 ABSOLUTE RULES - VIOLATION IS NOT ALLOWED:
 1. DO NOT change the face AT ALL - eyes, nose, mouth, eyebrows, skin tone, face shape, facial features must be 100% IDENTICAL to the original
 2. DO NOT change the person's identity - they must be recognizable as the SAME person
 3. DO NOT change body, clothing, background, lighting, or pose
-4. ONLY modify the hair: hairstyle, hair shape, hair volume, hair length
-5. The result must look like the SAME person just got a new haircut at a salon
+4. ONLY modify the hair: hairstyle, hair shape, hair volume, hair length${hasCustomColor ? ', and MOST IMPORTANTLY change the hair COLOR to ' + colorOption.prompt : ''}
+5. The result must look like the SAME person just visited a salon${hasCustomColor ? ' and got their hair dyed to ' + colorOption.prompt : ''}
 
-Think of this as a "virtual haircut" - the person walks into a salon and walks out with new hair, but they are still the EXACT same person.
+${hasCustomColor ? '⚠️ CRITICAL: The hair color MUST be changed to ' + colorOption.prompt + '. Do NOT keep the original hair color!' : ''}
 
-Generate the photo with ONLY the hair changed to match the target hairstyle.`;
+Generate the photo with the hair changed to match the target hairstyle.${colorReminder}`;
 
     const response = await fetch(`${GEMINI_IMAGE_URL}?key=${GEMINI_API_KEY}`, {
       method: 'POST',
@@ -203,7 +221,7 @@ Generate the photo with ONLY the hair changed to match the target hairstyle.`;
     // Find the image part in the response
     const imagePart = parts.find((part: { inlineData?: { mimeType: string; data: string } }) => part.inlineData);
     if (imagePart && imagePart.inlineData) {
-      let resultImage = `data:${imagePart.inlineData.mimeType};base64,${imagePart.inlineData.data}`;
+      const resultImage = `data:${imagePart.inlineData.mimeType};base64,${imagePart.inlineData.data}`;
 
       // Note: Face composition disabled - AI results are better without manual face overlay
       // The Gemini model preserves face identity well on its own
@@ -370,30 +388,40 @@ export const generateFromReference = async (
 
   // Build color modification if not natural
   const colorOption = hairColors.find((c) => c.id === settings.color);
-  const colorPrompt = colorOption && colorOption.id !== 'natural' ? `Apply hair color: ${colorOption.prompt}.` : '';
+  const hasCustomColor = colorOption && colorOption.id !== 'natural';
+
+  let colorSection = '';
+  let colorReminder = '';
+  if (hasCustomColor) {
+    colorSection = `
+★★★ MANDATORY HAIR COLOR CHANGE ★★★
+The hair MUST be dyed to: ${colorOption.nameKo} (${colorOption.prompt})
+This is NOT optional - CHANGE the hair color to ${colorOption.prompt}.
+Do NOT keep the original hair color from either photo.`;
+    colorReminder = ` The final hair color MUST be ${colorOption.prompt}.`;
+  }
 
   try {
     console.log('Generating from reference...');
 
     // Strong prompt for reference-based generation - preserve face identity
-    const simpleRefPrompt = `You are a professional hair stylist photo editor. Your ONLY job is to copy the HAIRSTYLE from the reference photo.
+    const simpleRefPrompt = `You are a professional hair stylist and colorist photo editor. Your job is to copy the HAIRSTYLE from the reference photo.
 
 TWO IMAGES PROVIDED:
 - FIRST IMAGE: The person (CLIENT) - their face must NOT change at all
 - SECOND IMAGE: The hairstyle to copy (REFERENCE)
-
-${colorPrompt ? `ALSO APPLY HAIR COLOR: ${colorPrompt}` : ''}
+${colorSection}
 
 ABSOLUTE RULES - VIOLATION IS NOT ALLOWED:
 1. The CLIENT's face must remain 100% IDENTICAL - same eyes, nose, mouth, eyebrows, skin tone, face shape
 2. The CLIENT must be recognizable as the EXACT SAME PERSON after the edit
 3. DO NOT blend or morph faces - keep the CLIENT's face completely unchanged
 4. DO NOT change body, clothing, background, lighting, or pose
-5. ONLY copy the HAIR from the reference: hairstyle shape, volume, length, styling
+5. ONLY copy the HAIR from the reference: hairstyle shape, volume, length, styling${hasCustomColor ? ', and change the hair COLOR to ' + colorOption.prompt : ''}
 
-Think of this as a hairdresser showing "this is how you would look with this hairstyle" - the person stays the same, only their hair changes.
+${hasCustomColor ? '⚠️ CRITICAL: The hair color MUST be ' + colorOption.prompt + '. Do NOT use the original hair color!' : ''}
 
-Generate the CLIENT's photo with ONLY the hair changed to match the REFERENCE hairstyle.`;
+Generate the CLIENT's photo with the hair changed to match the REFERENCE hairstyle.${colorReminder}`;
 
     const response = await fetch(`${GEMINI_IMAGE_URL}?key=${GEMINI_API_KEY}`, {
       method: 'POST',

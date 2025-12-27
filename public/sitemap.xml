@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+
+  <!-- 메인 페이지 -->
+  <url>
+    <loc>https://looksim.app/</loc>
+    <lastmod>2024-12-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://looksim.app/?lang=ko"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://looksim.app/?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://looksim.app/?lang=zh"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://looksim.app/?lang=ja"/>
+  </url>
+
+  <!-- 헤어스타일 시뮬레이션 -->
+  <url>
+    <loc>https://looksim.app/camera</loc>
+    <lastmod>2024-12-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- 얼굴 분석 -->
+  <url>
+    <loc>https://looksim.app/analysis</loc>
+    <lastmod>2024-12-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- 체중 시뮬레이션 -->
+  <url>
+    <loc>https://looksim.app/weight</loc>
+    <lastmod>2024-12-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- 피트니스 시뮬레이션 -->
+  <url>
+    <loc>https://looksim.app/fitness</loc>
+    <lastmod>2024-12-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- 헤어 컬러 시뮬레이션 -->
+  <url>
+    <loc>https://looksim.app/hair-color</loc>
+    <lastmod>2024-12-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- 헤어 볼륨 시뮬레이션 -->
+  <url>
+    <loc>https://looksim.app/hair-volume</loc>
+    <lastmod>2024-12-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- 피부 시술 시뮬레이션 -->
+  <url>
+    <loc>https://looksim.app/skin-treatment</loc>
+    <lastmod>2024-12-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- 노화 시뮬레이션 -->
+  <url>
+    <loc>https://looksim.app/aging</loc>
+    <lastmod>2024-12-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- 메이크업 시뮬레이션 -->
+  <url>
+    <loc>https://looksim.app/makeup</loc>
+    <lastmod>2024-12-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- 설정 -->
+  <url>
+    <loc>https://looksim.app/settings</loc>
+    <lastmod>2024-12-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <!-- 히스토리 -->
+  <url>
+    <loc>https://looksim.app/history</loc>
+    <lastmod>2024-12-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <!-- 개인정보처리방침 -->
+  <url>
+    <loc>https://looksim.app/privacy</loc>
+    <lastmod>2024-12-24</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <!-- 이용약관 -->
+  <url>
+    <loc>https://looksim.app/terms</loc>
+    <lastmod>2024-12-24</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+</urlset>
