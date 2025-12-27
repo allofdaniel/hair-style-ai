@@ -41,6 +41,7 @@ jobs:
 
       - name: Create Keystore
         run: |
+          rm -f android/app/release.keystore
           keytool -genkeypair -v \
             -keystore android/app/release.keystore \
             -alias looksim \
