@@ -12,6 +12,7 @@ import { hairColors, hairTextures } from '../data/hairStyles';
 
 const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 const OPENAI_EDIT_URL = 'https://api.openai.com/v1/images/edits';
+const OPENAI_CHAT_URL = 'https://api.openai.com/v1/chat/completions';
 
 interface GenerateHairStyleParams {
   userPhoto: string;
@@ -116,6 +117,86 @@ export const buildPrompt = (
   return parts.join(', ');
 };
 
+// Fetch reference image and convert to base64
+const fetchReferenceImageAsBase64 = async (thumbnailUrl: string): Promise<string | null> => {
+  try {
+    // Handle relative URLs
+    const fullUrl = thumbnailUrl.startsWith('/')
+      ? `${window.location.origin}${thumbnailUrl}`
+      : thumbnailUrl;
+
+    const response = await fetch(fullUrl);
+    if (!response.ok) return null;
+
+    const blob = await response.blob();
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.onerror = () => resolve(null);
+      reader.readAsDataURL(blob);
+    });
+  } catch (error) {
+    console.error('Failed to fetch reference image:', error);
+    return null;
+  }
+};
+
+// Analyze reference image using GPT-4o Vision to get detailed hairstyle description
+const analyzeReferenceImage = async (referenceBase64: string, styleName: string): Promise<string | null> => {
+  try {
+    const response = await fetch(OPENAI_CHAT_URL, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'user',
+            content: [
+              {
+                type: 'text',
+                text: `Analyze this hairstyle reference image (${styleName}) and describe it in EXTREME detail for a hair stylist to recreate. Include:
+1. Exact hair length (in cm) for bangs, sides, top, back
+2. Hair texture and wave pattern (straight, wavy, curly, S-curl, etc.)
+3. Hair volume and body (flat, natural, voluminous)
+4. Parting style (center, left, right, no part)
+5. Any special techniques (layers, undercut, fade, perm type)
+6. How the hair falls and shapes around the face
+7. Overall silhouette and shape
+
+Be VERY specific with measurements and styling details. This will be used to generate the exact same hairstyle on another person's photo.
+Respond in 2-3 sentences, focusing on the most distinctive and important features.`
+              },
+              {
+                type: 'image_url',
+                image_url: {
+                  url: referenceBase64,
+                  detail: 'high'
+                }
+              }
+            ]
+          }
+        ],
+        max_tokens: 300,
+      }),
+    });
+
+    if (!response.ok) {
+      console.error('GPT-4o Vision analysis failed:', response.status);
+      return null;
+    }
+
+    const data = await response.json();
+    return data.choices?.[0]?.message?.content || null;
+  } catch (error) {
+    console.error('Error analyzing reference image:', error);
+    return null;
+  }
+};
+
 // Convert base64 to Blob for API upload
 const base64ToBlob = (base64: string, mimeType: string): Blob => {
   const base64Data = base64.includes('base64,') ? base64.split('base64,')[1] : base64;
@@ -141,9 +222,25 @@ export const generateHairStyle = async (
     };
   }
 
-  const stylePrompt = buildPrompt(style, settings, texture);
+  let stylePrompt = buildPrompt(style, settings, texture);
 
   try {
+    // Step 1: Fetch and analyze reference image for accurate hairstyle details
+    let referenceAnalysis: string | null = null;
+    if (style.thumbnail) {
+      console.log('Fetching reference image:', style.thumbnail);
+      const referenceBase64 = await fetchReferenceImageAsBase64(style.thumbnail);
+      if (referenceBase64) {
+        console.log('Analyzing reference image with GPT-4o Vision...');
+        referenceAnalysis = await analyzeReferenceImage(referenceBase64, style.nameKo);
+        if (referenceAnalysis) {
+          console.log('Reference analysis:', referenceAnalysis);
+          // Use the analyzed description as primary, fallback to existing prompt
+          stylePrompt = referenceAnalysis;
+        }
+      }
+    }
+
     // Determine mime type
     let mimeType = 'image/png';
     if (userPhoto.includes('data:image/jpeg')) {
@@ -153,20 +250,22 @@ export const generateHairStyle = async (
     }
 
     console.log('Calling OpenAI GPT-Image-1.5 API...');
+    console.log('Final style prompt:', stylePrompt.substring(0, 200) + '...');
 
     // Strong prompt to preserve face identity and ONLY change hair
     const editPrompt = `TASK: Change ONLY the hair in this photo to: ${style.nameKo} (${style.name})
 
-HAIRSTYLE DETAILS: ${stylePrompt}
+EXACT HAIRSTYLE TO COPY: ${stylePrompt}
 
 CRITICAL RULES:
 1. Keep the person's face 100% IDENTICAL - same eyes, nose, mouth, skin, face shape
 2. Keep the same person's identity - must be recognizable as the EXACT same person
 3. Keep body, clothing, background, lighting, and pose unchanged
-4. ONLY modify the hair: style, shape, volume, length
-5. Result should look like the same person just got a haircut
+4. ONLY modify the hair according to the EXACT specifications above
+5. Result should look like the same person just got this specific haircut
+6. Pay attention to hair length, texture, wave pattern, volume, and parting
 
-This is a virtual haircut - same person, new hair only.`;
+This is a virtual haircut preview - same person, specific new hairstyle only.`;
 
     // Use image edit API with the user's photo
     const imageBlob = base64ToBlob(userPhoto, mimeType);
