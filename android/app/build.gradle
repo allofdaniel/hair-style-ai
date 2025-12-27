@@ -19,9 +19,9 @@ android {
     signingConfigs {
         release {
             storeFile file('release.keystore')
-            storePassword 'looksim2024!'
-            keyAlias 'hairstyleai'
-            keyPassword 'looksim2024!'
+            storePassword 'looksim2024'
+            keyAlias 'looksim'
+            keyPassword 'looksim2024'
         }
     }
     buildTypes {

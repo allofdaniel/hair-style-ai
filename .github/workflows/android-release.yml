@@ -39,9 +39,17 @@ jobs:
       - name: Sync Capacitor
         run: npx cap sync android
 
-      - name: Decode Keystore
+      - name: Create Keystore
         run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > android/app/release.keystore
+          keytool -genkeypair -v \
+            -keystore android/app/release.keystore \
+            -alias looksim \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -storepass looksim2024 \
+            -keypass looksim2024 \
+            -dname "CN=LookSim, OU=Dev, O=LookSim, L=Seoul, ST=Seoul, C=KR"
 
       - name: Build Release AAB
         working-directory: android
