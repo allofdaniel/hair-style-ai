@@ -225,17 +225,23 @@ export const generateHairStyle = async (
   let stylePrompt = buildPrompt(style, settings, texture);
 
   try {
-    // Step 1: Fetch and analyze reference image for accurate hairstyle details
-    let referenceAnalysis: string | null = null;
-    if (style.thumbnail) {
-      console.log('Fetching reference image:', style.thumbnail);
+    // Step 1: Use pre-analyzed prompt if available, otherwise analyze reference image
+    // Pre-analyzed prompts are stored in style.prompt by the analysis script
+    const preAnalyzedPrompt = cleanHairStylePrompt(style.prompt);
+
+    if (preAnalyzedPrompt && preAnalyzedPrompt.length > 50) {
+      // Use the pre-analyzed prompt directly (no API call needed)
+      console.log('Using pre-analyzed prompt:', preAnalyzedPrompt.substring(0, 100) + '...');
+      stylePrompt = preAnalyzedPrompt;
+    } else if (style.thumbnail) {
+      // Fallback: Analyze reference image in real-time (costs API call)
+      console.log('No pre-analyzed prompt, fetching reference image:', style.thumbnail);
       const referenceBase64 = await fetchReferenceImageAsBase64(style.thumbnail);
       if (referenceBase64) {
         console.log('Analyzing reference image with GPT-4o Vision...');
-        referenceAnalysis = await analyzeReferenceImage(referenceBase64, style.nameKo);
+        const referenceAnalysis = await analyzeReferenceImage(referenceBase64, style.nameKo);
         if (referenceAnalysis) {
           console.log('Reference analysis:', referenceAnalysis);
-          // Use the analyzed description as primary, fallback to existing prompt
           stylePrompt = referenceAnalysis;
         }
       }

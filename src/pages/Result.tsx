@@ -1,11 +1,9 @@
 /**
- * Result Page - UX 심리학 법칙 적용
- *
- * 1. 힉의 법칙: 뷰 모드 3개로 제한 (결과/비교/슬라이더)
- * 2. 밀러의 법칙: 액션 버튼 그룹핑 (저장/공유)
- * 3. 피츠의 법칙: 주요 버튼 크기 확대, 터치 영역 44px+
- * 4. 제이콥의 법칙: 표준 아이콘 사용 (저장, 공유, 뒤로)
- * 5. 테슬러의 법칙: 기본 뷰를 '결과'로 자동 설정
+ * Result Page - Apple Human Interface Guidelines
+ * - 44pt 최소 터치 타겟
+ * - 시스템 색상 사용
+ * - 라이트/다크 모드 지원
+ * - 깔끔하고 미니멀한 디자인
  */
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -14,12 +12,13 @@ import { generateBackView } from '../services/openai';
 import { hairStyles } from '../data/hairStyles';
 import ShareSheet from '../components/ShareSheet';
 import RatingPrompt, { shouldShowRatingPrompt, incrementSimulationCount } from '../components/RatingPrompt';
+import HairRefinementPanel from '../components/HairRefinementPanel';
 import { useI18n, type Language } from '../i18n/useI18n';
 
 // 결과 페이지 다국어 텍스트
 const RESULT_TEXTS: Record<Language, Record<string, string>> = {
-  ko: { result: '결과', before: 'Before', after: 'After', frontView: '앞머리', backView: '뒷머리', generating: '생성 중...', generate: '(생성)', save: '저장', saveAll: '전체', tryAnother: '다른 스타일 시도하기', saved: '저장 완료!', compare: '비교', slider: '슬라이더', backViewLabel: '뒷모습' },
-  en: { result: 'Result', before: 'Before', after: 'After', frontView: 'Front', backView: 'Back', generating: 'Generating...', generate: '(Generate)', save: 'Save', saveAll: 'All', tryAnother: 'Try Another Style', saved: 'Saved!', compare: 'Compare', slider: 'Slider', backViewLabel: 'Back View' },
+  ko: { result: '결과', before: 'Before', after: 'After', frontView: '앞머리', backView: '뒷머리', generating: '생성 중...', generate: '(생성)', save: '저장', saveAll: '전체', tryAnother: '다른 스타일 시도하기', saved: '저장 완료!', compare: '비교', slider: '슬라이더', backViewLabel: '뒷모습', refine: '미세 조정' },
+  en: { result: 'Result', before: 'Before', after: 'After', frontView: 'Front', backView: 'Back', generating: 'Generating...', generate: '(Generate)', save: 'Save', saveAll: 'All', tryAnother: 'Try Another Style', saved: 'Saved!', compare: 'Compare', slider: 'Slider', backViewLabel: 'Back View', refine: 'Fine Tune' },
   zh: { result: '结果', before: '之前', after: '之后', frontView: '正面', backView: '背面', generating: '生成中...', generate: '(生成)', save: '保存', saveAll: '全部', tryAnother: '尝试其他风格', saved: '已保存!', compare: '对比', slider: '滑块', backViewLabel: '背面' },
   ja: { result: '結果', before: 'Before', after: 'After', frontView: '前', backView: '後ろ', generating: '生成中...', generate: '(生成)', save: '保存', saveAll: '全て', tryAnother: '他のスタイルを試す', saved: '保存完了!', compare: '比較', slider: 'スライダー', backViewLabel: '後ろ姿' },
   es: { result: 'Resultado', before: 'Antes', after: 'Después', frontView: 'Frente', backView: 'Atrás', generating: 'Generando...', generate: '(Generar)', save: 'Guardar', saveAll: 'Todo', tryAnother: 'Probar Otro Estilo', saved: '¡Guardado!', compare: 'Comparar', slider: 'Control', backViewLabel: 'Vista Posterior' },
@@ -38,7 +37,7 @@ interface MultiResult {
   styleName: string;
   resultImage: string;
   backImage?: string;
-  backViewImage?: string;  // Processing에서 전달되는 이름
+  backViewImage?: string;
 }
 
 export default function Result() {
@@ -55,9 +54,9 @@ export default function Result() {
   const [isGeneratingBack, setIsGeneratingBack] = useState(false);
   const [showShareSheet, setShowShareSheet] = useState(false);
   const [showRatingPrompt, setShowRatingPrompt] = useState(false);
+  const [showRefinementPanel, setShowRefinementPanel] = useState(false);
   const sliderRef = useRef<HTMLDivElement>(null);
 
-  // 시뮬레이션 완료 카운트 및 레이팅 프롬프트 체크
   useEffect(() => {
     incrementSimulationCount();
     const timer = setTimeout(() => {
@@ -68,7 +67,6 @@ export default function Result() {
     return () => clearTimeout(timer);
   }, []);
 
-  // 멀티 결과 로드
   useEffect(() => {
     const savedResults = localStorage.getItem('multiResults');
     if (savedResults) {
@@ -87,17 +85,14 @@ export default function Result() {
   }, [resultImage]);
 
   const currentResult = results[currentIndex];
-  // backViewImage (Processing에서 미리 생성된 것) 또는 backImage (Result에서 온디맨드 생성) 사용
   const backViewImg = currentResult?.backViewImage || currentResult?.backImage;
   const displayImage = hairView === 'back' && backViewImg
     ? backViewImg
     : currentResult?.resultImage;
 
-  // 뒷머리 생성 함수
   const handleGenerateBack = async () => {
     if (!currentResult || isGeneratingBack) return;
 
-    // 이미 뒷머리가 있으면 (Processing에서 생성했거나 온디맨드로 생성한 경우) 그냥 전환
     if (currentResult.backViewImage || currentResult.backImage) {
       setHairView('back');
       return;
@@ -121,7 +116,6 @@ export default function Result() {
       });
 
       if (result.success && result.resultImage) {
-        // 결과에 뒷머리 이미지 추가
         setResults(prev => prev.map((r, idx) =>
           idx === currentIndex
             ? { ...r, backImage: result.resultImage }
@@ -180,7 +174,15 @@ export default function Result() {
     setShowShareSheet(true);
   };
 
-  // 슬라이더 핸들링
+  const handleRefinementComplete = (newImage: string) => {
+    setResults(prev => prev.map((r, idx) =>
+      idx === currentIndex
+        ? { ...r, resultImage: newImage }
+        : r
+    ));
+    setShowRefinementPanel(false);
+  };
+
   const handleSliderTouch = (e: React.TouchEvent | React.MouseEvent) => {
     if (!sliderRef.current) return;
     const rect = sliderRef.current.getBoundingClientRect();
@@ -195,18 +197,18 @@ export default function Result() {
       return null;
     }
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#0a0a12] to-[#0f0f1a] flex items-center justify-center">
-        <div className="w-12 h-12 border-3 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+      <div className="min-h-screen bg-[var(--color-bg-primary)] flex items-center justify-center">
+        <div className="w-10 h-10 border-3 border-[var(--color-blue)]/30 border-t-[var(--color-blue)] rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0a0a12] to-[#0f0f1a] flex flex-col safe-area-top safe-area-bottom">
+    <div className="min-h-screen bg-[var(--color-bg-primary)] flex flex-col safe-area-top safe-area-bottom">
       {/* Save Success Toast */}
       {showSaveSuccess && (
-        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50">
-          <div className="px-4 py-2 bg-green-500/90 rounded-full text-white text-sm font-medium flex items-center gap-2">
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 animate-fade-in">
+          <div className="px-5 py-2.5 bg-[var(--color-green)] rounded-full text-white text-subheadline font-medium flex items-center gap-2">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
               <path d="M20 6L9 17l-5-5"/>
             </svg>
@@ -215,33 +217,33 @@ export default function Result() {
         </div>
       )}
 
-      {/* Header - 피츠의 법칙: 버튼 44px, 제이콥의 법칙: 표준 아이콘 */}
-      <header className="px-5 py-4 flex items-center justify-between safe-area-top">
+      {/* Header */}
+      <header className="relative flex items-center justify-between h-11 px-4 bg-[var(--color-bg-primary)] border-b border-[var(--color-separator)]">
         <button
           onClick={handleStartOver}
-          className="w-11 h-11 flex items-center justify-center rounded-full bg-white/10 active:scale-95 transition-transform"
+          className="w-11 h-11 flex items-center justify-center -ml-2 active:opacity-60 transition-opacity"
         >
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--color-blue)" strokeWidth="2.5" strokeLinecap="round">
+            <path d="M15 18l-6-6 6-6"/>
           </svg>
         </button>
-        <h1 className="text-lg font-semibold text-white">
+        <h1 className="absolute left-1/2 -translate-x-1/2 text-headline text-[var(--color-label)]">
           {results.length > 1 ? `${currentIndex + 1} / ${results.length}` : texts.result}
         </h1>
         <button
           onClick={handleShare}
-          className="w-11 h-11 flex items-center justify-center rounded-full bg-white/10 active:scale-95 transition-transform"
+          className="w-11 h-11 flex items-center justify-center -mr-2 active:opacity-60 transition-opacity text-[var(--color-blue)]"
         >
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13"/>
           </svg>
         </button>
       </header>
 
-      {/* 멀티 결과 썸네일 (2개 이상일 때) */}
+      {/* 멀티 결과 썸네일 */}
       {results.length > 1 && (
-        <div className="px-5 pb-3">
-          <div className="flex gap-2 overflow-x-auto scrollbar-hide py-1">
+        <div className="px-4 py-3 bg-[var(--color-bg-secondary)]">
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide">
             {results.map((result, idx) => (
               <button
                 key={result.styleId}
@@ -253,11 +255,11 @@ export default function Result() {
                 <img
                   src={result.resultImage}
                   alt={result.styleName}
-                  className={`w-16 h-20 object-cover rounded-lg border-2 ${
-                    idx === currentIndex ? 'border-purple-500' : 'border-transparent'
+                  className={`w-14 h-[72px] object-cover rounded-lg ${
+                    idx === currentIndex ? 'ring-2 ring-[var(--color-blue)]' : ''
                   }`}
                 />
-                <span className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[10px] text-center py-0.5 rounded-b-lg truncate px-1">
+                <span className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-[10px] text-center py-0.5 rounded-b-lg truncate px-1">
                   {result.styleName}
                 </span>
               </button>
@@ -266,9 +268,9 @@ export default function Result() {
         </div>
       )}
 
-      {/* View Mode Tabs */}
-      <div className="px-5 pb-3">
-        <div className="flex bg-white/5 rounded-xl p-1 border border-white/10">
+      {/* View Mode Segmented Control */}
+      <div className="px-4 py-3">
+        <div className="flex bg-[var(--color-fill-tertiary)] rounded-[9px] p-[2px]">
           {[
             { id: 'result', label: texts.result },
             { id: 'compare', label: texts.compare },
@@ -277,10 +279,10 @@ export default function Result() {
             <button
               key={mode.id}
               onClick={() => setViewMode(mode.id as typeof viewMode)}
-              className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${
+              className={`flex-1 py-2 rounded-[7px] text-subheadline font-medium transition-all ${
                 viewMode === mode.id
-                  ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
-                  : 'text-white/50'
+                  ? 'bg-[var(--color-bg-primary)] text-[var(--color-label)] shadow-sm'
+                  : 'text-[var(--color-label-secondary)]'
               }`}
             >
               {mode.label}
@@ -289,15 +291,15 @@ export default function Result() {
         </div>
       </div>
 
-      {/* Front/Back View Toggle */}
-      <div className="px-5 pb-3">
+      {/* Front/Back Toggle */}
+      <div className="px-4 pb-3">
         <div className="flex gap-2">
           <button
             onClick={() => setHairView('front')}
-            className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2 ${
+            className={`flex-1 h-11 rounded-xl text-subheadline font-medium transition-all flex items-center justify-center gap-2 ${
               hairView === 'front'
-                ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
-                : 'bg-white/5 border border-white/10 text-white/50'
+                ? 'bg-[var(--color-blue)] text-white'
+                : 'bg-[var(--color-fill-tertiary)] text-[var(--color-label)]'
             }`}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -309,15 +311,15 @@ export default function Result() {
           <button
             onClick={handleGenerateBack}
             disabled={isGeneratingBack}
-            className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2 ${
+            className={`flex-1 h-11 rounded-xl text-subheadline font-medium transition-all flex items-center justify-center gap-2 ${
               hairView === 'back'
-                ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
-                : 'bg-white/5 border border-white/10 text-white/50'
+                ? 'bg-[var(--color-blue)] text-white'
+                : 'bg-[var(--color-fill-tertiary)] text-[var(--color-label)]'
             } ${isGeneratingBack ? 'opacity-50' : ''}`}
           >
             {isGeneratingBack ? (
               <>
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-current/30 border-t-current rounded-full animate-spin" />
                 {texts.generating}
               </>
             ) : (
@@ -335,12 +337,12 @@ export default function Result() {
       </div>
 
       {/* Main Content */}
-      <main className="flex-1 px-5 pb-4">
+      <main className="flex-1 px-4 pb-4 overflow-hidden">
         {viewMode === 'result' && (
-          <div className="relative aspect-[3/4] rounded-3xl overflow-hidden bg-white/5 shadow-2xl">
+          <div className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-[var(--color-bg-secondary)]">
             <img src={displayImage} alt="Result" className="w-full h-full object-cover" />
             {hairView === 'back' && (
-              <div className="absolute top-3 right-3 bg-black/60 px-3 py-1.5 rounded-full text-xs text-white">
+              <div className="absolute top-3 right-3 bg-black/50 backdrop-blur-sm px-3 py-1.5 rounded-full text-caption1 text-white">
                 {texts.backViewLabel}
               </div>
             )}
@@ -350,18 +352,18 @@ export default function Result() {
         {viewMode === 'compare' && (
           <div className="flex gap-3 h-full">
             <div className="flex-1">
-              <div className="bg-white/10 rounded-t-xl px-3 py-1.5">
-                <p className="text-xs text-white/60 text-center">{texts.before}</p>
+              <div className="bg-[var(--color-fill-tertiary)] rounded-t-xl px-3 py-1.5">
+                <p className="text-caption1 text-[var(--color-label-secondary)] text-center">{texts.before}</p>
               </div>
-              <div className="aspect-[3/4] rounded-b-2xl overflow-hidden bg-white/5">
+              <div className="aspect-[3/4] rounded-b-xl overflow-hidden bg-[var(--color-bg-secondary)]">
                 <img src={userPhoto} alt="Before" className="w-full h-full object-cover" />
               </div>
             </div>
             <div className="flex-1">
-              <div className="bg-gradient-to-r from-purple-600/50 to-pink-600/50 rounded-t-xl px-3 py-1.5">
-                <p className="text-xs text-white text-center">{texts.after}</p>
+              <div className="bg-[var(--color-blue)] rounded-t-xl px-3 py-1.5">
+                <p className="text-caption1 text-white text-center">{texts.after}</p>
               </div>
-              <div className="aspect-[3/4] rounded-b-2xl overflow-hidden bg-white/5 ring-2 ring-purple-500/30">
+              <div className="aspect-[3/4] rounded-b-xl overflow-hidden bg-[var(--color-bg-secondary)] ring-2 ring-[var(--color-blue)]">
                 <img src={displayImage} alt="After" className="w-full h-full object-cover" />
               </div>
             </div>
@@ -371,7 +373,7 @@ export default function Result() {
         {viewMode === 'slider' && (
           <div
             ref={sliderRef}
-            className="relative aspect-[3/4] rounded-3xl overflow-hidden bg-white/5 shadow-2xl cursor-ew-resize touch-none"
+            className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-[var(--color-bg-secondary)] cursor-ew-resize touch-none"
             onMouseDown={(e) => {
               handleSliderTouch(e);
               const handleMove = (ev: MouseEvent) => handleSliderTouch(ev as unknown as React.MouseEvent);
@@ -396,16 +398,16 @@ export default function Result() {
               className="absolute top-0 bottom-0 w-0.5 bg-white"
               style={{ left: `${sliderPosition}%`, transform: 'translateX(-50%)' }}
             >
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-xl">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0a0a12" strokeWidth="2.5">
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-label)" strokeWidth="2.5">
                   <path d="M18 8l4 4-4 4M6 8l-4 4 4 4"/>
                 </svg>
               </div>
             </div>
-            <div className="absolute bottom-4 left-4 bg-black/60 px-3 py-1.5 rounded-full text-xs text-white/90">
+            <div className="absolute bottom-3 left-3 bg-black/50 backdrop-blur-sm px-3 py-1.5 rounded-full text-caption1 text-white">
               {texts.before}
             </div>
-            <div className="absolute bottom-4 right-4 bg-gradient-to-r from-purple-600/80 to-pink-600/80 px-3 py-1.5 rounded-full text-xs text-white">
+            <div className="absolute bottom-3 right-3 bg-[var(--color-blue)] px-3 py-1.5 rounded-full text-caption1 text-white">
               {texts.after}
             </div>
           </div>
@@ -414,22 +416,34 @@ export default function Result() {
 
       {/* Style Name */}
       {currentResult && (
-        <div className="px-5 pb-3">
-          <div className="bg-white/5 rounded-2xl p-4 border border-white/10 text-center">
-            <p className="text-white font-semibold text-lg">{currentResult.styleName}</p>
+        <div className="px-4 pb-3">
+          <div className="bg-[var(--color-bg-secondary)] rounded-xl p-4 text-center">
+            <p className="text-[var(--color-label)] font-semibold text-body">{currentResult.styleName}</p>
           </div>
         </div>
       )}
 
-      {/* Action Buttons - 피츠의 법칙: 주요 버튼 크게, 밀러의 법칙: 그룹핑 */}
-      <div className="p-5 space-y-3 safe-area-bottom">
-        {/* 밀러의 법칙: 저장 관련 버튼 그룹 */}
+      {/* Action Buttons */}
+      <div className="px-4 pb-4 space-y-3 safe-area-bottom">
+        {/* 미세 조정 버튼 */}
+        <button
+          onClick={() => setShowRefinementPanel(true)}
+          className="w-full h-[50px] rounded-xl bg-[var(--color-blue)] text-white font-semibold text-body flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M12 3v18M3 12h18"/>
+            <circle cx="12" cy="12" r="3" fill="currentColor" stroke="none"/>
+          </svg>
+          {texts.refine}
+        </button>
+
+        {/* 저장 버튼들 */}
         <div className="flex gap-3">
           <button
             onClick={handleSave}
-            className="flex-1 h-14 rounded-2xl bg-white/10 text-white font-medium flex items-center justify-center gap-2 active:scale-98 transition-transform"
+            className="flex-1 h-[50px] rounded-xl bg-[var(--color-fill-tertiary)] text-[var(--color-label)] font-medium text-body flex items-center justify-center gap-2 active:bg-[var(--color-fill-secondary)] transition-colors"
           >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
             </svg>
             {texts.save}
@@ -437,19 +451,20 @@ export default function Result() {
           {results.length > 1 && (
             <button
               onClick={handleSaveAll}
-              className="flex-1 h-14 rounded-2xl bg-white/10 text-white font-medium flex items-center justify-center gap-2 active:scale-98 transition-transform"
+              className="flex-1 h-[50px] rounded-xl bg-[var(--color-fill-tertiary)] text-[var(--color-label)] font-medium text-body flex items-center justify-center gap-2 active:bg-[var(--color-fill-secondary)] transition-colors"
             >
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
               </svg>
               {texts.saveAll}
             </button>
           )}
         </div>
-        {/* 피츠의 법칙: 가장 중요한 액션이므로 가장 크게 */}
+
+        {/* 다시 시도 버튼 */}
         <button
           onClick={handleStartOver}
-          className="w-full h-14 rounded-2xl bg-gradient-to-r from-[#3182f6] to-[#6366f1] text-white font-semibold shadow-lg active:scale-98 transition-transform"
+          className="w-full h-[50px] rounded-xl bg-[var(--color-label)] text-[var(--color-bg-primary)] font-semibold text-body active:opacity-80 transition-opacity"
         >
           {texts.tryAnother}
         </button>
@@ -467,6 +482,18 @@ export default function Result() {
       {/* Rating Prompt */}
       {showRatingPrompt && (
         <RatingPrompt onClose={() => setShowRatingPrompt(false)} />
+      )}
+
+      {/* Refinement Panel */}
+      {showRefinementPanel && currentResult && displayImage && userPhoto && (
+        <HairRefinementPanel
+          resultImage={displayImage}
+          userPhoto={userPhoto}
+          styleName={currentResult.styleName}
+          onRefinementComplete={handleRefinementComplete}
+          onClose={() => setShowRefinementPanel(false)}
+          language={language === 'ko' ? 'ko' : 'en'}
+        />
       )}
     </div>
   );

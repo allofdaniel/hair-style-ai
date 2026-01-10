@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace = "com.looksim.app"
+    namespace = "com.beforecut.app"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.looksim.app"
+        applicationId "com.beforecut.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -18,10 +18,10 @@ android {
     }
     signingConfigs {
         release {
-            storeFile file('release.keystore')
-            storePassword 'looksim2024'
-            keyAlias 'looksim'
-            keyPassword 'looksim2024'
+            storeFile file('beforecut.keystore')
+            storePassword 'beforecut2024'
+            keyAlias 'beforecut'
+            keyPassword 'beforecut2024'
         }
     }
     buildTypes {

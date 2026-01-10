@@ -2,9 +2,10 @@ import type { HairStyle, HairSettings, HairTexture } from '../stores/useAppStore
 import { hairColors, hairTextures } from '../data/hairStyles';
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-// Gemini 2.5 Flash Image - production-ready image generation model (Dec 2025)
+// Gemini 2.5 Flash Image - production-ready image generation model
+// Model name: gemini-2.5-flash-image (NOT gemini-2.5-flash-image-generation)
 // Best for: fast generation, multi-image fusion, character consistency, local edits
-const GEMINI_IMAGE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-generation:generateContent';
+const GEMINI_IMAGE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent';
 
 interface GenerateHairStyleParams {
   userPhoto: string;
@@ -114,21 +115,26 @@ Do NOT keep the original hair color - CHANGE IT to ${colorOption.prompt}.`;
     }
 
     // Strong prompt to preserve face identity and ONLY change hair
-    const simplePrompt = `You are a professional hair stylist and colorist photo editor. Your job is to change the HAIR in this photo.
+    const simplePrompt = `Professional hair salon photo editor. Change ONLY the hair in this photo.
 
-TARGET HAIRSTYLE: ${style.nameKo} (${style.name})
-STYLE DETAILS: ${stylePrompt}${colorInstruction}
+TARGET: ${style.nameKo} (${style.name})
+DETAILS: ${stylePrompt}${colorInstruction}
 
-ABSOLUTE RULES - VIOLATION IS NOT ALLOWED:
-1. DO NOT change the face AT ALL - eyes, nose, mouth, eyebrows, skin tone, face shape, facial features must be 100% IDENTICAL to the original
-2. DO NOT change the person's identity - they must be recognizable as the SAME person
-3. DO NOT change body, clothing, background, lighting, or pose
-4. ONLY modify the hair: hairstyle, hair shape, hair volume, hair length${hasCustomColor ? ', and MOST IMPORTANTLY change the hair COLOR to ' + colorOption.prompt : ''}
-5. The result must look like the SAME person just visited a salon${hasCustomColor ? ' and got their hair dyed to ' + colorOption.prompt : ''}
+★★★ FACE - ABSOLUTE RULES (NO EXCEPTIONS) ★★★
+- Face is UNTOUCHABLE: Do NOT modify face in any way
+- Keep EXACT: facial features ratio, face shape, eye size, nose, mouth, jawline
+- Do NOT make the person look younger or cuter - preserve actual age appearance
+- Do NOT change the person's gender under any circumstances
+- Do NOT generate a new person (opposite sex or same sex)
+- The person in output must be 100% identical to input (just with different hair)
 
-${hasCustomColor ? '⚠️ CRITICAL: The hair color MUST be changed to ' + colorOption.prompt + '. Do NOT keep the original hair color!' : ''}
+★★★ WHAT TO CHANGE ★★★
+- ONLY the hair: style, shape, volume, length${hasCustomColor ? ', and COLOR to ' + colorOption.prompt : ''}
+- Keep same: background, lighting, clothing, pose, skin tone
 
-Generate the photo with the hair changed to match the target hairstyle.${colorReminder}`;
+${hasCustomColor ? '⚠️ HAIR COLOR MUST BE: ' + colorOption.prompt + ' (mandatory change)' : ''}
+
+Generate the photo showing the SAME person with the new hairstyle.${colorReminder}`;
 
     const response = await fetch(`${GEMINI_IMAGE_URL}?key=${GEMINI_API_KEY}`, {
       method: 'POST',
@@ -405,23 +411,28 @@ Do NOT keep the original hair color from either photo.`;
     console.log('Generating from reference...');
 
     // Strong prompt for reference-based generation - preserve face identity
-    const simpleRefPrompt = `You are a professional hair stylist and colorist photo editor. Your job is to copy the HAIRSTYLE from the reference photo.
+    const simpleRefPrompt = `Professional hair salon photo editor. Copy ONLY the hairstyle from reference.
 
-TWO IMAGES PROVIDED:
-- FIRST IMAGE: The person (CLIENT) - their face must NOT change at all
-- SECOND IMAGE: The hairstyle to copy (REFERENCE)
+TWO IMAGES:
+- IMAGE 1: CLIENT (their face must stay EXACTLY the same)
+- IMAGE 2: REFERENCE (copy this hairstyle)
 ${colorSection}
 
-ABSOLUTE RULES - VIOLATION IS NOT ALLOWED:
-1. The CLIENT's face must remain 100% IDENTICAL - same eyes, nose, mouth, eyebrows, skin tone, face shape
-2. The CLIENT must be recognizable as the EXACT SAME PERSON after the edit
-3. DO NOT blend or morph faces - keep the CLIENT's face completely unchanged
-4. DO NOT change body, clothing, background, lighting, or pose
-5. ONLY copy the HAIR from the reference: hairstyle shape, volume, length, styling${hasCustomColor ? ', and change the hair COLOR to ' + colorOption.prompt : ''}
+★★★ FACE - ABSOLUTE RULES (NO EXCEPTIONS) ★★★
+- CLIENT's face is UNTOUCHABLE: Do NOT modify in any way
+- Keep EXACT: facial features ratio, face shape, eye size, nose, mouth, jawline
+- Do NOT make the person look younger or cuter - preserve actual age appearance
+- Do NOT change the CLIENT's gender under any circumstances
+- Do NOT blend or morph faces between CLIENT and REFERENCE
+- Do NOT generate a new person - CLIENT must be 100% recognizable
 
-${hasCustomColor ? '⚠️ CRITICAL: The hair color MUST be ' + colorOption.prompt + '. Do NOT use the original hair color!' : ''}
+★★★ WHAT TO COPY FROM REFERENCE ★★★
+- ONLY the hair: style, shape, volume, length, styling${hasCustomColor ? ', and change COLOR to ' + colorOption.prompt : ''}
+- Keep CLIENT's: background, lighting, clothing, pose, skin tone
 
-Generate the CLIENT's photo with the hair changed to match the REFERENCE hairstyle.${colorReminder}`;
+${hasCustomColor ? '⚠️ HAIR COLOR MUST BE: ' + colorOption.prompt + ' (mandatory)' : ''}
+
+Generate CLIENT's photo with REFERENCE hairstyle applied.${colorReminder}`;
 
     const response = await fetch(`${GEMINI_IMAGE_URL}?key=${GEMINI_API_KEY}`, {
       method: 'POST',

@@ -1,10 +1,11 @@
 /**
- * Home 페이지 - iOS/토스 스타일
- * - 깔끔한 화이트 테마
- * - 부드러운 애니메이션
- * - 프리미엄 느낌
+ * Home 페이지 - 토스/카카오뱅크 스타일
+ * - 넉넉한 여백과 프리미엄 느낌
+ * - 스프링 바운스 애니메이션
+ * - 부드러운 터치 피드백
  */
 
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../stores/useAppStore';
 import IOSButton, { IOSIconButton } from '../components/IOSButton';
@@ -12,6 +13,7 @@ import IOSButton, { IOSIconButton } from '../components/IOSButton';
 export default function Home() {
   const navigate = useNavigate();
   const { gender, setGender } = useAppStore();
+  const [pressedGender, setPressedGender] = useState<'male' | 'female' | null>(null);
 
   const handleStart = () => {
     navigate('/camera');
@@ -55,51 +57,84 @@ export default function Home() {
           </p>
         </div>
 
-        {/* 성별 선택 */}
-        <div className="w-full max-w-sm mb-8 animate-fade-in" style={{ animationDelay: '100ms' }}>
-          <p className="text-center text-[#8b95a1] text-[13px] mb-4 font-medium">
+        {/* 성별 선택 - 토스 스타일 */}
+        <div className="w-full max-w-sm mb-10 animate-fade-in" style={{ animationDelay: '100ms' }}>
+          <p className="text-center text-[#8b95a1] text-[14px] mb-5 font-medium">
             스타일 유형을 선택하세요
           </p>
-          <div className="flex gap-3">
+          <div className="flex gap-4">
+            {/* 남성 버튼 */}
             <button
               onClick={() => setGender('male')}
-              className={`flex-1 py-6 px-4 rounded-2xl font-semibold transition-all duration-300 active:scale-[0.97] ${
+              onMouseDown={() => setPressedGender('male')}
+              onMouseUp={() => setPressedGender(null)}
+              onMouseLeave={() => setPressedGender(null)}
+              onTouchStart={() => setPressedGender('male')}
+              onTouchEnd={() => setPressedGender(null)}
+              onTouchCancel={() => setPressedGender(null)}
+              className={`flex-1 py-7 px-5 rounded-3xl font-semibold transition-all duration-150 transform-gpu ${
+                pressedGender === 'male' ? 'scale-[0.96]' : 'scale-100'
+              } ${
                 gender === 'male'
-                  ? 'bg-[#3182f6] text-white shadow-xl shadow-[#3182f6]/30'
-                  : 'bg-[#f2f4f6] text-[#6b7684] hover:bg-[#e5e8eb]'
+                  ? 'bg-[#3182f6] text-white shadow-[0_8px_24px_rgba(49,130,246,0.35)]'
+                  : pressedGender === 'male'
+                    ? 'bg-[#e5e8eb] text-[#4e5968] shadow-none'
+                    : 'bg-[#f2f4f6] text-[#6b7684] shadow-[0_2px_8px_rgba(0,0,0,0.04)]'
               }`}
+              style={{
+                transitionTimingFunction: pressedGender === 'male'
+                  ? 'cubic-bezier(0.25, 0.1, 0.25, 1)'
+                  : 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+              }}
             >
-              <div className="flex flex-col items-center gap-3">
-                <div className={`w-14 h-14 rounded-full flex items-center justify-center ${
-                  gender === 'male' ? 'bg-white/20' : 'bg-white shadow-sm'
-                }`}>
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" className={gender === 'male' ? 'text-white' : 'text-[#6b7684]'}>
+              <div className="flex flex-col items-center gap-4">
+                <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-200 ${
+                  gender === 'male' ? 'bg-white/25' : 'bg-white shadow-sm'
+                } ${pressedGender === 'male' ? 'scale-95' : 'scale-100'}`}>
+                  <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor" className={gender === 'male' ? 'text-white' : 'text-[#6b7684]'}>
                     <circle cx="12" cy="8" r="4"/>
                     <path d="M12 14c-4 0-8 2-8 6h16c0-4-4-6-8-6z"/>
                   </svg>
                 </div>
-                <span className="text-[15px]">남성</span>
+                <span className="text-[16px]">남성</span>
               </div>
             </button>
+
+            {/* 여성 버튼 */}
             <button
               onClick={() => setGender('female')}
-              className={`flex-1 py-6 px-4 rounded-2xl font-semibold transition-all duration-300 active:scale-[0.97] ${
+              onMouseDown={() => setPressedGender('female')}
+              onMouseUp={() => setPressedGender(null)}
+              onMouseLeave={() => setPressedGender(null)}
+              onTouchStart={() => setPressedGender('female')}
+              onTouchEnd={() => setPressedGender(null)}
+              onTouchCancel={() => setPressedGender(null)}
+              className={`flex-1 py-7 px-5 rounded-3xl font-semibold transition-all duration-150 transform-gpu ${
+                pressedGender === 'female' ? 'scale-[0.96]' : 'scale-100'
+              } ${
                 gender === 'female'
-                  ? 'bg-[#6b5ce7] text-white shadow-xl shadow-[#6b5ce7]/30'
-                  : 'bg-[#f2f4f6] text-[#6b7684] hover:bg-[#e5e8eb]'
+                  ? 'bg-[#6b5ce7] text-white shadow-[0_8px_24px_rgba(107,92,231,0.35)]'
+                  : pressedGender === 'female'
+                    ? 'bg-[#e5e8eb] text-[#4e5968] shadow-none'
+                    : 'bg-[#f2f4f6] text-[#6b7684] shadow-[0_2px_8px_rgba(0,0,0,0.04)]'
               }`}
+              style={{
+                transitionTimingFunction: pressedGender === 'female'
+                  ? 'cubic-bezier(0.25, 0.1, 0.25, 1)'
+                  : 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+              }}
             >
-              <div className="flex flex-col items-center gap-3">
-                <div className={`w-14 h-14 rounded-full flex items-center justify-center ${
-                  gender === 'female' ? 'bg-white/20' : 'bg-white shadow-sm'
-                }`}>
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" className={gender === 'female' ? 'text-white' : 'text-[#6b7684]'}>
+              <div className="flex flex-col items-center gap-4">
+                <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-200 ${
+                  gender === 'female' ? 'bg-white/25' : 'bg-white shadow-sm'
+                } ${pressedGender === 'female' ? 'scale-95' : 'scale-100'}`}>
+                  <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor" className={gender === 'female' ? 'text-white' : 'text-[#6b7684]'}>
                     <circle cx="12" cy="8" r="4"/>
                     <path d="M12 14c-4 0-8 2-8 6h16c0-4-4-6-8-6z"/>
                     <path d="M8 7c0-2 1.5-5 4-5s4 3 4 5" strokeWidth="2" stroke="currentColor" fill="none"/>
                   </svg>
                 </div>
-                <span className="text-[15px]">여성</span>
+                <span className="text-[16px]">여성</span>
               </div>
             </button>
           </div>
@@ -109,7 +144,7 @@ export default function Home() {
         <div className="w-full max-w-sm animate-fade-in" style={{ animationDelay: '200ms' }}>
           <IOSButton
             variant="primary"
-            size="xl"
+            size="lg"
             fullWidth
             onClick={handleStart}
             icon={
@@ -123,28 +158,28 @@ export default function Home() {
           </IOSButton>
         </div>
 
-        {/* 기능 소개 */}
-        <div className="mt-12 grid grid-cols-3 gap-4 max-w-sm animate-fade-in" style={{ animationDelay: '300ms' }}>
+        {/* 기능 소개 - 토스 스타일 */}
+        <div className="mt-14 grid grid-cols-3 gap-5 max-w-sm animate-fade-in" style={{ animationDelay: '300ms' }}>
           <div className="text-center">
-            <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-[#3182f6]/10 flex items-center justify-center">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[#3182f6]/10 flex items-center justify-center shadow-[0_2px_8px_rgba(49,130,246,0.12)]">
               <span className="text-2xl">✨</span>
             </div>
-            <p className="text-[13px] text-[#191f28] font-semibold">45+</p>
-            <p className="text-[11px] text-[#8b95a1]">스타일</p>
+            <p className="text-[14px] text-[#191f28] font-bold">80+</p>
+            <p className="text-[12px] text-[#8b95a1] mt-0.5">스타일</p>
           </div>
           <div className="text-center">
-            <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-[#6b5ce7]/10 flex items-center justify-center">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[#6b5ce7]/10 flex items-center justify-center shadow-[0_2px_8px_rgba(107,92,231,0.12)]">
               <span className="text-2xl">🎯</span>
             </div>
-            <p className="text-[13px] text-[#191f28] font-semibold">K-Pop</p>
-            <p className="text-[11px] text-[#8b95a1]">셀럽 스타일</p>
+            <p className="text-[14px] text-[#191f28] font-bold">K-Pop</p>
+            <p className="text-[12px] text-[#8b95a1] mt-0.5">셀럽 스타일</p>
           </div>
           <div className="text-center">
-            <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-[#00c471]/10 flex items-center justify-center">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[#00c471]/10 flex items-center justify-center shadow-[0_2px_8px_rgba(0,196,113,0.12)]">
               <span className="text-2xl">🔒</span>
             </div>
-            <p className="text-[13px] text-[#191f28] font-semibold">100%</p>
-            <p className="text-[11px] text-[#8b95a1]">얼굴 보존</p>
+            <p className="text-[14px] text-[#191f28] font-bold">100%</p>
+            <p className="text-[12px] text-[#8b95a1] mt-0.5">얼굴 보존</p>
           </div>
         </div>
       </main>

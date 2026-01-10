@@ -5,7 +5,7 @@
  * - 프리미엄 디자인
  */
 
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Camera as CapacitorCamera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { useAppStore } from '../stores/useAppStore';
@@ -46,9 +46,92 @@ export default function Camera() {
   const [isLoading, setIsLoading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [showPreviewAnimation, setShowPreviewAnimation] = useState(false);
+  const [cameraError, setCameraError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+
+  // 카메라 스트림 시작
+  const startCamera = useCallback(async () => {
+    try {
+      setCameraError(null);
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: 'user', // 전면 카메라
+          width: { ideal: 1280 },
+          height: { ideal: 1920 },
+        },
+        audio: false,
+      });
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        streamRef.current = stream;
+      }
+    } catch (error) {
+      console.error('Camera access error:', error);
+      setCameraError('카메라 접근 권한이 필요합니다');
+    }
+  }, []);
+
+  // 카메라 스트림 중지
+  const stopCamera = useCallback(() => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+  }, []);
+
+  // 컴포넌트 마운트시 카메라 시작
+  useEffect(() => {
+    startCamera();
+    return () => stopCamera();
+  }, [startCamera, stopCamera]);
+
+  // 프리뷰 상태가 변경되면 카메라 제어
+  useEffect(() => {
+    if (previewUrl) {
+      stopCamera();
+    } else {
+      startCamera();
+    }
+  }, [previewUrl, startCamera, stopCamera]);
 
   const takePhoto = async () => {
+    // 실시간 비디오에서 캡처
+    if (videoRef.current && canvasRef.current) {
+      setIsLoading(true);
+      try {
+        const video = videoRef.current;
+        const canvas = canvasRef.current;
+
+        // 비디오 크기에 맞춰 캔버스 설정
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          // 전면 카메라는 미러링되어 보이므로 캡처시 뒤집기
+          ctx.translate(canvas.width, 0);
+          ctx.scale(-1, 1);
+          ctx.drawImage(video, 0, 0);
+
+          const base64Image = canvas.toDataURL('image/jpeg', 0.9);
+          const resizedImage = await resizeImage(base64Image, 1024);
+          setPreviewUrl(resizedImage);
+          setUserPhoto(resizedImage);
+          setTimeout(() => setShowPreviewAnimation(true), 50);
+        }
+      } catch (error) {
+        console.error('Capture error:', error);
+      } finally {
+        setIsLoading(false);
+      }
+      return;
+    }
+
+    // 폴백: Capacitor Camera 사용
     try {
       setIsLoading(true);
       const image = await CapacitorCamera.getPhoto({
@@ -215,23 +298,27 @@ export default function Camera() {
             </div>
           </div>
         ) : (
-          /* 촬영 전 상태 */
+          /* 촬영 전 상태 - 실시간 카메라 프리뷰 */
           <div className="flex-1 flex flex-col">
             {/* 카메라 영역 */}
             <div className="flex-1 flex items-center justify-center py-6">
-              <div className="w-full max-w-sm aspect-[3/4] rounded-[32px] bg-gradient-to-br from-[#f2f4f6] to-[#e5e8eb] flex flex-col items-center justify-center border-2 border-dashed border-[#d1d6db] transition-all duration-300">
-                {isLoading ? (
-                  <div className="text-center animate-fade-in">
-                    <div className="w-16 h-16 mx-auto mb-4">
-                      <svg className="w-full h-full animate-spin text-[#3182f6]" viewBox="0 0 24 24">
-                        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" strokeDasharray="30 70" strokeLinecap="round"/>
-                      </svg>
-                    </div>
-                    <p className="text-[15px] text-[#6b7684] font-medium">불러오는 중...</p>
-                  </div>
-                ) : (
-                  <div className="text-center animate-fade-in">
-                    {/* 일러스트 아이콘 */}
+              <div className="relative w-full max-w-sm aspect-[3/4] rounded-[32px] overflow-hidden bg-black">
+                {/* 실시간 비디오 프리뷰 */}
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  className="w-full h-full object-cover"
+                  style={{ transform: 'scaleX(-1)' }} // 미러링 (셀카처럼)
+                />
+
+                {/* 캡처용 숨겨진 캔버스 */}
+                <canvas ref={canvasRef} className="hidden" />
+
+                {/* 카메라 에러 표시 */}
+                {cameraError && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-[#f2f4f6] to-[#e5e8eb]">
                     <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-[#3182f6]/10 to-[#6b5ce7]/10 flex items-center justify-center">
                       <svg width="48" height="48" viewBox="0 0 24 24" fill="none" className="text-[#3182f6]">
                         <rect x="2" y="5" width="20" height="14" rx="3" stroke="currentColor" strokeWidth="1.5"/>
@@ -239,72 +326,82 @@ export default function Camera() {
                         <circle cx="17" cy="8" r="1" fill="currentColor"/>
                       </svg>
                     </div>
-                    <h2 className="text-[18px] font-bold text-[#191f28] mb-2">
-                      정면 사진을 준비해주세요
-                    </h2>
-                    <p className="text-[14px] text-[#8b95a1] leading-relaxed">
-                      얼굴과 머리카락이<br/>
-                      잘 보이는 사진이 좋아요
-                    </p>
+                    <p className="text-[15px] text-[#6b7684] font-medium text-center px-4">{cameraError}</p>
+                    <button
+                      onClick={startCamera}
+                      className="mt-4 px-4 py-2 bg-[#3182f6] text-white rounded-lg text-sm font-medium"
+                    >
+                      다시 시도
+                    </button>
+                  </div>
+                )}
+
+                {/* 로딩 오버레이 */}
+                {isLoading && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+                    <div className="w-16 h-16">
+                      <svg className="w-full h-full animate-spin text-white" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" strokeDasharray="30 70" strokeLinecap="round"/>
+                      </svg>
+                    </div>
+                  </div>
+                )}
+
+                {/* 가이드 오버레이 */}
+                {!cameraError && !isLoading && (
+                  <div className="absolute inset-0 pointer-events-none">
+                    {/* 얼굴 가이드 */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-48 h-64 border-2 border-white/40 rounded-[50%]" />
+                    </div>
+                    {/* 하단 힌트 */}
+                    <div className="absolute bottom-4 left-0 right-0 text-center">
+                      <p className="text-white/80 text-sm font-medium drop-shadow-lg">
+                        얼굴을 가이드 안에 맞춰주세요
+                      </p>
+                    </div>
                   </div>
                 )}
               </div>
             </div>
 
-            {/* 액션 버튼들 */}
-            <div className="space-y-3">
-              {/* 메인 버튼들 */}
-              <div className="flex gap-3">
-                <button
-                  onClick={selectFromGallery}
-                  disabled={isLoading}
-                  className="flex-1 flex flex-col items-center gap-2 py-5 px-4 bg-[#f2f4f6] rounded-2xl transition-all duration-200 active:scale-[0.97] active:bg-[#e5e8eb] disabled:opacity-50"
-                >
-                  <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6b7684" strokeWidth="1.5">
-                      <rect x="3" y="3" width="18" height="18" rx="3"/>
-                      <circle cx="8.5" cy="8.5" r="1.5"/>
-                      <path d="M21 15l-5-5L5 21"/>
-                    </svg>
-                  </div>
-                  <span className="text-[14px] font-semibold text-[#4e5968]">앨범에서 선택</span>
-                </button>
+            {/* 아이폰 스타일 카메라 버튼 영역 */}
+            <div className="flex items-center justify-between px-8 py-4">
+              {/* 갤러리 버튼 (왼쪽) */}
+              <button
+                onClick={selectFromGallery}
+                disabled={isLoading}
+                className="w-14 h-14 rounded-lg bg-[#1c1c1e] overflow-hidden flex items-center justify-center transition-all duration-200 active:scale-95 disabled:opacity-50"
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5">
+                  <rect x="3" y="3" width="18" height="18" rx="2"/>
+                  <circle cx="8.5" cy="8.5" r="1.5"/>
+                  <path d="M21 15l-5-5L5 21"/>
+                </svg>
+              </button>
 
-                <button
-                  onClick={takePhoto}
-                  disabled={isLoading}
-                  className="flex-1 flex flex-col items-center gap-2 py-5 px-4 bg-gradient-to-br from-[#3182f6] to-[#1b64da] rounded-2xl transition-all duration-200 active:scale-[0.97] disabled:opacity-50 shadow-lg shadow-[#3182f6]/30"
-                >
-                  <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5">
-                      <rect x="2" y="5" width="20" height="14" rx="3"/>
-                      <circle cx="12" cy="12" r="3.5"/>
-                      <circle cx="17" cy="8" r="1" fill="white"/>
-                    </svg>
+              {/* 아이폰 스타일 셔터 버튼 (중앙) */}
+              <button
+                onClick={takePhoto}
+                disabled={isLoading}
+                className="relative w-20 h-20 rounded-full transition-all duration-200 active:scale-95 disabled:opacity-50"
+              >
+                {/* 외부 링 */}
+                <div className="absolute inset-0 rounded-full border-[4px] border-white shadow-lg" />
+                {/* 내부 버튼 */}
+                <div className="absolute inset-[6px] rounded-full bg-white shadow-inner transition-all duration-150 active:bg-gray-200" />
+                {/* 촬영 중 표시 */}
+                {isLoading && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-8 h-8 border-3 border-[#3182f6] border-t-transparent rounded-full animate-spin" />
                   </div>
-                  <span className="text-[14px] font-semibold text-white">카메라 촬영</span>
-                </button>
-              </div>
+                )}
+              </button>
+
+              {/* 대칭을 위한 오른쪽 공간 */}
+              <div className="w-14 h-14" />
             </div>
 
-            {/* 팁 카드 */}
-            <div className="mt-6 bg-gradient-to-r from-[#3182f6]/5 to-[#6b5ce7]/5 rounded-2xl p-4 border border-[#3182f6]/10">
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-full bg-[#3182f6]/10 flex items-center justify-center flex-shrink-0">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3182f6" strokeWidth="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <path d="M12 16v-4M12 8h.01"/>
-                  </svg>
-                </div>
-                <div>
-                  <p className="text-[13px] font-semibold text-[#191f28] mb-1">촬영 팁</p>
-                  <p className="text-[12px] text-[#6b7684] leading-relaxed">
-                    밝은 조명에서 정면을 바라보고 촬영하면<br/>
-                    더 자연스러운 결과를 얻을 수 있어요
-                  </p>
-                </div>
-              </div>
-            </div>
           </div>
         )}
       </main>

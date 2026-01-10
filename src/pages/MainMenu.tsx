@@ -1,26 +1,23 @@
 /**
- * MainMenu - UX 심리학 법칙 적용 디자인
+ * MainMenu - Apple Human Interface Guidelines
  *
- * 적용된 UX 법칙:
- * 1. 힉의 법칙: 카테고리 6개로 제한, 선택지 단순화
- * 2. 밀러의 법칙: 정보 5-7개 그룹핑, 초기 인기 스타일만 표시
- * 3. 피츠의 법칙: 핵심 버튼(촬영) 72px, 터치 영역 최소 44px
- * 4. 제이콥의 법칙: 표준 아이콘(X, 햄버거, 뒤로가기), 친숙한 패턴
- * 5. 테슬러의 법칙: 기본값 자동 설정, 추천 자동화
- * 6. 도허티 임계값: 400ms 이내 피드백, 스켈레톤 UI
- * 7. 3초 법칙: 이미지 지연 로딩, 즉각적 인터랙션
+ * Design Principles:
+ * 1. Clarity: Clean, readable text and intuitive icons
+ * 2. Deference: Content-focused UI that stays out of the way
+ * 3. Depth: Visual layers and realistic motion
  */
 
 import { useRef, useState, useEffect, useCallback, useMemo, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore, type HairStyle } from '../stores/useAppStore';
-import { hairStyles, getCategories, getStylesByCategory } from '../data/hairStyles';
+import { useProcessingQueue } from '../stores/useProcessingQueue';
+import { getStylesByCategory } from '../data/hairStyles';
 import { colorCategories, getColorsByCategory } from '../data/hairColors';
 import ConsentModal from '../components/ConsentModal';
 import { useI18n } from '../i18n/useI18n';
+import { getAssetUrl } from '../config/assetConfig';
 
-// 피츠의 법칙: 터치 영역 최소 44x44px 확보
-// 도허티 임계값: 즉각적 시각 피드백 (active:scale-95)
+// Apple HIG: Minimum 44pt touch targets
 const StyleItem = memo(({ style, isSelected, index, onToggle }: {
   style: HairStyle;
   isSelected: boolean;
@@ -28,37 +25,68 @@ const StyleItem = memo(({ style, isSelected, index, onToggle }: {
   onToggle: (style: HairStyle) => void;
 }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [gifLoaded, setGifLoaded] = useState(false);
+  const hasGif = !!style.gif;
+  const showGif = hasGif && !isSelected;
 
   return (
     <button
       onClick={() => onToggle(style)}
-      className={`flex-shrink-0 w-[88px] h-[110px] rounded-2xl overflow-hidden relative
-        transition-all duration-150 active:scale-95
-        ${isSelected ? 'ring-2 ring-[#3182f6] ring-offset-1 ring-offset-black' : ''}`}
-      style={{ minWidth: '88px', minHeight: '110px' }} // 피츠의 법칙: 최소 터치 영역
+      className={`flex-shrink-0 w-20 h-[100px] rounded-2xl overflow-hidden relative
+        transition-transform duration-200 active:scale-95
+        ${isSelected
+          ? 'ring-2 ring-[var(--color-blue)] ring-offset-2 dark:ring-offset-black'
+          : 'ring-1 ring-black/5 dark:ring-white/10'}`}
+      style={{ minWidth: '80px', minHeight: '100px' }}
     >
-      {/* 3초 법칙: 스켈레톤 UI로 즉각적 피드백 */}
-      {!imageLoaded && (
-        <div className="absolute inset-0 bg-[#2a2a2a] animate-pulse" />
+      {/* Skeleton */}
+      {!imageLoaded && !gifLoaded && (
+        <div className="absolute inset-0 bg-[var(--color-gray-6)] dark:bg-[var(--color-gray-5)] animate-pulse" />
       )}
-      {style.thumbnail ? (
+
+      {/* GIF */}
+      {hasGif && (
         <img
-          src={style.thumbnail}
+          src={getAssetUrl(style.gif!)}
           alt={style.nameKo}
-          className={`w-full h-full object-cover transition-opacity duration-200 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-200 ${showGif ? 'opacity-100' : 'opacity-0'}`}
+          loading="lazy"
+          onLoad={() => setGifLoaded(true)}
+        />
+      )}
+
+      {/* Thumbnail */}
+      {style.thumbnail && (
+        <img
+          src={getAssetUrl(style.thumbnail)}
+          alt={style.nameKo}
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-200 ${!showGif ? 'opacity-100' : 'opacity-0'}`}
           loading="lazy"
           onLoad={() => setImageLoaded(true)}
         />
-      ) : (
-        <div className="w-full h-full bg-[#f2f4f6]" />
       )}
-      {isSelected && (
-        <div className="absolute top-1.5 right-1.5 w-6 h-6 bg-[#3182f6] rounded-full flex items-center justify-center shadow-lg">
-          <span className="text-white text-[11px] font-bold">{index + 1}</span>
+
+      {!style.thumbnail && !hasGif && (
+        <div className="w-full h-full bg-[var(--color-gray-6)] dark:bg-[var(--color-gray-5)]" />
+      )}
+
+      {/* 360° Badge */}
+      {hasGif && showGif && (
+        <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 bg-white/90 dark:bg-black/80 backdrop-blur-sm rounded text-[10px] font-medium text-label">
+          360°
         </div>
       )}
-      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-2 pb-2 pt-8">
-        <p className="text-white text-[12px] font-medium truncate">{style.nameKo}</p>
+
+      {/* Selection Badge */}
+      {isSelected && (
+        <div className="absolute top-1.5 right-1.5 w-5 h-5 bg-[var(--color-blue)] rounded-full flex items-center justify-center">
+          <span className="text-white text-[10px] font-semibold">{index + 1}</span>
+        </div>
+      )}
+
+      {/* Title Overlay */}
+      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent px-2 pb-1.5 pt-6">
+        <p className="text-white text-[11px] font-medium truncate">{style.nameKo}</p>
       </div>
     </button>
   );
@@ -73,18 +101,19 @@ export default function MainMenu() {
   const referenceInputRef = useRef<HTMLInputElement>(null);
 
   const {
-    setUserPhoto, setSelectedStyle, gender, setGender,
+    setUserPhoto, gender, setGender,
     setUseCustomMode, selectedHairColor, setSelectedHairColor,
     addUploadedReference, uploadedReferenceImages,
     hasConsented, setHasConsented,
+    hairSettings,
   } = useAppStore();
+  const { addToQueue, queue } = useProcessingQueue();
 
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
-  // 테슬러의 법칙: 기본값을 '인기'로 설정하여 사용자 결정 부담 감소
-  const [selectedCategory, setSelectedCategory] = useState<string>('popular');
   const [isCapturing, setIsCapturing] = useState(false);
   const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
+  const [isMirrored, setIsMirrored] = useState(true);
   const [uploadedPhoto, setUploadedPhoto] = useState<string | null>(null);
   const [mode, setMode] = useState<'camera' | 'photo'>('camera');
   const [customSelected, setCustomSelected] = useState(false);
@@ -93,17 +122,15 @@ export default function MainMenu() {
   const [showReferencePicker, setShowReferencePicker] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [showConsentModal, setShowConsentModal] = useState(false);
+  const [showAddedToast, setShowAddedToast] = useState(false);
 
   useEffect(() => {
     if (!hasConsented) setShowConsentModal(true);
   }, [hasConsented]);
 
-  // 밀러의 법칙: 한 번에 5-7개 정보 그룹으로 제한
-  const categories = useMemo(() => getCategories(gender), [gender]);
-  // 테슬러의 법칙: 복잡한 필터링을 시스템이 처리
   const displayStyles = useMemo(() =>
-    getStylesByCategory(gender, selectedCategory)
-  , [gender, selectedCategory]);
+    getStylesByCategory(gender, 'all')
+  , [gender]);
 
   const startCamera = useCallback(async (facing: 'user' | 'environment') => {
     try {
@@ -118,7 +145,7 @@ export default function MainMenu() {
       }
       setStream(newStream);
     } catch (error) {
-      console.error('카메라 접근 실패:', error);
+      console.error('Camera access failed:', error);
     }
   }, []);
 
@@ -172,7 +199,7 @@ export default function MainMenu() {
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         const ctx = canvas.getContext('2d')!;
-        if (facingMode === 'user') { ctx.translate(canvas.width, 0); ctx.scale(-1, 1); }
+        if (isMirrored) { ctx.translate(canvas.width, 0); ctx.scale(-1, 1); }
         ctx.drawImage(video, 0, 0);
         photoData = canvas.toDataURL('image/jpeg', 0.9);
       } else throw new Error('No photo source');
@@ -182,13 +209,16 @@ export default function MainMenu() {
         setUseCustomMode(true);
         navigate('/custom');
       } else {
-        setUseCustomMode(false);
-        if (selectedStyles.length === 1) {
-          const style = hairStyles.find(s => s.id === selectedStyles[0]);
-          if (style) setSelectedStyle(style);
-        }
-        localStorage.setItem('selectedStyleIds', JSON.stringify(selectedStyles));
-        navigate('/processing');
+        addToQueue(
+          selectedStyles.map(styleId => ({
+            styleId,
+            userPhoto: photoData,
+            hairSettings,
+          }))
+        );
+        setSelectedStyles([]);
+        setShowAddedToast(true);
+        setTimeout(() => setShowAddedToast(false), 2500);
       }
     } catch (error) {
       console.error('Capture error:', error);
@@ -201,124 +231,141 @@ export default function MainMenu() {
 
   return (
     <div className="h-screen bg-black flex flex-col overflow-hidden">
-      {/* 카메라 영역 */}
+      {/* Camera View */}
       <div className="relative flex-1 min-h-0">
         {mode === 'camera' ? (
           <video
             ref={videoRef}
             autoPlay playsInline muted
-            className={`w-full h-full object-cover ${facingMode === 'user' ? 'scale-x-[-1]' : ''}`}
+            className={`w-full h-full object-cover ${isMirrored ? 'scale-x-[-1]' : ''}`}
           />
         ) : uploadedPhoto && (
           <img src={uploadedPhoto} alt="" className="w-full h-full object-contain bg-black" />
         )}
 
-        {/* 상단 - 제이콥의 법칙: 표준 아이콘 사용 (햄버거, 앨범) */}
-        <div className="absolute top-0 inset-x-0 p-4 flex justify-between items-center safe-area-top">
-          {/* 피츠의 법칙: 터치 영역 44x44 확보 */}
-          <button
-            onClick={() => setShowMenu(true)}
-            className="w-11 h-11 flex items-center justify-center rounded-full bg-black/30 backdrop-blur-sm active:scale-95 transition-transform"
-          >
-            {/* 표준 햄버거 메뉴 아이콘 */}
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-              <path d="M3 12h18M3 6h18M3 18h18"/>
-            </svg>
-          </button>
-          <span className="text-white text-[17px] font-semibold drop-shadow-lg">{t('app_name')}</span>
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="w-11 h-11 flex items-center justify-center rounded-full bg-black/30 backdrop-blur-sm active:scale-95 transition-transform"
-          >
-            {/* 표준 앨범/갤러리 아이콘 */}
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-              <rect x="3" y="3" width="18" height="18" rx="2"/>
-              <circle cx="8.5" cy="8.5" r="1.5"/>
-              <path d="M21 15l-5-5L5 21"/>
-            </svg>
-          </button>
-          <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileSelect} className="hidden" />
+        {/* Top Bar - Apple HIG: Clean, minimal controls */}
+        <div className="absolute top-0 inset-x-0 safe-area-top">
+          <div className="flex justify-between items-center px-4 h-11">
+            {/* Menu Button - 44pt minimum */}
+            <button
+              onClick={() => setShowMenu(true)}
+              className="w-11 h-11 flex items-center justify-center rounded-full bg-black/20 backdrop-blur-md active:bg-black/40 transition-colors"
+              aria-label="Menu"
+            >
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round">
+                <path d="M3 12h18M3 6h18M3 18h18"/>
+              </svg>
+            </button>
+
+            {/* Title */}
+            <span className="text-white text-headline font-semibold drop-shadow-sm">{t('app_name')}</span>
+
+            {/* Gallery Button - 44pt minimum */}
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="w-11 h-11 flex items-center justify-center rounded-full bg-black/20 backdrop-blur-md active:bg-black/40 transition-colors"
+              aria-label="Photo Library"
+            >
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+                <path d="M21 15l-5-5L5 21"/>
+              </svg>
+            </button>
+            <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileSelect} className="hidden" />
+          </div>
         </div>
 
-        {/* 하단 카메라 전환, 사진모드 복귀 - 피츠의 법칙: 버튼 크기 확대 */}
-        <div className="absolute bottom-4 inset-x-4 flex justify-between items-center">
-          {mode === 'photo' ? (
-            <button
-              onClick={() => { setUploadedPhoto(null); setMode('camera'); }}
-              className="h-10 px-4 flex items-center gap-2 bg-black/30 backdrop-blur-sm rounded-full active:scale-95 transition-transform"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-                <path d="M15 18l-6-6 6-6"/>
-              </svg>
-              <span className="text-white/90 text-[13px] font-medium">{t('back_to_camera')}</span>
-            </button>
-          ) : (
-            <button
-              onClick={() => setFacingMode(f => f === 'user' ? 'environment' : 'user')}
-              className="w-10 h-10 flex items-center justify-center bg-black/30 backdrop-blur-sm rounded-full active:scale-95 transition-transform"
-            >
-              {/* 표준 카메라 전환 아이콘 */}
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-                <path d="M16 3h5v5M8 21H3v-5"/>
-                <path d="M21 3l-7.5 7.5M3 21l7.5-7.5"/>
-              </svg>
-            </button>
-          )}
-          {/* 성별 - 힉의 법칙: 명확한 2개 선택지 */}
-          <div className="flex bg-black/30 backdrop-blur-sm rounded-full p-1">
-            <button
-              onClick={() => { setGender('male'); setSelectedCategory('popular'); setSelectedStyles([]); }}
-              className={`px-5 py-2 text-[13px] font-medium rounded-full transition-all ${
-                gender === 'male' ? 'bg-white text-black' : 'text-white/80'
-              }`}
-            >{t('male')}</button>
-            <button
-              onClick={() => { setGender('female'); setSelectedCategory('popular'); setSelectedStyles([]); }}
-              className={`px-5 py-2 text-[13px] font-medium rounded-full transition-all ${
-                gender === 'female' ? 'bg-white text-black' : 'text-white/80'
-              }`}
-            >{t('female')}</button>
+        {/* Bottom Camera Controls */}
+        <div className="absolute bottom-4 inset-x-4">
+          <div className="flex justify-between items-center">
+            {mode === 'photo' ? (
+              <button
+                onClick={() => { setUploadedPhoto(null); setMode('camera'); }}
+                className="h-9 px-4 flex items-center gap-2 bg-black/30 backdrop-blur-md rounded-full active:bg-black/50 transition-colors"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                  <path d="M15 18l-6-6 6-6"/>
+                </svg>
+                <span className="text-white text-subheadline font-medium">{t('back_to_camera')}</span>
+              </button>
+            ) : (
+              <div className="flex gap-2">
+                {/* Mirror Toggle */}
+                <button
+                  onClick={() => setIsMirrored(m => !m)}
+                  className={`w-10 h-10 flex items-center justify-center rounded-full backdrop-blur-md active:scale-95 transition-all ${
+                    isMirrored ? 'bg-white/30' : 'bg-black/30'
+                  }`}
+                  aria-label="Mirror"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5">
+                    <path d="M8 3H5a2 2 0 00-2 2v14a2 2 0 002 2h3"/>
+                    <path d="M16 3h3a2 2 0 012 2v14a2 2 0 01-2 2h-3"/>
+                    <path d="M12 3v18" strokeDasharray="2 2"/>
+                  </svg>
+                </button>
+
+                {/* Camera Flip */}
+                <button
+                  onClick={() => {
+                    const newMode = facingMode === 'user' ? 'environment' : 'user';
+                    setFacingMode(newMode);
+                    setIsMirrored(newMode === 'user');
+                  }}
+                  className="w-10 h-10 flex items-center justify-center bg-black/30 backdrop-blur-md rounded-full active:scale-95 transition-transform"
+                  aria-label="Flip Camera"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5">
+                    <path d="M20 16v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4"/>
+                    <path d="M4 8V4a2 2 0 012-2h12a2 2 0 012 2v4"/>
+                    <path d="M12 15a3 3 0 100-6 3 3 0 000 6z"/>
+                    <path d="M16 3l-4 4-4-4"/>
+                    <path d="M16 21l-4-4-4 4"/>
+                  </svg>
+                </button>
+              </div>
+            )}
+
+            {/* Gender Toggle - Apple Segmented Control Style */}
+            <div className="flex bg-black/30 backdrop-blur-md rounded-full p-0.5">
+              <button
+                onClick={() => { setGender('male'); setSelectedStyles([]); }}
+                className={`px-4 py-1.5 text-footnote font-semibold rounded-full transition-all ${
+                  gender === 'male' ? 'bg-white text-black' : 'text-white/80'
+                }`}
+              >{t('male')}</button>
+              <button
+                onClick={() => { setGender('female'); setSelectedStyles([]); }}
+                className={`px-4 py-1.5 text-footnote font-semibold rounded-full transition-all ${
+                  gender === 'female' ? 'bg-white text-black' : 'text-white/80'
+                }`}
+              >{t('female')}</button>
+            </div>
           </div>
         </div>
 
         <canvas ref={canvasRef} className="hidden" />
       </div>
 
-      {/* 하단 패널 */}
-      <div className="bg-[#1a1a1a] rounded-t-3xl pt-5 pb-8 px-4">
-        {/* 카테고리 - 힉의 법칙: 6개로 제한, 밀러의 법칙: 그룹핑 */}
-        <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide">
-          {categories.map(cat => (
-            <button
-              key={cat.id}
-              onClick={() => setSelectedCategory(cat.id)}
-              className={`flex-shrink-0 h-10 px-4 rounded-full text-[13px] font-medium transition-all flex items-center gap-1.5 ${
-                selectedCategory === cat.id
-                  ? 'bg-white text-black'
-                  : 'bg-white/10 text-white/70 active:bg-white/20'
-              }`}
-            >
-              {'icon' in cat && <span className="text-[14px]">{cat.icon}</span>}
-              <span>{cat.nameKo}</span>
-            </button>
-          ))}
-        </div>
-
-        {/* 스타일 목록 - 밀러의 법칙: 인기 카테고리는 5개만, 피츠의 법칙: 터치 영역 확대 */}
-        <div className="flex gap-3 overflow-x-auto pb-5 scrollbar-hide">
-          {/* 커스텀 버튼 */}
+      {/* Bottom Panel - Apple HIG: Grouped background with safe area */}
+      <div className="bg-[var(--color-bg-grouped)] dark:bg-[var(--color-bg-secondary)] rounded-t-3xl pt-4 safe-area-bottom border-t border-[var(--color-separator)]">
+        {/* Style Carousel */}
+        <div className="flex gap-2.5 overflow-x-auto pb-4 px-4 scrollbar-hide">
+          {/* Custom Button */}
           <button
             onClick={() => { setCustomSelected(true); setSelectedStyles([]); }}
-            className={`flex-shrink-0 w-[88px] h-[110px] rounded-2xl bg-gradient-to-br from-[#3182f6] to-[#6366f1]
-              flex flex-col items-center justify-center gap-2 transition-all active:scale-95 ${
-              customSelected ? 'ring-2 ring-white ring-offset-2 ring-offset-[#1a1a1a]' : ''
+            className={`flex-shrink-0 w-20 h-[100px] rounded-2xl bg-[var(--color-blue)]
+              flex flex-col items-center justify-center gap-1.5 transition-all active:scale-95 ${
+              customSelected ? 'ring-2 ring-[var(--color-blue)] ring-offset-2 dark:ring-offset-black' : ''
             }`}
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
               <path d="M12 5v14M5 12h14"/>
             </svg>
-            <span className="text-white text-[11px] font-medium">{t('custom_setting')}</span>
+            <span className="text-white text-caption-1 font-medium">{t('custom_setting')}</span>
           </button>
+
           {displayStyles.map(style => (
             <StyleItem
               key={style.id}
@@ -330,97 +377,106 @@ export default function MainMenu() {
           ))}
         </div>
 
-        {/* 하단 액션 - 피츠의 법칙: 핵심 버튼(촬영) 가장 크게, 부가 버튼 충분한 터치 영역 */}
-        <div className="flex items-center justify-between px-4">
-          {/* 염색 버튼 - 피츠의 법칙: 최소 48x48 */}
+        {/* Action Bar */}
+        <div className="flex items-center justify-between px-6 pb-2">
+          {/* Color Button - 44pt minimum */}
           <button
             onClick={() => setShowColorPicker(true)}
-            className="w-14 h-14 rounded-full bg-white/10 border border-white/20 flex flex-col items-center justify-center gap-0.5 active:scale-95 transition-transform"
+            className="w-14 h-14 rounded-full bg-[var(--color-bg-grouped-secondary)] dark:bg-[var(--color-gray-5)] flex flex-col items-center justify-center active:scale-95 transition-transform shadow-sm"
+            aria-label="Hair Color"
           >
             {selectedHairColor ? (
-              <div className="w-7 h-7 rounded-full border-2 border-white/30" style={{ backgroundColor: selectedHairColor }} />
+              <div className="w-7 h-7 rounded-full border-2 border-white shadow-sm" style={{ backgroundColor: selectedHairColor }} />
             ) : (
               <>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" opacity="0.6">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-gray-1)" strokeWidth="1.5">
                   <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
                 </svg>
-                <span className="text-white/50 text-[10px]">{t('dye')}</span>
+                <span className="text-[var(--color-gray-1)] text-caption-2 font-medium mt-0.5">{t('dye')}</span>
               </>
             )}
           </button>
 
-          {/* 메인 촬영 버튼 - 피츠의 법칙: 가장 중요한 기능이므로 가장 크게 (80px) */}
+          {/* Shutter Button - Apple Camera Style */}
           <button
             onClick={captureAndProcess}
             disabled={!canProcess || isCapturing}
-            className={`w-20 h-20 rounded-full transition-all active:scale-95 shadow-lg ${
-              canProcess ? 'bg-[#3182f6] shadow-[#3182f6]/30' : 'bg-white/20'
+            className={`w-[72px] h-[72px] rounded-full transition-all active:scale-95 ${
+              canProcess
+                ? 'bg-[var(--color-blue)]'
+                : 'bg-[var(--color-gray-4)] dark:bg-[var(--color-gray-3)]'
             }`}
+            aria-label="Capture"
           >
             {isCapturing ? (
-              <div className="w-8 h-8 mx-auto border-3 border-white/30 border-t-white rounded-full animate-spin" />
+              <div className="w-7 h-7 mx-auto border-[3px] border-white/30 border-t-white rounded-full animate-spin" />
             ) : (
-              <div className={`w-16 h-16 mx-auto rounded-full border-[3px] transition-all ${
-                canProcess ? 'border-white' : 'border-white/30'
+              <div className={`w-[60px] h-[60px] mx-auto rounded-full border-[3px] transition-all ${
+                canProcess ? 'border-white' : 'border-[var(--color-gray-2)]'
               }`} />
             )}
           </button>
 
-          {/* 참고 이미지 버튼 */}
+          {/* Reference Button - 44pt minimum */}
           <button
             onClick={() => setShowReferencePicker(true)}
-            className="w-14 h-14 rounded-full bg-white/10 border border-white/20 flex flex-col items-center justify-center gap-0.5 active:scale-95 transition-transform"
+            className="w-14 h-14 rounded-full bg-[var(--color-bg-grouped-secondary)] dark:bg-[var(--color-gray-5)] flex flex-col items-center justify-center active:scale-95 transition-transform shadow-sm"
+            aria-label="Reference Photo"
           >
             {uploadedReferenceImages.length > 0 ? (
-              <span className="text-[#3182f6] text-[15px] font-bold">{uploadedReferenceImages.length}</span>
+              <span className="text-[var(--color-blue)] text-callout font-bold">{uploadedReferenceImages.length}</span>
             ) : (
               <>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" opacity="0.6">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-gray-1)" strokeWidth="1.5">
                   <rect x="3" y="3" width="18" height="18" rx="2"/>
                   <path d="M12 8v8M8 12h8"/>
                 </svg>
-                <span className="text-white/50 text-[10px]">{t('reference')}</span>
+                <span className="text-[var(--color-gray-1)] text-caption-2 font-medium mt-0.5">{t('reference')}</span>
               </>
             )}
           </button>
         </div>
 
+        {/* Selection Status */}
         {canProcess && (
-          <p className="text-center text-white/50 text-[12px] mt-4">
+          <p className="text-center text-[var(--color-label-secondary)] text-footnote pb-2">
             {customSelected ? t('custom_mode') : `${selectedStyles.length}${t('selected_count')}`}
           </p>
         )}
       </div>
 
-      {/* 사이드 메뉴 - 제이콥의 법칙: 표준 슬라이드 메뉴 패턴 */}
+      {/* Side Menu - Apple HIG Sheet Style */}
       {showMenu && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm" onClick={() => setShowMenu(false)}>
+        <div className="fixed inset-0 z-50 bg-black/40" onClick={() => setShowMenu(false)}>
           <div
-            className="absolute top-0 left-0 bottom-0 w-72 bg-white shadow-2xl animate-slide-in-left"
+            className="absolute top-0 left-0 bottom-0 w-[280px] bg-[var(--color-bg-grouped)] dark:bg-[var(--color-bg-secondary)] animate-slide-in-left"
             onClick={e => e.stopPropagation()}
           >
-            {/* 헤더 - 제이콥의 법칙: X 버튼으로 닫기 */}
-            <div className="flex justify-between items-start p-6 pt-12 safe-area-top">
-              <div>
-                <h2 className="text-[22px] font-bold text-[#191f28]">{t('app_name')}</h2>
-                <p className="text-[14px] text-[#8b95a1] mt-1">{t('app_desc')}</p>
+            {/* Header */}
+            <div className="safe-area-top px-5 pt-2 pb-4 border-b border-[var(--color-separator)]">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h2 className="text-title-2 text-label font-bold">{t('app_name')}</h2>
+                  <p className="text-subheadline text-[var(--color-label-secondary)] mt-0.5">{t('app_desc')}</p>
+                </div>
+                <button
+                  onClick={() => setShowMenu(false)}
+                  className="w-8 h-8 flex items-center justify-center rounded-full bg-[var(--color-fill-secondary)] active:bg-[var(--color-fill-primary)] transition-colors"
+                  aria-label="Close"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-label)" strokeWidth="2.5">
+                    <path d="M18 6L6 18M6 6l12 12"/>
+                  </svg>
+                </button>
               </div>
-              <button
-                onClick={() => setShowMenu(false)}
-                className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#f2f4f6] active:scale-95 transition-all"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#191f28" strokeWidth="2">
-                  <path d="M18 6L6 18M6 6l12 12"/>
-                </svg>
-              </button>
             </div>
 
-            {/* 밀러의 법칙: 메뉴 항목 5개로 그룹화 */}
-            <nav className="px-4 space-y-1">
-              {/* 메인 기능 그룹 */}
+            {/* Navigation - Apple HIG List Style */}
+            <nav className="p-2 space-y-0.5">
+              {/* Active Item */}
               <button
                 onClick={() => setShowMenu(false)}
-                className="w-full flex items-center gap-3 px-4 py-4 text-[16px] font-medium text-[#191f28] bg-[#f2f4f6] rounded-2xl"
+                className="w-full flex items-center gap-3 px-4 py-3 text-body font-semibold text-[var(--color-blue)] bg-[var(--color-blue)]/10 rounded-xl"
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M20 7h-9M14 17H5"/>
@@ -428,99 +484,57 @@ export default function MainMenu() {
                 </svg>
                 {t('hairstyle')}
               </button>
-              <button
-                onClick={() => { setShowMenu(false); navigate('/analysis'); }}
-                className="w-full flex items-center gap-3 px-4 py-4 text-[16px] text-[#4e5968] rounded-2xl hover:bg-[#f9fafb] active:bg-[#f2f4f6] transition-colors"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="8" r="5"/>
-                  <path d="M3 21c0-4 3.6-8 8-8h2c4.4 0 8 4 8 8"/>
-                </svg>
-                {t('face_analysis')}
-              </button>
-              <button
-                onClick={() => { setShowMenu(false); navigate('/weight'); }}
-                className="w-full flex items-center gap-3 px-4 py-4 text-[16px] text-[#4e5968] rounded-2xl hover:bg-[#f9fafb] active:bg-[#f2f4f6] transition-colors"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M12 2v4M6.34 6.34l2.83 2.83M2 12h4M6.34 17.66l2.83-2.83M12 18v4M17.66 17.66l-2.83-2.83M18 12h4M17.66 6.34l-2.83 2.83"/>
-                </svg>
-                {t('weight_simulation')}
-              </button>
-              <button
-                onClick={() => { setShowMenu(false); navigate('/fitness'); }}
-                className="w-full flex items-center gap-3 px-4 py-4 text-[16px] text-[#4e5968] rounded-2xl hover:bg-[#f9fafb] active:bg-[#f2f4f6] transition-colors"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M6.5 6.5h11v11h-11z"/>
-                  <path d="M4 4h3v3H4zM17 4h3v3h-3zM4 17h3v3H4zM17 17h3v3h-3z"/>
-                </svg>
-                {t('fitness_simulation')}
-              </button>
 
-              {/* 구분선 */}
-              <div className="h-px bg-[#f2f4f6] my-2" />
-              <p className="px-4 py-2 text-[11px] text-[#8b95a1] font-medium uppercase tracking-wide">{t('beauty_simulations')}</p>
+              {/* Menu Items */}
+              {[
+                { path: '/analysis', icon: 'M12 2C9.5 2 8 3.5 8 6c0 1.5.5 2.5 1 3.5S8 12 6 13c-3 1.5-3 4-3 6h18c0-2 0-4.5-3-6-2-1-2-2.5-1.5-3.5S16 7.5 16 6c0-2.5-1.5-4-4-4z', label: t('face_analysis') },
+                { path: '/weight', icon: 'M12 2v4M6.34 6.34l2.83 2.83M2 12h4M6.34 17.66l2.83-2.83M12 18v4M17.66 17.66l-2.83-2.83M18 12h4M17.66 6.34l-2.83 2.83', label: t('weight_simulation') },
+                { path: '/fitness', icon: 'M6.5 6.5h11v11h-11zM4 4h3v3H4zM17 4h3v3h-3zM4 17h3v3H4zM17 17h3v3h-3z', label: t('fitness_simulation') },
+              ].map(item => (
+                <button
+                  key={item.path}
+                  onClick={() => { setShowMenu(false); navigate(item.path); }}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-body text-label rounded-xl hover:bg-[var(--color-fill-quaternary)] active:bg-[var(--color-fill-tertiary)] transition-colors"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path d={item.icon}/>
+                  </svg>
+                  {item.label}
+                </button>
+              ))}
 
-              <button
-                onClick={() => { setShowMenu(false); navigate('/hair-color'); }}
-                className="w-full flex items-center gap-3 px-4 py-3 text-[15px] text-[#4e5968] rounded-2xl hover:bg-[#f9fafb] active:bg-[#f2f4f6] transition-colors"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
-                </svg>
-                {t('hair_color_simulation')}
-              </button>
-              <button
-                onClick={() => { setShowMenu(false); navigate('/hair-volume'); }}
-                className="w-full flex items-center gap-3 px-4 py-3 text-[15px] text-[#4e5968] rounded-2xl hover:bg-[#f9fafb] active:bg-[#f2f4f6] transition-colors"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M12 2a10 10 0 0 1 10 10c0 5.52-4.48 10-10 10S2 17.52 2 12"/>
-                  <path d="M2 12c0-2.76 1.12-5.26 2.93-7.07"/>
-                </svg>
-                {t('hair_volume_simulation')}
-              </button>
-              <button
-                onClick={() => { setShowMenu(false); navigate('/skin-treatment'); }}
-                className="w-full flex items-center gap-3 px-4 py-3 text-[15px] text-[#4e5968] rounded-2xl hover:bg-[#f9fafb] active:bg-[#f2f4f6] transition-colors"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="12" r="10"/>
-                  <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
-                  <line x1="9" y1="9" x2="9.01" y2="9"/>
-                  <line x1="15" y1="9" x2="15.01" y2="9"/>
-                </svg>
-                {t('skin_treatment_simulation')}
-              </button>
-              <button
-                onClick={() => { setShowMenu(false); navigate('/aging'); }}
-                className="w-full flex items-center gap-3 px-4 py-3 text-[15px] text-[#4e5968] rounded-2xl hover:bg-[#f9fafb] active:bg-[#f2f4f6] transition-colors"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="12" r="10"/>
-                  <polyline points="12 6 12 12 16 14"/>
-                </svg>
-                {t('aging_simulation')}
-              </button>
-              <button
-                onClick={() => { setShowMenu(false); navigate('/makeup'); }}
-                className="w-full flex items-center gap-3 px-4 py-3 text-[15px] text-[#4e5968] rounded-2xl hover:bg-[#f9fafb] active:bg-[#f2f4f6] transition-colors"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                </svg>
-                {t('makeup_simulation')}
-              </button>
+              {/* Separator */}
+              <div className="h-px bg-[var(--color-separator)] my-2 mx-4" />
+              <p className="px-4 py-2 text-caption-1 text-[var(--color-label-tertiary)] font-medium uppercase tracking-wide">{t('beauty_simulations')}</p>
+
+              {/* Beauty Simulations */}
+              {[
+                { path: '/hair-color', icon: 'M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z', label: t('hair_color_simulation') },
+                { path: '/hair-volume', icon: 'M12 2a10 10 0 0 1 10 10c0 5.52-4.48 10-10 10S2 17.52 2 12M2 12c0-2.76 1.12-5.26 2.93-7.07', label: t('hair_volume_simulation') },
+                { path: '/skin-treatment', icon: 'M12 22c5.52 0 10-4.48 10-10S17.52 2 12 2M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01', label: t('skin_treatment_simulation') },
+                { path: '/aging', icon: 'M12 22c5.52 0 10-4.48 10-10S17.52 2 12 2 2 6.48 2 12 6.48 22 12 22zM12 6v6l4 2', label: t('aging_simulation') },
+                { path: '/makeup', icon: 'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z', label: t('makeup_simulation') },
+              ].map(item => (
+                <button
+                  key={item.path}
+                  onClick={() => { setShowMenu(false); navigate(item.path); }}
+                  className="w-full flex items-center gap-3 px-4 py-2.5 text-subheadline text-label rounded-xl hover:bg-[var(--color-fill-quaternary)] active:bg-[var(--color-fill-tertiary)] transition-colors"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path d={item.icon}/>
+                  </svg>
+                  {item.label}
+                </button>
+              ))}
             </nav>
 
-            {/* 하단 보조 메뉴 */}
-            <div className="absolute bottom-8 left-0 right-0 px-4 space-y-1 safe-area-bottom">
+            {/* Footer */}
+            <div className="absolute bottom-0 left-0 right-0 p-2 safe-area-bottom border-t border-[var(--color-separator)]">
               <button
                 onClick={() => { setShowMenu(false); navigate('/history'); }}
-                className="w-full flex items-center gap-3 px-4 py-3 text-[15px] text-[#6b7684] rounded-xl hover:bg-[#f9fafb]"
+                className="w-full flex items-center gap-3 px-4 py-2.5 text-subheadline text-[var(--color-label-secondary)] rounded-xl hover:bg-[var(--color-fill-quaternary)] transition-colors"
               >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <circle cx="12" cy="12" r="10"/>
                   <polyline points="12 6 12 12 16 14"/>
                 </svg>
@@ -528,11 +542,11 @@ export default function MainMenu() {
               </button>
               <button
                 onClick={() => { setShowMenu(false); navigate('/settings'); }}
-                className="w-full flex items-center gap-3 px-4 py-3 text-[15px] text-[#6b7684] rounded-xl hover:bg-[#f9fafb]"
+                className="w-full flex items-center gap-3 px-4 py-2.5 text-subheadline text-[var(--color-label-secondary)] rounded-xl hover:bg-[var(--color-fill-quaternary)] transition-colors"
               >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <circle cx="12" cy="12" r="3"/>
-                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                  <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
                 </svg>
                 {t('settings')}
               </button>
@@ -541,37 +555,61 @@ export default function MainMenu() {
         </div>
       )}
 
-      {/* 염색 모달 */}
+      {/* Color Picker Modal - Apple HIG Sheet */}
       {showColorPicker && (
-        <div className="fixed inset-0 z-50 bg-black/50" onClick={() => setShowColorPicker(false)}>
-          <div className="absolute bottom-0 inset-x-0 bg-white rounded-t-3xl max-h-[70vh]" onClick={e => e.stopPropagation()}>
-            <div className="flex justify-between items-center p-5 border-b border-[#f2f4f6]">
-              <span className="text-[17px] font-semibold text-[#191f28]">{t('hair_color')}</span>
-              <button onClick={() => setShowColorPicker(false)} className="text-[15px] text-[#8b95a1]">{t('close')}</button>
+        <div className="fixed inset-0 z-50 bg-black/40" onClick={() => setShowColorPicker(false)}>
+          <div
+            className="absolute bottom-0 inset-x-0 bg-[var(--color-bg-grouped)] dark:bg-[var(--color-bg-secondary)] rounded-t-3xl max-h-[70vh] animate-slide-up"
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Handle */}
+            <div className="flex justify-center pt-3 pb-2">
+              <div className="w-9 h-1 bg-[var(--color-gray-4)] rounded-full" />
             </div>
-            <div className="flex gap-2 px-5 py-4 overflow-x-auto scrollbar-hide">
+
+            {/* Header */}
+            <div className="flex justify-between items-center px-5 pb-3 border-b border-[var(--color-separator)]">
+              <span className="text-headline text-label font-semibold">{t('hair_color')}</span>
+              <button
+                onClick={() => setShowColorPicker(false)}
+                className="text-body text-[var(--color-blue)] font-medium"
+              >
+                {t('close')}
+              </button>
+            </div>
+
+            {/* Category Tabs */}
+            <div className="flex gap-2 px-4 py-3 overflow-x-auto scrollbar-hide">
               {colorCategories.map(cat => (
                 <button
                   key={cat.id}
                   onClick={() => setSelectedColorCategory(cat.id)}
-                  className={`flex-shrink-0 px-4 py-2 rounded-full text-[13px] font-medium ${
-                    selectedColorCategory === cat.id ? 'bg-[#191f28] text-white' : 'bg-[#f2f4f6] text-[#6b7684]'
+                  className={`flex-shrink-0 px-4 py-2 rounded-full text-footnote font-semibold transition-all ${
+                    selectedColorCategory === cat.id
+                      ? 'bg-[var(--color-label)] text-[var(--color-bg-primary)]'
+                      : 'bg-[var(--color-fill-secondary)] text-[var(--color-label-secondary)]'
                   }`}
                 >{cat.nameKo}</button>
               ))}
             </div>
-            <div className="p-5 grid grid-cols-6 gap-3 max-h-[40vh] overflow-y-auto">
+
+            {/* Color Grid */}
+            <div className="p-4 grid grid-cols-6 gap-3 max-h-[40vh] overflow-y-auto safe-area-bottom">
               <button
                 onClick={() => { setSelectedHairColor(null); setShowColorPicker(false); }}
-                className={`aspect-square rounded-2xl bg-[#f2f4f6] flex items-center justify-center ${!selectedHairColor ? 'ring-2 ring-[#3182f6]' : ''}`}
+                className={`aspect-square rounded-2xl bg-[var(--color-fill-secondary)] flex items-center justify-center ${
+                  !selectedHairColor ? 'ring-2 ring-[var(--color-blue)]' : ''
+                }`}
               >
-                <span className="text-[#b0b8c1] text-[11px]">{t('no_color')}</span>
+                <span className="text-[var(--color-label-tertiary)] text-caption-2">{t('no_color')}</span>
               </button>
               {getColorsByCategory(selectedColorCategory).map(color => (
                 <button
                   key={color.id}
                   onClick={() => { setSelectedHairColor(color.hex); setShowColorPicker(false); }}
-                  className={`aspect-square rounded-2xl ${selectedHairColor === color.hex ? 'ring-2 ring-[#3182f6]' : ''}`}
+                  className={`aspect-square rounded-2xl active:scale-95 transition-transform ${
+                    selectedHairColor === color.hex ? 'ring-2 ring-[var(--color-blue)]' : ''
+                  }`}
                   style={{ backgroundColor: color.hex }}
                 />
               ))}
@@ -580,26 +618,42 @@ export default function MainMenu() {
         </div>
       )}
 
-      {/* 참고 이미지 모달 */}
+      {/* Reference Picker Modal */}
       {showReferencePicker && (
-        <div className="fixed inset-0 z-50 bg-black/50" onClick={() => setShowReferencePicker(false)}>
-          <div className="absolute bottom-0 inset-x-0 bg-white rounded-t-3xl" onClick={e => e.stopPropagation()}>
-            <div className="flex justify-between items-center p-5 border-b border-[#f2f4f6]">
-              <div>
-                <p className="text-[17px] font-semibold text-[#191f28]">{t('reference_images')}</p>
-                <p className="text-[13px] text-[#8b95a1] mt-0.5">{t('reference_desc')}</p>
-              </div>
-              <button onClick={() => setShowReferencePicker(false)} className="text-[15px] text-[#8b95a1]">{t('close')}</button>
+        <div className="fixed inset-0 z-50 bg-black/40" onClick={() => setShowReferencePicker(false)}>
+          <div
+            className="absolute bottom-0 inset-x-0 bg-[var(--color-bg-grouped)] dark:bg-[var(--color-bg-secondary)] rounded-t-3xl animate-slide-up"
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Handle */}
+            <div className="flex justify-center pt-3 pb-2">
+              <div className="w-9 h-1 bg-[var(--color-gray-4)] rounded-full" />
             </div>
-            <div className="p-5">
+
+            {/* Header */}
+            <div className="flex justify-between items-center px-5 pb-3 border-b border-[var(--color-separator)]">
+              <div>
+                <p className="text-headline text-label font-semibold">{t('reference_images')}</p>
+                <p className="text-footnote text-[var(--color-label-secondary)] mt-0.5">{t('reference_desc')}</p>
+              </div>
+              <button
+                onClick={() => setShowReferencePicker(false)}
+                className="text-body text-[var(--color-blue)] font-medium"
+              >
+                {t('close')}
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="p-4 safe-area-bottom">
               {uploadedReferenceImages.length > 0 && (
                 <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide">
                   {uploadedReferenceImages.map((img, idx) => (
                     <div key={idx} className="relative flex-shrink-0">
-                      <img src={img} alt="" className="w-20 h-24 object-cover rounded-2xl" />
+                      <img src={img} alt="" className="w-16 h-20 object-cover rounded-xl" />
                       <button
                         onClick={() => useAppStore.getState().removeUploadedReference(idx)}
-                        className="absolute -top-2 -right-2 w-6 h-6 bg-[#191f28] text-white rounded-full text-[12px]"
+                        className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-[var(--color-red)] text-white rounded-full text-caption-2 font-bold flex items-center justify-center"
                       >×</button>
                     </div>
                   ))}
@@ -608,7 +662,7 @@ export default function MainMenu() {
               <button
                 onClick={() => referenceInputRef.current?.click()}
                 disabled={uploadedReferenceImages.length >= 5}
-                className="w-full py-4 border-2 border-dashed border-[#e5e8eb] rounded-2xl text-[14px] text-[#8b95a1]"
+                className="w-full py-4 border-2 border-dashed border-[var(--color-separator)] rounded-2xl text-subheadline text-[var(--color-label-tertiary)] active:bg-[var(--color-fill-quaternary)] transition-colors disabled:opacity-50"
               >
                 {t('add_photo')}
               </button>
@@ -623,6 +677,28 @@ export default function MainMenu() {
           onAccept={() => { setHasConsented(true); setShowConsentModal(false); }}
           onDecline={() => alert('서비스 이용을 위해서는 약관 동의가 필요합니다.')}
         />
+      )}
+
+      {/* Toast - Apple HIG Style */}
+      {showAddedToast && (
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 animate-scale-in">
+          <div className="bg-[var(--color-green)] text-white px-5 py-3 rounded-2xl shadow-lg flex items-center gap-2">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
+              <path d="M20 6L9 17l-5-5"/>
+            </svg>
+            <span className="font-semibold text-body">백그라운드에서 생성 중!</span>
+          </div>
+        </div>
+      )}
+
+      {/* Queue Indicator */}
+      {queue.length > 0 && (
+        <div className="fixed top-4 right-4 z-40 safe-area-top">
+          <div className="bg-[var(--color-blue)] text-white px-3 py-2 rounded-xl shadow-lg flex items-center gap-2 text-footnote font-semibold">
+            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            {queue.length}개 생성 중
+          </div>
+        </div>
       )}
     </div>
   );

@@ -1,37 +1,123 @@
 @import "tailwindcss";
 
+/* ========================================
+   Apple Human Interface Guidelines
+   Design System
+   ======================================== */
+
+:root {
+  /* Apple SF Pro Font Stack */
+  --font-system: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', 'Apple SD Gothic Neo', 'Pretendard Variable', sans-serif;
+
+  /* ===== Light Mode (Default) ===== */
+  /* Apple System Colors - Light */
+  --color-blue: #007AFF;
+  --color-green: #34C759;
+  --color-indigo: #5856D6;
+  --color-orange: #FF9500;
+  --color-pink: #FF2D55;
+  --color-purple: #AF52DE;
+  --color-red: #FF3B30;
+  --color-teal: #5AC8FA;
+  --color-yellow: #FFCC00;
+
+  /* Apple Gray Scale - Light */
+  --color-gray-1: #8E8E93;
+  --color-gray-2: #AEAEB2;
+  --color-gray-3: #C7C7CC;
+  --color-gray-4: #D1D1D6;
+  --color-gray-5: #E5E5EA;
+  --color-gray-6: #F2F2F7;
+
+  /* Semantic Colors - Light */
+  --color-label: #000000;
+  --color-label-secondary: #3C3C43;
+  --color-label-tertiary: rgba(60, 60, 67, 0.6);
+  --color-label-quaternary: rgba(60, 60, 67, 0.18);
+
+  /* Background Colors - Light */
+  --color-bg-primary: #FFFFFF;
+  --color-bg-secondary: #F2F2F7;
+  --color-bg-tertiary: #FFFFFF;
+  --color-bg-grouped: #F2F2F7;
+  --color-bg-grouped-secondary: #FFFFFF;
+
+  /* Fill Colors - Light */
+  --color-fill-primary: rgba(120, 120, 128, 0.2);
+  --color-fill-secondary: rgba(120, 120, 128, 0.16);
+  --color-fill-tertiary: rgba(118, 118, 128, 0.12);
+  --color-fill-quaternary: rgba(116, 116, 128, 0.08);
+
+  /* Separator Colors - Light */
+  --color-separator: rgba(60, 60, 67, 0.29);
+  --color-separator-opaque: #C6C6C8;
+
+  /* System Background for Blur - Light */
+  --color-system-bg-thin: rgba(255, 255, 255, 0.5);
+  --color-system-bg-thick: rgba(255, 255, 255, 0.85);
+}
+
+/* ===== Dark Mode ===== */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Apple System Colors - Dark */
+    --color-blue: #0A84FF;
+    --color-green: #30D158;
+    --color-indigo: #5E5CE6;
+    --color-orange: #FF9F0A;
+    --color-pink: #FF375F;
+    --color-purple: #BF5AF2;
+    --color-red: #FF453A;
+    --color-teal: #64D2FF;
+    --color-yellow: #FFD60A;
+
+    /* Apple Gray Scale - Dark */
+    --color-gray-1: #8E8E93;
+    --color-gray-2: #636366;
+    --color-gray-3: #48484A;
+    --color-gray-4: #3A3A3C;
+    --color-gray-5: #2C2C2E;
+    --color-gray-6: #1C1C1E;
+
+    /* Semantic Colors - Dark */
+    --color-label: #FFFFFF;
+    --color-label-secondary: #EBEBF5;
+    --color-label-tertiary: rgba(235, 235, 245, 0.6);
+    --color-label-quaternary: rgba(235, 235, 245, 0.18);
+
+    /* Background Colors - Dark */
+    --color-bg-primary: #000000;
+    --color-bg-secondary: #1C1C1E;
+    --color-bg-tertiary: #2C2C2E;
+    --color-bg-grouped: #000000;
+    --color-bg-grouped-secondary: #1C1C1E;
+
+    /* Fill Colors - Dark */
+    --color-fill-primary: rgba(120, 120, 128, 0.36);
+    --color-fill-secondary: rgba(120, 120, 128, 0.32);
+    --color-fill-tertiary: rgba(118, 118, 128, 0.24);
+    --color-fill-quaternary: rgba(116, 116, 128, 0.18);
+
+    /* Separator Colors - Dark */
+    --color-separator: rgba(84, 84, 88, 0.65);
+    --color-separator-opaque: #38383A;
+
+    /* System Background for Blur - Dark */
+    --color-system-bg-thin: rgba(0, 0, 0, 0.5);
+    --color-system-bg-thick: rgba(0, 0, 0, 0.85);
+  }
+}
+
 @theme {
-  /* Toss Design System Font */
-  --font-sans: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+  /* Font */
+  --font-sans: var(--font-system);
 
-  /* Toss Brand Colors */
-  --color-primary: #3182f6;
-  --color-primary-dark: #1b64da;
-  --color-primary-light: #4a93f7;
-  --color-secondary: #6b5ce7;
-  --color-accent: #00c471;
-
-  /* Toss Gray Scale */
-  --color-gray-50: #f9fafb;
-  --color-gray-100: #f2f4f6;
-  --color-gray-200: #e5e8eb;
-  --color-gray-300: #d1d6db;
-  --color-gray-400: #b0b8c1;
-  --color-gray-500: #8b95a1;
-  --color-gray-600: #6b7684;
-  --color-gray-700: #4e5968;
-  --color-gray-800: #333d4b;
-  --color-gray-900: #191f28;
-
-  /* Semantic Colors */
-  --color-bg-primary: #ffffff;
-  --color-bg-secondary: #f9fafb;
-  --color-bg-tertiary: #f2f4f6;
-
-  --color-text-primary: #191f28;
-  --color-text-secondary: #4e5968;
-  --color-text-tertiary: #8b95a1;
-  --color-text-disabled: #b0b8c1;
+  /* Primary Brand Color */
+  --color-primary: var(--color-blue);
+  --color-primary-dark: #0066CC;
+  --color-primary-light: #40A0FF;
+  --color-secondary: var(--color-indigo);
+  --color-accent: var(--color-green);
 }
 
 * {
@@ -44,20 +130,68 @@ html, body, #root {
   width: 100%;
   height: 100%;
   background-color: var(--color-bg-primary);
-  color: var(--color-text-primary);
-  font-family: var(--font-sans);
+  color: var(--color-label);
+  font-family: var(--font-system);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
+  font-feature-settings: 'kern' 1;
+  text-rendering: optimizeLegibility;
 }
 
-/* Safe area for mobile */
+/* Apple HIG Typography Scale */
+.text-large-title { font-size: 34px; font-weight: 700; line-height: 1.2; letter-spacing: -0.02em; }
+.text-title-1 { font-size: 28px; font-weight: 700; line-height: 1.2; letter-spacing: -0.02em; }
+.text-title-2 { font-size: 22px; font-weight: 700; line-height: 1.27; letter-spacing: -0.01em; }
+.text-title-3 { font-size: 20px; font-weight: 600; line-height: 1.25; letter-spacing: -0.01em; }
+.text-headline { font-size: 17px; font-weight: 600; line-height: 1.29; letter-spacing: -0.01em; }
+.text-body { font-size: 17px; font-weight: 400; line-height: 1.29; letter-spacing: -0.01em; }
+.text-callout { font-size: 16px; font-weight: 400; line-height: 1.31; letter-spacing: -0.01em; }
+.text-subheadline { font-size: 15px; font-weight: 400; line-height: 1.33; letter-spacing: -0.01em; }
+.text-footnote { font-size: 13px; font-weight: 400; line-height: 1.38; letter-spacing: -0.01em; }
+.text-caption-1 { font-size: 12px; font-weight: 400; line-height: 1.33; }
+.text-caption-2 { font-size: 11px; font-weight: 400; line-height: 1.27; }
+
+/* Apple HIG Color Classes */
+.text-label { color: var(--color-label); }
+.text-label-secondary { color: var(--color-label-secondary); }
+.text-label-tertiary { color: var(--color-label-tertiary); }
+.bg-primary { background-color: var(--color-bg-primary); }
+.bg-secondary { background-color: var(--color-bg-secondary); }
+.bg-grouped { background-color: var(--color-bg-grouped); }
+.bg-grouped-secondary { background-color: var(--color-bg-grouped-secondary); }
+.border-separator { border-color: var(--color-separator); }
+
+/* Safe area for mobile - Apple HIG Compliant */
 .safe-area-top {
-  padding-top: env(safe-area-inset-top);
+  padding-top: max(env(safe-area-inset-top), 20px);
 }
 
 .safe-area-bottom {
-  padding-bottom: env(safe-area-inset-bottom);
+  padding-bottom: max(env(safe-area-inset-bottom), 34px);
+}
+
+.safe-area-left {
+  padding-left: env(safe-area-inset-left);
+}
+
+.safe-area-right {
+  padding-right: env(safe-area-inset-right);
+}
+
+/* iOS Navigation Bar Height */
+.nav-bar-height {
+  height: 44px;
+}
+
+/* iOS Tab Bar Safe Area */
+.tab-bar-safe {
+  padding-bottom: calc(env(safe-area-inset-bottom) + 49px);
+}
+
+/* Bottom Sheet with Safe Area */
+.bottom-sheet-safe {
+  padding-bottom: max(env(safe-area-inset-bottom), 20px);
 }
 
 /* Toss Style Scrollbar - Hidden by default */
@@ -505,9 +639,44 @@ html, body, #root {
   }
 }
 
-/* 다크 모드 지원 (향후) */
+/* 다크 모드 - Apple HIG Compliant */
 @media (prefers-color-scheme: dark) {
-  /* 다크 모드 스타일은 향후 구현 */
+  html, body, #root {
+    background-color: var(--color-bg-primary);
+    color: var(--color-label);
+  }
+
+  .btn-secondary {
+    background-color: var(--color-gray-5);
+    color: var(--color-label);
+  }
+
+  .btn-secondary:hover {
+    background-color: var(--color-gray-4);
+  }
+
+  .skeleton {
+    background: linear-gradient(90deg, #2C2C2E 25%, #3A3A3C 50%, #2C2C2E 75%);
+    background-size: 200% 100%;
+  }
+
+  .shadow-toss,
+  .shadow-toss-lg {
+    box-shadow: none;
+  }
+
+  /* iOS-style materials for dark mode */
+  .material-thin {
+    background: var(--color-system-bg-thin);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+  }
+
+  .material-thick {
+    background: var(--color-system-bg-thick);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+  }
 }
 
 /* ========================================

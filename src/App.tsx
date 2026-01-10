@@ -2,10 +2,9 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { lazy, Suspense, useEffect, useState } from 'react';
 import NetworkStatus from './components/NetworkStatus';
 import SkipLink from './components/SkipLink';
-import PWAInstallPrompt from './components/PWAInstallPrompt';
 import CookieConsent from './components/CookieConsent';
 import OnboardingTutorial, { hasCompletedOnboarding } from './components/OnboardingTutorial';
-import BackgroundTaskIndicator from './components/BackgroundTaskIndicator';
+import ProcessingIndicator from './components/ProcessingIndicator';
 import { trackPageView } from './services/analytics';
 import { initPageSEO } from './services/seo';
 import { useI18n } from './i18n/useI18n';
@@ -74,6 +73,7 @@ const NotFound = lazy(() => import('./pages/NotFound'));
 const Privacy = lazy(() => import('./pages/Privacy'));
 const Terms = lazy(() => import('./pages/Terms'));
 const Admin = lazy(() => import('./pages/Admin'));
+const Auth = lazy(() => import('./pages/Auth'));
 
 // 페이지 추적 및 SEO 컴포넌트
 function PageTracker() {
@@ -145,6 +145,9 @@ function App() {
             {/* 관리자 페이지 */}
             <Route path="/admin" element={<Admin />} />
 
+            {/* 인증 페이지 */}
+            <Route path="/auth" element={<Auth />} />
+
             {/* 404 페이지 */}
             <Route path="*" element={<NotFound />} />
           </Routes>
@@ -154,11 +157,8 @@ function App() {
       {/* 온보딩 튜토리얼 (첫 방문 사용자) */}
       <OnboardingManager />
 
-      {/* 백그라운드 작업 표시기 */}
-      <BackgroundTaskIndicator />
-
-      {/* PWA 설치 프롬프트 */}
-      <PWAInstallPrompt />
+      {/* 백그라운드 AI 생성 인디케이터 */}
+      <ProcessingIndicator />
 
       {/* GDPR/CCPA 쿠키 동의 배너 */}
       <CookieConsent />

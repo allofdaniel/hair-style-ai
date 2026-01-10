@@ -1,4 +1,4 @@
-package com.allofdaniel.hairstyleai;
+package com.beforecut.app;
 
 import com.getcapacitor.BridgeActivity;
 

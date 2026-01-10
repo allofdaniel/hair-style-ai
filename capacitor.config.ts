@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.looksim.app',
-  appName: 'LookSim',
+  appId: 'com.beforecut.app',
+  appName: 'BeforeCut',
   webDir: 'dist',
   server: {
     androidScheme: 'https',

@@ -1,14 +1,17 @@
 /**
- * iOS/토스 스타일 버튼 컴포넌트
- * - 부드러운 스프링 애니메이션
- * - 햅틱 피드백 지원
- * - 다양한 스타일 variants
+ * Apple HIG Button Components
+ *
+ * Design Principles:
+ * - Minimum 44pt touch target
+ * - Clear visual feedback on press
+ * - Consistent corner radius (12pt for small, 14pt for large)
+ * - SF-style animations
  */
 
-import type { ReactNode, ButtonHTMLAttributes } from 'react';
+import { useState, type ReactNode, type ButtonHTMLAttributes } from 'react';
 
-type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'success';
-type ButtonSize = 'sm' | 'md' | 'lg' | 'xl';
+type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'destructive' | 'filled';
+type ButtonSize = 'sm' | 'md' | 'lg';
 
 interface IOSButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
@@ -20,19 +23,35 @@ interface IOSButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
 }
 
-const variantStyles: Record<ButtonVariant, string> = {
-  primary: 'bg-[#3182f6] text-white active:bg-[#1b64da] shadow-lg shadow-[#3182f6]/25',
-  secondary: 'bg-[#f2f4f6] text-[#191f28] active:bg-[#e5e8eb]',
-  ghost: 'bg-transparent text-[#3182f6] active:bg-[#3182f6]/10',
-  danger: 'bg-[#ff5247] text-white active:bg-[#e53935] shadow-lg shadow-[#ff5247]/25',
-  success: 'bg-[#00c471] text-white active:bg-[#00a65a] shadow-lg shadow-[#00c471]/25',
+// Apple HIG compliant button styles
+const variantStyles: Record<ButtonVariant, { base: string; pressed: string }> = {
+  primary: {
+    base: 'bg-[var(--color-blue)] text-white',
+    pressed: 'bg-[#0066CC] dark:bg-[#0066CC]',
+  },
+  secondary: {
+    base: 'bg-[var(--color-fill-secondary)] text-[var(--color-label)]',
+    pressed: 'bg-[var(--color-fill-primary)]',
+  },
+  ghost: {
+    base: 'bg-transparent text-[var(--color-blue)]',
+    pressed: 'bg-[var(--color-blue)]/10',
+  },
+  destructive: {
+    base: 'bg-[var(--color-red)] text-white',
+    pressed: 'bg-[#CC2929] dark:bg-[#CC2929]',
+  },
+  filled: {
+    base: 'bg-[var(--color-label)] text-[var(--color-bg-primary)]',
+    pressed: 'bg-[var(--color-label-secondary)]',
+  },
 };
 
+// Apple HIG size specs (minimum 44pt touch target)
 const sizeStyles: Record<ButtonSize, string> = {
-  sm: 'h-9 px-4 text-[13px] rounded-xl gap-1.5',
-  md: 'h-12 px-5 text-[15px] rounded-2xl gap-2',
-  lg: 'h-14 px-6 text-[16px] rounded-2xl gap-2.5',
-  xl: 'h-[60px] px-8 text-[17px] rounded-3xl gap-3',
+  sm: 'h-11 px-4 text-subheadline rounded-xl gap-2',
+  md: 'h-[50px] px-5 text-body rounded-[14px] gap-2',
+  lg: 'h-[56px] px-6 text-body rounded-2xl gap-2.5',
 };
 
 export default function IOSButton({
@@ -48,38 +67,59 @@ export default function IOSButton({
   onClick,
   ...props
 }: IOSButtonProps) {
+  const [isPressed, setIsPressed] = useState(false);
+
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    // 햅틱 피드백 (지원되는 경우)
+    // Haptic feedback
     if ('vibrate' in navigator) {
       navigator.vibrate(10);
     }
     onClick?.(e);
   };
 
+  const handlePressStart = () => {
+    if (!disabled && !loading) {
+      setIsPressed(true);
+    }
+  };
+
+  const handlePressEnd = () => {
+    setIsPressed(false);
+  };
+
+  const styles = variantStyles[variant];
+
   return (
     <button
       onClick={handleClick}
+      onMouseDown={handlePressStart}
+      onMouseUp={handlePressEnd}
+      onMouseLeave={handlePressEnd}
+      onTouchStart={handlePressStart}
+      onTouchEnd={handlePressEnd}
+      onTouchCancel={handlePressEnd}
       disabled={disabled || loading}
       className={`
         relative inline-flex items-center justify-center font-semibold
-        transition-all duration-200 ease-out
-        active:scale-[0.97] active:transition-transform active:duration-100
-        disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100
-        ${variantStyles[variant]}
+        transition-all duration-150 ease-out
+        transform-gpu
+        ${isPressed ? 'scale-[0.97] opacity-90' : 'scale-100 opacity-100'}
+        ${isPressed ? styles.pressed : styles.base}
+        disabled:opacity-40 disabled:cursor-not-allowed disabled:scale-100
         ${sizeStyles[size]}
         ${fullWidth ? 'w-full' : ''}
         ${className}
       `}
       {...props}
     >
-      {/* 로딩 스피너 */}
+      {/* Loading Spinner */}
       {loading && (
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+          <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin opacity-70" />
         </div>
       )}
 
-      {/* 콘텐츠 */}
+      {/* Content */}
       <span className={`flex items-center justify-center gap-2 ${loading ? 'opacity-0' : ''} ${iconPosition === 'right' ? 'flex-row-reverse' : ''}`}>
         {icon && <span className="flex-shrink-0">{icon}</span>}
         {children}
@@ -88,7 +128,7 @@ export default function IOSButton({
   );
 }
 
-// 아이콘 버튼 (원형)
+// Icon Button (Circular) - Apple HIG Style
 interface IOSIconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
   size?: 'sm' | 'md' | 'lg';
@@ -101,11 +141,15 @@ export function IOSIconButton({
   children,
   className = '',
   onClick,
+  disabled,
   ...props
 }: IOSIconButtonProps) {
+  const [isPressed, setIsPressed] = useState(false);
+
+  // Apple HIG: Minimum 44pt touch target
   const sizeClasses = {
-    sm: 'w-9 h-9',
-    md: 'w-11 h-11',
+    sm: 'w-11 h-11',
+    md: 'w-12 h-12',
     lg: 'w-14 h-14',
   };
 
@@ -116,14 +160,27 @@ export function IOSIconButton({
     onClick?.(e);
   };
 
+  const handlePressStart = () => !disabled && setIsPressed(true);
+  const handlePressEnd = () => setIsPressed(false);
+
+  const styles = variantStyles[variant];
+
   return (
     <button
       onClick={handleClick}
+      onMouseDown={handlePressStart}
+      onMouseUp={handlePressEnd}
+      onMouseLeave={handlePressEnd}
+      onTouchStart={handlePressStart}
+      onTouchEnd={handlePressEnd}
+      onTouchCancel={handlePressEnd}
+      disabled={disabled}
       className={`
         inline-flex items-center justify-center rounded-full
-        transition-all duration-200 ease-out
-        active:scale-[0.92] active:transition-transform active:duration-100
-        ${variantStyles[variant]}
+        transition-all duration-150 transform-gpu
+        ${isPressed ? 'scale-[0.92] opacity-90' : 'scale-100 opacity-100'}
+        ${isPressed ? styles.pressed : styles.base}
+        disabled:opacity-40 disabled:cursor-not-allowed
         ${sizeClasses[size]}
         ${className}
       `}
@@ -134,7 +191,7 @@ export function IOSIconButton({
   );
 }
 
-// 카드 스타일 버튼 (세로형)
+// Card Style Button - Apple HIG Style
 interface IOSCardButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   icon: ReactNode;
   title: string;
@@ -149,8 +206,11 @@ export function IOSCardButton({
   selected = false,
   className = '',
   onClick,
+  disabled,
   ...props
 }: IOSCardButtonProps) {
+  const [isPressed, setIsPressed] = useState(false);
+
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     if ('vibrate' in navigator) {
       navigator.vibrate(10);
@@ -158,33 +218,123 @@ export function IOSCardButton({
     onClick?.(e);
   };
 
+  const handlePressStart = () => !disabled && setIsPressed(true);
+  const handlePressEnd = () => setIsPressed(false);
+
   return (
     <button
       onClick={handleClick}
+      onMouseDown={handlePressStart}
+      onMouseUp={handlePressEnd}
+      onMouseLeave={handlePressEnd}
+      onTouchStart={handlePressStart}
+      onTouchEnd={handlePressEnd}
+      onTouchCancel={handlePressEnd}
+      disabled={disabled}
       className={`
-        flex flex-col items-center justify-center gap-2 p-4
-        bg-white rounded-3xl
-        transition-all duration-300 ease-out
-        active:scale-[0.96]
+        flex flex-col items-center justify-center gap-2.5 p-4
+        bg-[var(--color-bg-grouped-secondary)] dark:bg-[var(--color-gray-5)]
+        rounded-2xl
+        transition-all duration-150 transform-gpu
+        ${isPressed ? 'scale-[0.96] opacity-90' : 'scale-100'}
         ${selected
-          ? 'ring-2 ring-[#3182f6] shadow-lg shadow-[#3182f6]/20'
-          : 'shadow-md shadow-black/5 hover:shadow-lg'
+          ? 'ring-2 ring-[var(--color-blue)]'
+          : ''
         }
+        disabled:opacity-40 disabled:cursor-not-allowed
         ${className}
       `}
       {...props}
     >
-      <div className={`text-3xl ${selected ? 'scale-110' : ''} transition-transform duration-300`}>
+      <div className={`text-2xl transition-transform duration-200 ${selected ? 'scale-110' : isPressed ? 'scale-95' : 'scale-100'}`}>
         {icon}
       </div>
       <div className="text-center">
-        <div className={`font-semibold text-[15px] ${selected ? 'text-[#3182f6]' : 'text-[#191f28]'}`}>
+        <div className={`font-semibold text-subheadline ${selected ? 'text-[var(--color-blue)]' : 'text-label'}`}>
           {title}
         </div>
         {subtitle && (
-          <div className="text-[12px] text-[#8b95a1] mt-0.5">{subtitle}</div>
+          <div className="text-caption-1 text-[var(--color-label-secondary)] mt-0.5">{subtitle}</div>
         )}
       </div>
     </button>
+  );
+}
+
+// Text Button - Apple HIG Style (for navigation bars)
+interface IOSTextButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'default' | 'destructive';
+  children: ReactNode;
+}
+
+export function IOSTextButton({
+  variant = 'default',
+  children,
+  className = '',
+  disabled,
+  ...props
+}: IOSTextButtonProps) {
+  const [isPressed, setIsPressed] = useState(false);
+
+  const handlePressStart = () => !disabled && setIsPressed(true);
+  const handlePressEnd = () => setIsPressed(false);
+
+  return (
+    <button
+      onMouseDown={handlePressStart}
+      onMouseUp={handlePressEnd}
+      onMouseLeave={handlePressEnd}
+      onTouchStart={handlePressStart}
+      onTouchEnd={handlePressEnd}
+      onTouchCancel={handlePressEnd}
+      disabled={disabled}
+      className={`
+        min-h-11 px-2 text-body font-medium
+        transition-opacity duration-150
+        ${isPressed ? 'opacity-50' : 'opacity-100'}
+        ${variant === 'destructive' ? 'text-[var(--color-red)]' : 'text-[var(--color-blue)]'}
+        disabled:opacity-40 disabled:cursor-not-allowed
+        ${className}
+      `}
+      {...props}
+    >
+      {children}
+    </button>
+  );
+}
+
+// Segmented Control - Apple HIG Style
+interface SegmentedControlProps {
+  options: { value: string; label: string }[];
+  value: string;
+  onChange: (value: string) => void;
+  className?: string;
+}
+
+export function SegmentedControl({
+  options,
+  value,
+  onChange,
+  className = '',
+}: SegmentedControlProps) {
+  return (
+    <div className={`flex bg-[var(--color-fill-tertiary)] rounded-[10px] p-0.5 ${className}`}>
+      {options.map((option) => (
+        <button
+          key={option.value}
+          onClick={() => onChange(option.value)}
+          className={`
+            flex-1 py-2 px-3 text-footnote font-semibold rounded-lg
+            transition-all duration-200
+            ${value === option.value
+              ? 'bg-[var(--color-bg-primary)] text-label shadow-sm'
+              : 'text-[var(--color-label-secondary)]'
+            }
+          `}
+        >
+          {option.label}
+        </button>
+      ))}
+    </div>
   );
 }

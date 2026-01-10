@@ -1,8 +1,10 @@
 /**
- * Processing 페이지 - iOS/토스 스타일
- * - 부드러운 애니메이션
- * - 백그라운드로 전환 가능
- * - 사용자 경험 최적화
+ * Processing Page - Apple HIG Style
+ *
+ * Design Principles:
+ * - Clean, minimal interface
+ * - Smooth animations
+ * - Clear progress indication
  */
 
 import { useEffect, useState, useRef } from 'react';
@@ -17,10 +19,9 @@ interface ProcessingResult {
   styleId: string;
   styleName: string;
   resultImage: string;
-  backViewImage?: string;  // 뒷머리 이미지
+  backViewImage?: string;
 }
 
-// AI 생성 중 표시할 팁들
 const AI_TIPS = [
   { icon: '✨', text: 'AI가 당신의 얼굴 특징을 분석하고 있어요' },
   { icon: '🎨', text: '선택한 헤어스타일을 자연스럽게 적용 중이에요' },
@@ -41,14 +42,13 @@ export default function Processing() {
   const [currentTip, setCurrentTip] = useState(0);
   const processingRef = useRef(false);
 
-  // 팁 로테이션
+  // Tip rotation
   useEffect(() => {
     const tipInterval = setInterval(() => {
       setCurrentTip(prev => (prev + 1) % AI_TIPS.length);
     }, 4000);
     return () => clearInterval(tipInterval);
   }, []);
-
 
   useEffect(() => {
     if (!userPhoto || processingRef.current) {
@@ -89,15 +89,14 @@ export default function Processing() {
         setProgress(baseProgress + 10);
 
         try {
-          // 진행률 시뮬레이션
           const progressInterval = setInterval(() => {
             setProgress(prev => {
-              const maxProgress = baseProgress + 85;
+              const maxProgress = Math.min(baseProgress + 85, 99);
               if (prev >= maxProgress) {
                 clearInterval(progressInterval);
-                return prev;
+                return maxProgress;
               }
-              return prev + Math.random() * 5;
+              return Math.min(prev + Math.random() * 5, maxProgress);
             });
           }, 500);
 
@@ -113,7 +112,7 @@ export default function Processing() {
               styleId: style.id,
               styleName: style.nameKo,
               resultImage: result.resultImage,
-              backViewImage: result.backViewImage,  // 뒷머리 이미지 추가
+              backViewImage: result.backViewImage,
             });
 
             try {
@@ -127,14 +126,14 @@ export default function Processing() {
                 date: new Date().toISOString(),
               });
             } catch (storageError) {
-              console.warn('히스토리 저장 실패:', storageError);
+              console.warn('History save failed:', storageError);
             }
           }
         } catch (error) {
           console.error(`Error processing style ${style.name}:`, error);
         }
 
-        setProgress(((i + 1) / styleIds.length) * 100);
+        setProgress(Math.min(((i + 1) / styleIds.length) * 100, 100));
       }
 
       if (isCancelled) return;
@@ -156,92 +155,85 @@ export default function Processing() {
     return () => { isCancelled = true; };
   }, []);
 
-
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center px-6 safe-area-top safe-area-bottom">
-      {/* 메인 콘텐츠 */}
+    <div className="min-h-screen bg-[var(--color-bg-primary)] flex flex-col items-center justify-center px-6 safe-area-top safe-area-bottom">
+      {/* Main Content */}
       <div className="w-full max-w-sm text-center">
-        {/* 애니메이션 로더 */}
-        <div className="relative w-32 h-32 mx-auto mb-8">
-          {/* 외부 링 */}
-          <svg className="w-32 h-32 -rotate-90 animate-spin" style={{ animationDuration: '3s' }}>
+        {/* Animated Loader - Apple HIG Style */}
+        <div className="relative w-28 h-28 mx-auto mb-8">
+          {/* Outer Ring */}
+          <svg className="w-28 h-28 -rotate-90" viewBox="0 0 112 112">
             <circle
-              cx="64" cy="64" r="56"
+              cx="56" cy="56" r="48"
               fill="none"
-              stroke="#f2f4f6"
-              strokeWidth="8"
+              stroke="var(--color-gray-5)"
+              strokeWidth="6"
             />
             <circle
-              cx="64" cy="64" r="56"
+              cx="56" cy="56" r="48"
               fill="none"
-              stroke="url(#gradient)"
-              strokeWidth="8"
-              strokeDasharray={`${progress * 3.52} 352`}
+              stroke="var(--color-blue)"
+              strokeWidth="6"
+              strokeDasharray={`${progress * 3.02} 302`}
               strokeLinecap="round"
               className="transition-all duration-500"
             />
-            <defs>
-              <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#3182f6" />
-                <stop offset="100%" stopColor="#6b5ce7" />
-              </linearGradient>
-            </defs>
           </svg>
 
-          {/* 중앙 아이콘 */}
+          {/* Center Icon */}
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-4xl animate-pulse transition-all duration-500">
+            <span className="text-4xl animate-pulse transition-all duration-500">
               {AI_TIPS[currentTip].icon}
-            </div>
+            </span>
           </div>
         </div>
 
-        {/* 진행률 */}
+        {/* Progress Display */}
         <div className="mb-6">
           <div className="flex items-center justify-center gap-2 mb-3">
             {totalStyles > 1 && (
-              <span className="text-[13px] font-medium text-[#8b95a1] bg-[#f2f4f6] px-2 py-1 rounded-full">
+              <span className="text-caption-1 font-medium text-[var(--color-label-tertiary)] bg-[var(--color-fill-secondary)] px-2 py-1 rounded-full">
                 {currentStyleIndex + 1}/{totalStyles}
               </span>
             )}
-            <span className="text-[28px] font-bold bg-gradient-to-r from-[#3182f6] to-[#6b5ce7] bg-clip-text text-transparent">
+            <span className="text-title-1 font-bold text-[var(--color-blue)]">
               {Math.round(progress)}%
             </span>
           </div>
 
-          {/* 프로그레스 바 */}
-          <div className="h-2 bg-[#f2f4f6] rounded-full overflow-hidden">
+          {/* Progress Bar */}
+          <div className="h-1 bg-[var(--color-gray-5)] rounded-full overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-[#3182f6] to-[#6b5ce7] transition-all duration-500 ease-out rounded-full"
+              className="h-full bg-[var(--color-blue)] transition-all duration-500 ease-out rounded-full"
               style={{ width: `${progress}%` }}
             />
           </div>
         </div>
 
-        {/* 현재 스타일 */}
+        {/* Current Style */}
         {currentStyleName && (
-          <p className="text-[17px] font-semibold text-[#191f28] mb-2 animate-fade-in">
+          <p className="text-headline font-semibold text-label mb-2 animate-fade-in">
             {currentStyleName}
           </p>
         )}
 
-        {/* AI 팁 */}
-        <p className="text-[14px] text-[#8b95a1] min-h-[40px] transition-all duration-500 animate-fade-in" key={currentTip}>
+        {/* AI Tip */}
+        <p className="text-subheadline text-[var(--color-label-secondary)] min-h-[40px] transition-all duration-500 animate-fade-in" key={currentTip}>
           {AI_TIPS[currentTip].text}
         </p>
 
-        {/* 멀티 스타일 인디케이터 */}
+        {/* Multi Style Indicator */}
         {totalStyles > 1 && (
-          <div className="flex justify-center gap-2 mt-8">
+          <div className="flex justify-center gap-1.5 mt-8">
             {Array.from({ length: totalStyles }).map((_, idx) => (
               <div
                 key={idx}
                 className={`w-2 h-2 rounded-full transition-all duration-300 ${
                   idx < currentStyleIndex
-                    ? 'bg-[#00c471] scale-100'
+                    ? 'bg-[var(--color-green)]'
                     : idx === currentStyleIndex
-                    ? 'bg-[#3182f6] scale-125 animate-pulse'
-                    : 'bg-[#e5e8eb] scale-100'
+                    ? 'bg-[var(--color-blue)] scale-125'
+                    : 'bg-[var(--color-gray-4)]'
                 }`}
               />
             ))}
@@ -249,8 +241,8 @@ export default function Processing() {
         )}
       </div>
 
-      {/* 하단 안내 */}
-      <p className="absolute bottom-8 text-[13px] text-[#b0b8c1]">
+      {/* Bottom Notice */}
+      <p className="absolute bottom-8 text-footnote text-[var(--color-label-tertiary)] safe-area-bottom">
         {t('please_wait') || '잠시만 기다려주세요...'}
       </p>
     </div>

@@ -13,10 +13,18 @@ interface I18nState {
 // RTL 언어 목록
 const RTL_LANGUAGES: Language[] = ['ar'];
 
+// 브라우저 언어 감지
+const detectBrowserLanguage = (): Language => {
+  if (typeof navigator === 'undefined') return 'en';
+  const browserLang = navigator.language.split('-')[0];
+  const supportedLangs: Language[] = ['en', 'ko', 'ja', 'zh', 'es', 'pt', 'fr', 'de', 'th', 'vi', 'id', 'hi', 'ar'];
+  return supportedLangs.includes(browserLang as Language) ? (browserLang as Language) : 'en';
+};
+
 export const useI18n = create<I18nState>()(
   persist(
     (set, get) => ({
-      language: 'ko',
+      language: detectBrowserLanguage(), // 영어 기본, 브라우저 언어 자동 감지
       setLanguage: (lang) => {
         set({ language: lang });
         // DOM에 RTL 속성 즉시 적용
@@ -26,7 +34,7 @@ export const useI18n = create<I18nState>()(
       },
       t: (key) => {
         const { language } = get();
-        return translations[language]?.[key] || translations.ko[key] || key;
+        return translations[language]?.[key] || translations.en[key] || key;
       },
       isRTL: () => RTL_LANGUAGES.includes(get().language),
       getDir: () => RTL_LANGUAGES.includes(get().language) ? 'rtl' : 'ltr',

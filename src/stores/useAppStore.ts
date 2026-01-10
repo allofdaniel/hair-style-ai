@@ -1,5 +1,41 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
+
+// Safe localStorage that handles errors and corrupted data
+const safeLocalStorage = {
+  getItem: (name: string): string | null => {
+    try {
+      const value = localStorage.getItem(name);
+      if (value) {
+        // Validate JSON before returning
+        JSON.parse(value);
+      }
+      return value;
+    } catch (error) {
+      console.warn('Corrupted localStorage data, clearing:', error);
+      try {
+        localStorage.removeItem(name);
+      } catch {
+        // Ignore
+      }
+      return null;
+    }
+  },
+  setItem: (name: string, value: string): void => {
+    try {
+      localStorage.setItem(name, value);
+    } catch (error) {
+      console.warn('Failed to set item in localStorage:', error);
+    }
+  },
+  removeItem: (name: string): void => {
+    try {
+      localStorage.removeItem(name);
+    } catch (error) {
+      console.warn('Failed to remove item from localStorage:', error);
+    }
+  },
+};
 
 export type Gender = 'male' | 'female';
 export type HairTexture = 'straight' | 'wavy' | 'curly';
@@ -44,6 +80,7 @@ export interface HairStyle {
   celebrities?: string[];
   prompt: string;
   thumbnail?: string;
+  gif?: string;  // 360도 회전 GIF
 }
 
 export interface ReferenceAnalysis {
@@ -209,6 +246,11 @@ interface AppState {
   subscriptionPlan: SubscriptionPlan;
   setSubscriptionPlan: (plan: SubscriptionPlan) => void;
   isPremium: () => boolean;
+
+  // Favorites (즐겨찾기)
+  favoriteStyleIds: string[];
+  toggleFavorite: (styleId: string) => void;
+  isFavorite: (styleId: string) => boolean;
 
   // Reset
   reset: () => void;
@@ -501,6 +543,21 @@ export const useAppStore = create<AppState>()(
         return subscriptionPlan !== 'free';
       },
 
+      // Favorites (즐겨찾기)
+      favoriteStyleIds: [],
+      toggleFavorite: (styleId: string) => {
+        const { favoriteStyleIds } = get();
+        if (favoriteStyleIds.includes(styleId)) {
+          set({ favoriteStyleIds: favoriteStyleIds.filter(id => id !== styleId) });
+        } else {
+          set({ favoriteStyleIds: [...favoriteStyleIds, styleId] });
+        }
+      },
+      isFavorite: (styleId: string) => {
+        const { favoriteStyleIds } = get();
+        return favoriteStyleIds.includes(styleId);
+      },
+
       // Reset
       reset: () =>
         set({
@@ -520,6 +577,7 @@ export const useAppStore = create<AppState>()(
     {
       name: 'hair-style-ai-storage',
       version: 2, // 버전 추가로 마이그레이션 지원
+      storage: createJSONStorage(() => safeLocalStorage),
       partialize: (state) => ({
         // Only persist these fields - NO history (too large with base64 images)
         hasConsented: state.hasConsented,
@@ -533,6 +591,7 @@ export const useAppStore = create<AppState>()(
         referralInfo: state.referralInfo,
         selectedHairColor: state.selectedHairColor,
         savedResults: state.savedResults, // Saved results with thumbnails
+        favoriteStyleIds: state.favoriteStyleIds, // 즐겨찾기
       }),
       // 기존 데이터와 새 기본값을 안전하게 병합
       merge: (persistedState, currentState) => {
