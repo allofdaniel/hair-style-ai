@@ -109,7 +109,6 @@ export default function MainMenu() {
   } = useAppStore();
   const { addToQueue, queue } = useProcessingQueue();
 
-  const [stream, setStream] = useState<MediaStream | null>(null);
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
   const [isCapturing, setIsCapturing] = useState(false);
   const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
@@ -123,6 +122,8 @@ export default function MainMenu() {
   const [showMenu, setShowMenu] = useState(false);
   const [showConsentModal, setShowConsentModal] = useState(false);
   const [showAddedToast, setShowAddedToast] = useState(false);
+  const [cameraReady, setCameraReady] = useState(false);
+  const streamRef = useRef<MediaStream | null>(null);
 
   useEffect(() => {
     if (!hasConsented) setShowConsentModal(true);
@@ -132,27 +133,60 @@ export default function MainMenu() {
     getStylesByCategory(gender, 'all')
   , [gender]);
 
+  // 카메라 시작 함수
   const startCamera = useCallback(async (facing: 'user' | 'environment') => {
     try {
-      if (stream) stream.getTracks().forEach(track => track.stop());
+      // 기존 스트림 정리
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current = null;
+      }
+      setCameraReady(false);
+
       const newStream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: facing, width: { ideal: 1280 }, height: { ideal: 720 } },
         audio: false,
       });
+
+      streamRef.current = newStream;
+
       if (videoRef.current) {
         videoRef.current.srcObject = newStream;
-        await videoRef.current.play();
+        // play() 호출 전에 비디오가 로드될 때까지 대기
+        videoRef.current.onloadedmetadata = () => {
+          videoRef.current?.play().then(() => {
+            setCameraReady(true);
+          }).catch(err => {
+            console.error('Video play failed:', err);
+          });
+        };
       }
-      setStream(newStream);
     } catch (error) {
       console.error('Camera access failed:', error);
     }
   }, []);
 
+  // 카메라 정리 함수
+  const stopCamera = useCallback(() => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+    setCameraReady(false);
+  }, []);
+
+  // 카메라 모드 변경 시 카메라 시작/정지
   useEffect(() => {
-    if (mode === 'camera') startCamera(facingMode);
-    return () => { if (stream) stream.getTracks().forEach(track => track.stop()); };
-  }, [facingMode, mode, startCamera]);
+    if (mode === 'camera') {
+      startCamera(facingMode);
+    } else {
+      stopCamera();
+    }
+
+    return () => {
+      stopCamera();
+    };
+  }, [facingMode, mode, startCamera, stopCamera]);
 
   const handleStyleToggle = (style: HairStyle) => {
     setCustomSelected(false);
@@ -170,7 +204,7 @@ export default function MainMenu() {
     reader.onload = (event) => {
       setUploadedPhoto(event.target?.result as string);
       setMode('photo');
-      if (stream) { stream.getTracks().forEach(track => track.stop()); setStream(null); }
+      stopCamera();
     };
     reader.readAsDataURL(file);
   };
@@ -234,11 +268,22 @@ export default function MainMenu() {
       {/* Camera View */}
       <div className="relative flex-1 min-h-0">
         {mode === 'camera' ? (
-          <video
-            ref={videoRef}
-            autoPlay playsInline muted
-            className={`w-full h-full object-cover ${isMirrored ? 'scale-x-[-1]' : ''}`}
-          />
+          <>
+            <video
+              ref={videoRef}
+              autoPlay
+              playsInline
+              muted
+              className={`w-full h-full object-cover ${isMirrored ? 'scale-x-[-1]' : ''} ${cameraReady ? 'opacity-100' : 'opacity-0'}`}
+            />
+            {/* 카메라 로딩 중 표시 */}
+            {!cameraReady && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-black">
+                <div className="w-16 h-16 border-4 border-white/20 border-t-white rounded-full animate-spin mb-4" />
+                <p className="text-white/60 text-sm">카메라 로딩 중...</p>
+              </div>
+            )}
+          </>
         ) : uploadedPhoto && (
           <img src={uploadedPhoto} alt="" className="w-full h-full object-contain bg-black" />
         )}
