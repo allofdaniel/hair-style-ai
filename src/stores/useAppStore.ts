@@ -39,7 +39,7 @@ const safeLocalStorage = {
 
 export type Gender = 'male' | 'female';
 export type HairTexture = 'straight' | 'wavy' | 'curly';
-export type SubscriptionPlan = 'free' | 'basic' | 'pro' | 'unlimited';
+export type SubscriptionPlan = 'free' | 'basic' | 'pro' | 'premium' | 'unlimited';
 
 // 염색 색상 타입
 export interface HairColorOption {
@@ -241,6 +241,8 @@ interface AppState {
   credits: number;
   setCredits: (credits: number) => void;
   useCredit: () => boolean;
+  hasCredits: () => boolean;
+  addCredits: (amount: number) => void;
 
   // Subscription
   subscriptionPlan: SubscriptionPlan;
@@ -517,22 +519,27 @@ export const useAppStore = create<AppState>()(
       },
       clearSavedResults: () => set({ savedResults: [] }),
 
-      // Credits
-      credits: 999999, // DEV MODE: Unlimited credits for testing
+      // Credits - Production Mode
+      credits: 5, // 신규 사용자 무료 크레딧 5개
       setCredits: (credits) => set({ credits }),
       useCredit: () => {
-        // DEV MODE: Always return true, don't decrease credits
-        // TODO: Re-enable credit system for production
-        return true;
-
-        // Production code (commented out for now):
-        // const { credits, subscriptionPlan } = get();
-        // if (subscriptionPlan === 'unlimited') return true;
-        // if (credits > 0) {
-        //   set({ credits: credits - 1 });
-        //   return true;
-        // }
-        // return false;
+        const { credits, subscriptionPlan } = get();
+        // 구독자는 무제한
+        if (subscriptionPlan === 'premium' || subscriptionPlan === 'unlimited') return true;
+        // 크레딧 차감
+        if (credits > 0) {
+          set({ credits: credits - 1 });
+          return true;
+        }
+        return false;
+      },
+      hasCredits: () => {
+        const { credits, subscriptionPlan } = get();
+        if (subscriptionPlan === 'premium' || subscriptionPlan === 'unlimited') return true;
+        return credits > 0;
+      },
+      addCredits: (amount: number) => {
+        set((state) => ({ credits: state.credits + amount }));
       },
 
       // Subscription

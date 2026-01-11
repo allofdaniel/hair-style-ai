@@ -5,9 +5,12 @@
  * - 결제 플로우 연동 준비
  */
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useI18n, type Language } from '../i18n/useI18n';
 import { useProStore, PRO_FEATURES, PRICING } from '../stores/useProStore';
+import { getOfferings, purchasePackage, restorePurchases, initializeRevenueCat } from '../services/revenuecat';
+import type { PurchasesPackage, PurchasesOffering } from '@revenuecat/purchases-capacitor';
+import { Capacitor } from '@capacitor/core';
 
 // 페이월 텍스트 (다국어)
 const PAYWALL_TEXTS: Record<Language, Record<string, string>> = {
@@ -280,6 +283,9 @@ export default function Paywall({ onClose, reason = 'upgrade', lockedFeature }: 
   const [selectedPlan, setSelectedPlan] = useState<'pro' | 'premium'>('pro');
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('yearly');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [offerings, setOfferings] = useState<PurchasesOffering | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const isNative = Capacitor.isNativePlatform();
 
   // RTL 지원
   const isRtl = language === 'ar';
@@ -333,38 +339,125 @@ export default function Paywall({ onClose, reason = 'upgrade', lockedFeature }: 
     }
   }, [lockedFeature]);
 
+  // RevenueCat 초기화 및 offerings 로드
+  useEffect(() => {
+    const loadOfferings = async () => {
+      if (!isNative) return;
+
+      const initialized = await initializeRevenueCat();
+      if (initialized) {
+        const currentOfferings = await getOfferings();
+        setOfferings(currentOfferings);
+      }
+    };
+    loadOfferings();
+  }, [isNative]);
+
+  // 선택한 플랜과 기간에 맞는 패키지 찾기
+  const getSelectedPackage = useCallback((): PurchasesPackage | null => {
+    if (!offerings?.availablePackages) return null;
+
+    const packageId = `${selectedPlan}_${billingPeriod}`;
+    return offerings.availablePackages.find(
+      pkg => pkg.identifier.toLowerCase().includes(packageId.toLowerCase())
+    ) || offerings.availablePackages.find(
+      pkg => pkg.identifier.toLowerCase().includes(selectedPlan) &&
+             pkg.identifier.toLowerCase().includes(billingPeriod)
+    ) || null;
+  }, [offerings, selectedPlan, billingPeriod]);
+
   const pricing = PRICING[selectedPlan];
   const currentPrice = billingPeriod === 'yearly' ? pricing.yearly : pricing.monthly;
   const monthlyEquivalent = billingPeriod === 'yearly' ? pricing.yearlyMonthly : pricing.monthly;
 
   const handlePurchase = async () => {
     setIsProcessing(true);
+    setError(null);
 
-    // TODO: 실제 인앱결제 연동
-    // RevenueCat, Stripe, 또는 네이티브 결제 API 연동
     try {
-      // 데모용 - 실제로는 결제 API 호출
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      if (isNative) {
+        // 네이티브 앱: RevenueCat으로 실제 결제 처리
+        const selectedPackage = getSelectedPackage();
 
-      // 결제 성공 시 구독 상태 업데이트
-      setSubscription({
-        tier: selectedPlan,
-        subscriptionId: `demo_${Date.now()}`,
-        expiresAt: Date.now() + (billingPeriod === 'yearly' ? 365 : 30) * 24 * 60 * 60 * 1000,
-        billingPeriod,
-      });
+        if (!selectedPackage) {
+          // 패키지를 찾지 못한 경우, offerings에서 첫 번째 패키지 사용
+          const fallbackPackage = offerings?.availablePackages?.[0];
+          if (!fallbackPackage) {
+            throw new Error('No packages available');
+          }
+          console.log('Using fallback package:', fallbackPackage.identifier);
+        }
 
-      onClose();
-    } catch (error) {
-      console.error('Purchase failed:', error);
+        const packageToPurchase = selectedPackage || offerings?.availablePackages?.[0];
+        if (!packageToPurchase) {
+          throw new Error('No packages available for purchase');
+        }
+
+        const result = await purchasePackage(packageToPurchase);
+
+        if (result && result.isActive) {
+          // 구매 성공 - 구독 상태 업데이트
+          setSubscription({
+            tier: result.tier as 'pro' | 'premium',
+            subscriptionId: result.productId || `${selectedPlan}_${Date.now()}`,
+            expiresAt: result.expirationDate?.getTime() || Date.now() + 365 * 24 * 60 * 60 * 1000,
+            billingPeriod,
+          });
+          onClose();
+        } else if (result === null) {
+          // 사용자가 취소함
+          console.log('Purchase cancelled by user');
+        }
+      } else {
+        // 웹: 데모용 결제 시뮬레이션
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        setSubscription({
+          tier: selectedPlan,
+          subscriptionId: `demo_${Date.now()}`,
+          expiresAt: Date.now() + (billingPeriod === 'yearly' ? 365 : 30) * 24 * 60 * 60 * 1000,
+          billingPeriod,
+        });
+        onClose();
+      }
+    } catch (err) {
+      console.error('Purchase failed:', err);
+      setError(err instanceof Error ? err.message : 'Purchase failed. Please try again.');
     } finally {
       setIsProcessing(false);
     }
   };
 
   const handleRestore = async () => {
-    // TODO: 구매 복원 로직
-    console.log('Restoring purchases...');
+    setIsProcessing(true);
+    setError(null);
+
+    try {
+      if (isNative) {
+        const result = await restorePurchases();
+
+        if (result.isActive) {
+          // 복원 성공 - 구독 상태 업데이트
+          setSubscription({
+            tier: result.tier as 'pro' | 'premium',
+            subscriptionId: result.productId || `restored_${Date.now()}`,
+            expiresAt: result.expirationDate?.getTime() || Date.now() + 365 * 24 * 60 * 60 * 1000,
+            billingPeriod: result.productId?.includes('yearly') ? 'yearly' : 'monthly',
+          });
+          onClose();
+        } else {
+          setError(language === 'ko' ? '복원할 구매 내역이 없습니다.' : 'No purchases to restore.');
+        }
+      } else {
+        // 웹에서는 복원 불가
+        setError(language === 'ko' ? '웹에서는 구매 복원을 지원하지 않습니다.' : 'Restore is not available on web.');
+      }
+    } catch (err) {
+      console.error('Restore failed:', err);
+      setError(err instanceof Error ? err.message : 'Restore failed. Please try again.');
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   // Pro 플랜 기능
@@ -415,6 +508,13 @@ export default function Paywall({ onClose, reason = 'upgrade', lockedFeature }: 
             <div className="bg-orange-500/20 border border-orange-500/30 rounded-2xl p-4 mb-4">
               <p className="text-orange-300 font-medium">{texts.limitReached}</p>
               <p className="text-orange-200/70 text-sm mt-1">{texts.upgradeToUnlock}</p>
+            </div>
+          )}
+
+          {/* 에러 메시지 */}
+          {error && (
+            <div className="bg-red-500/20 border border-red-500/30 rounded-2xl p-4 mb-4">
+              <p className="text-red-300 font-medium">{error}</p>
             </div>
           )}
 
