@@ -133,6 +133,8 @@ export default function MainMenu() {
     getStylesByCategory(gender, 'all')
   , [gender]);
 
+  const [cameraError, setCameraError] = useState<string | null>(null);
+
   // 카메라 시작 함수
   const startCamera = useCallback(async (facing: 'user' | 'environment') => {
     try {
@@ -142,27 +144,71 @@ export default function MainMenu() {
         streamRef.current = null;
       }
       setCameraReady(false);
+      setCameraError(null);
 
-      const newStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: facing, width: { ideal: 1280 }, height: { ideal: 720 } },
+      // Check if getUserMedia is available
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('Camera not supported on this device');
+      }
+
+      // Android WebView에서 더 호환성 있는 설정
+      const constraints: MediaStreamConstraints = {
+        video: {
+          facingMode: facing,
+          width: { ideal: 1280, min: 640 },
+          height: { ideal: 720, min: 480 },
+        },
         audio: false,
-      });
+      };
+
+      console.log('Requesting camera with constraints:', JSON.stringify(constraints));
+
+      const newStream = await navigator.mediaDevices.getUserMedia(constraints);
+
+      console.log('Camera stream obtained:', newStream.getVideoTracks().length, 'video tracks');
 
       streamRef.current = newStream;
 
       if (videoRef.current) {
         videoRef.current.srcObject = newStream;
-        // play() 호출 전에 비디오가 로드될 때까지 대기
+
+        // 비디오가 로드될 때까지 대기
         videoRef.current.onloadedmetadata = () => {
-          videoRef.current?.play().then(() => {
-            setCameraReady(true);
-          }).catch(err => {
-            console.error('Video play failed:', err);
-          });
+          console.log('Video metadata loaded');
+          videoRef.current?.play()
+            .then(() => {
+              console.log('Video playing successfully');
+              setCameraReady(true);
+            })
+            .catch(err => {
+              console.error('Video play failed:', err);
+              setCameraError('카메라 재생에 실패했습니다.');
+            });
+        };
+
+        // 에러 핸들링
+        videoRef.current.onerror = (e) => {
+          console.error('Video element error:', e);
+          setCameraError('비디오 로드에 실패했습니다.');
         };
       }
     } catch (error) {
       console.error('Camera access failed:', error);
+
+      // 사용자에게 친화적인 에러 메시지
+      if (error instanceof Error) {
+        if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+          setCameraError('카메라 권한이 거부되었습니다. 설정에서 카메라 권한을 허용해주세요.');
+        } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
+          setCameraError('카메라를 찾을 수 없습니다.');
+        } else if (error.name === 'NotReadableError' || error.name === 'TrackStartError') {
+          setCameraError('카메라가 다른 앱에서 사용 중입니다.');
+        } else {
+          setCameraError(`카메라 오류: ${error.message}`);
+        }
+      } else {
+        setCameraError('카메라를 시작할 수 없습니다.');
+      }
     }
   }, []);
 
@@ -276,11 +322,30 @@ export default function MainMenu() {
               muted
               className={`w-full h-full object-cover ${isMirrored ? 'scale-x-[-1]' : ''} ${cameraReady ? 'opacity-100' : 'opacity-0'}`}
             />
-            {/* 카메라 로딩 중 표시 */}
+            {/* 카메라 로딩 중 또는 에러 표시 */}
             {!cameraReady && (
               <div className="absolute inset-0 flex flex-col items-center justify-center bg-black">
-                <div className="w-16 h-16 border-4 border-white/20 border-t-white rounded-full animate-spin mb-4" />
-                <p className="text-white/60 text-sm">카메라 로딩 중...</p>
+                {cameraError ? (
+                  <>
+                    <div className="w-16 h-16 flex items-center justify-center mb-4">
+                      <svg className="w-12 h-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                      </svg>
+                    </div>
+                    <p className="text-white/80 text-sm text-center px-4 mb-4">{cameraError}</p>
+                    <button
+                      onClick={() => startCamera(facingMode)}
+                      className="px-4 py-2 bg-white/20 rounded-lg text-white text-sm hover:bg-white/30 transition-colors"
+                    >
+                      다시 시도
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <div className="w-16 h-16 border-4 border-white/20 border-t-white rounded-full animate-spin mb-4" />
+                    <p className="text-white/60 text-sm">카메라 로딩 중...</p>
+                  </>
+                )}
               </div>
             )}
           </>
