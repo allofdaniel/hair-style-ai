@@ -224,6 +224,16 @@ export const generateHairStyle = async (
 
   let stylePrompt = buildPrompt(style, settings, texture);
 
+  // Build color prompt separately to ensure it's always included
+  const colorOption = hairColors.find((c) => c.id === settings.color);
+  const colorPrompt = colorOption && colorOption.id !== 'natural'
+    ? `HAIR COLOR: ${colorOption.prompt}`
+    : '';
+
+  if (colorPrompt) {
+    console.log('Color prompt will be added:', colorPrompt);
+  }
+
   try {
     // Step 1: Use pre-analyzed prompt if available, otherwise analyze reference image
     // Pre-analyzed prompts are stored in style.prompt by the analysis script
@@ -258,20 +268,58 @@ export const generateHairStyle = async (
     console.log('Calling OpenAI GPT-Image-1.5 API...');
     console.log('Final style prompt:', stylePrompt.substring(0, 200) + '...');
 
-    // Strong prompt to preserve face identity and ONLY change hair
-    const editPrompt = `TASK: Change ONLY the hair in this photo to: ${style.nameKo} (${style.name})
+    // PIXEL-PERFECT face preservation prompt - ZERO face modifications allowed
+    // This is an inpainting task where ONLY the hair region should change
+    const editPrompt = colorPrompt
+      ? `INPAINTING TASK - HAIR REGION ONLY
 
-EXACT HAIRSTYLE TO COPY: ${stylePrompt}
+⚠️ CRITICAL: THIS IS A FACE-LOCKED INPAINTING OPERATION ⚠️
 
-CRITICAL RULES:
-1. Keep the person's face 100% IDENTICAL - same eyes, nose, mouth, skin, face shape
-2. Keep the same person's identity - must be recognizable as the EXACT same person
-3. Keep body, clothing, background, lighting, and pose unchanged
-4. ONLY modify the hair according to the EXACT specifications above
-5. Result should look like the same person just got this specific haircut
-6. Pay attention to hair length, texture, wave pattern, volume, and parting
+ABSOLUTE RULE #1 - FACE IS READ-ONLY:
+The face region is LOCKED and must be copied PIXEL-BY-PIXEL from input to output.
+- DO NOT touch, modify, enhance, or regenerate ANY facial pixels
+- DO NOT add realism, details, or "improvements" to the face
+- DO NOT change skin tone, texture, or color even slightly
+- If the face looks artificial, plastic, or mannequin-like - KEEP IT THAT WAY
+- The face must be an EXACT PIXEL-LEVEL COPY, not a "similar recreation"
 
-This is a virtual haircut preview - same person, specific new hairstyle only.`;
+WHAT TO CHANGE (HAIR ONLY):
+- Hair style: ${style.nameKo}
+- Hair color: ${colorOption?.nameKo} (${colorOption?.prompt})
+- Hair details: ${stylePrompt}
+
+WHAT MUST NOT CHANGE:
+- Face (eyes, nose, mouth, skin, jaw, cheeks, forehead, ears, eyebrows) - FROZEN
+- Background - FROZEN
+- Clothing - FROZEN
+- Pose/angle - FROZEN
+- Lighting on face - FROZEN
+
+Think of this as: mask the hair area, edit ONLY that masked region, paste the original face back.`
+      : `INPAINTING TASK - HAIR REGION ONLY
+
+⚠️ CRITICAL: THIS IS A FACE-LOCKED INPAINTING OPERATION ⚠️
+
+ABSOLUTE RULE #1 - FACE IS READ-ONLY:
+The face region is LOCKED and must be copied PIXEL-BY-PIXEL from input to output.
+- DO NOT touch, modify, enhance, or regenerate ANY facial pixels
+- DO NOT add realism, details, or "improvements" to the face
+- DO NOT change skin tone, texture, or color even slightly
+- If the face looks artificial, plastic, or mannequin-like - KEEP IT THAT WAY
+- The face must be an EXACT PIXEL-LEVEL COPY, not a "similar recreation"
+
+WHAT TO CHANGE (HAIR ONLY):
+- Hair style: ${style.nameKo} (${style.name})
+- Hair details: ${stylePrompt}
+
+WHAT MUST NOT CHANGE:
+- Face (eyes, nose, mouth, skin, jaw, cheeks, forehead, ears, eyebrows) - FROZEN
+- Background - FROZEN
+- Clothing - FROZEN
+- Pose/angle - FROZEN
+- Lighting on face - FROZEN
+
+Think of this as: mask the hair area, edit ONLY that masked region, paste the original face back.`;
 
     // Use image edit API with the user's photo
     const imageBlob = base64ToBlob(userPhoto, mimeType);
@@ -468,11 +516,32 @@ export const generateBackView = async (
 
   const stylePrompt = buildPrompt(style, settings);
 
+  // Build color prompt separately to ensure it's always included
+  const colorOption = hairColors.find((c) => c.id === settings.color);
+  const colorPrompt = colorOption && colorOption.id !== 'natural'
+    ? `HAIR COLOR: ${colorOption.prompt}`
+    : '';
+
   try {
     console.log('Generating back view with OpenAI...');
+    if (colorPrompt) {
+      console.log('Back view color prompt:', colorPrompt);
+    }
 
     // Generate back view based on the front view result
-    const backViewPrompt = `Create a BACK VIEW of this same hairstyle: ${style.nameKo} (${style.name})
+    const backViewPrompt = colorOption && colorOption.id !== 'natural'
+      ? `Create a BACK VIEW of this ${colorOption.nameKo} colored ${style.nameKo} hairstyle.
+
+**MANDATORY: The hair color MUST be ${colorOption.nameKo}. ${colorOption.prompt}**
+
+HAIRSTYLE: ${stylePrompt}
+
+REQUIREMENTS:
+1. Show the BACK of the head with ${style.nameKo} hairstyle
+2. Hair color MUST be ${colorOption.nameKo} - this is mandatory
+3. Show nape, back layers, and overall shape from behind
+4. Keep the same ${colorOption.nameKo} hair color as specified`
+      : `Create a BACK VIEW of this same hairstyle: ${style.nameKo} (${style.name})
 
 HAIRSTYLE DETAILS: ${stylePrompt}
 

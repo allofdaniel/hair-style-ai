@@ -1940,17 +1940,42 @@ export const getFavoriteStyles = (gender: Gender, favoriteIds: string[]): HairSt
   return hairStyles.filter(style => style.gender === gender && favoriteIds.includes(style.id));
 };
 
-// 머리 색상 옵션
+// 머리 색상 옵션 - hairColors.ts의 ID와 일치해야 함
 export const hairColors = [
+  // Natural colors (hairColors.ts와 ID 매칭)
   { id: 'natural', nameKo: '자연색', prompt: 'keep the natural existing hair color unchanged' },
-  { id: 'black', nameKo: '블랙', prompt: 'pure jet black colored hair - the hair must be completely BLACK' },
-  { id: 'dark-brown', nameKo: '다크브라운', prompt: 'dark chocolate brown colored hair - the hair must be DARK BROWN' },
-  { id: 'ash-brown', nameKo: '애쉬브라운', prompt: 'ash brown colored hair with cool gray undertones - the hair must be ASH BROWN (grayish brown)' },
+  { id: 'natural-black', nameKo: '내추럴 블랙', prompt: 'pure jet black colored hair - the hair must be completely BLACK' },
+  { id: 'dark-brown', nameKo: '다크 브라운', prompt: 'dark chocolate brown colored hair - the hair must be DARK BROWN' },
+  { id: 'medium-brown', nameKo: '미디엄 브라운', prompt: 'medium brown colored hair - the hair must be MEDIUM BROWN' },
+  { id: 'light-brown', nameKo: '라이트 브라운', prompt: 'light golden brown colored hair - the hair must be LIGHT BROWN' },
   { id: 'chestnut', nameKo: '밤색', prompt: 'warm reddish chestnut brown colored hair - the hair must be CHESTNUT (reddish brown)' },
-  { id: 'honey-blonde', nameKo: '허니블론드', prompt: 'golden honey blonde colored hair - the hair must be BLONDE with golden honey tones' },
-  { id: 'platinum', nameKo: '플래티넘', prompt: 'bright platinum blonde almost white colored hair - the hair must be PLATINUM BLONDE (very light, almost white)' },
+  { id: 'auburn', nameKo: '적갈색', prompt: 'auburn reddish brown colored hair - the hair must be AUBURN (red-brown)' },
+  { id: 'honey-blonde', nameKo: '허니 블론드', prompt: 'golden honey blonde colored hair - the hair must be BLONDE with golden honey tones' },
+  { id: 'platinum-blonde', nameKo: '플래티넘 블론드', prompt: 'bright platinum blonde almost white colored hair - the hair must be PLATINUM BLONDE (very light, almost white)' },
+
+  // Fashion colors
+  { id: 'ash-gray', nameKo: '애쉬 그레이', prompt: 'ash gray colored hair with cool tones - the hair must be ASH GRAY' },
+  { id: 'silver', nameKo: '실버', prompt: 'silver metallic colored hair - the hair must be SILVER' },
+  { id: 'blue-black', nameKo: '블루 블랙', prompt: 'blue-black colored hair with visible blue sheen - the hair must show BLUE undertones' },
   { id: 'burgundy', nameKo: '버건디', prompt: 'deep burgundy wine red colored hair - the hair must be BURGUNDY RED (dark red wine color)' },
-  { id: 'blue-black', nameKo: '청흑색', prompt: 'blue-black colored hair with visible blue sheen - the hair must show BLUE undertones' },
+  { id: 'wine-red', nameKo: '와인 레드', prompt: 'wine red colored hair - the hair must be WINE RED' },
+  { id: 'rose-pink', nameKo: '로즈 핑크', prompt: 'rose pink colored hair - the hair must be ROSE PINK' },
+  { id: 'lavender', nameKo: '라벤더', prompt: 'lavender purple colored hair - the hair must be LAVENDER' },
+  { id: 'pastel-pink', nameKo: '파스텔 핑크', prompt: 'pastel pink colored hair - the hair must be PASTEL PINK' },
+  { id: 'pastel-blue', nameKo: '파스텔 블루', prompt: 'pastel blue colored hair - the hair must be PASTEL BLUE' },
+  { id: 'mint-green', nameKo: '민트 그린', prompt: 'mint green colored hair - the hair must be MINT GREEN' },
+  { id: 'coral', nameKo: '코랄', prompt: 'coral colored hair - the hair must be CORAL' },
+  { id: 'copper', nameKo: '카퍼', prompt: 'copper colored hair - the hair must be COPPER' },
+
+  // Highlight colors
+  { id: 'blonde-highlight', nameKo: '금발 하이라이트', prompt: 'hair with BLONDE HIGHLIGHTS - add visible blonde streaks throughout the hair' },
+  { id: 'caramel-highlight', nameKo: '카라멜 하이라이트', prompt: 'hair with CARAMEL HIGHLIGHTS - add visible caramel streaks throughout the hair' },
+  { id: 'red-highlight', nameKo: '레드 하이라이트', prompt: 'hair with RED HIGHLIGHTS - add visible red streaks throughout the hair' },
+
+  // Ombre colors
+  { id: 'brown-ombre', nameKo: '브라운 옴브레', prompt: 'BROWN OMBRE hair - dark roots gradually fading to light brown at the tips' },
+  { id: 'blonde-ombre', nameKo: '블론드 옴브레', prompt: 'BLONDE OMBRE hair - dark roots gradually fading to blonde at the tips' },
+  { id: 'red-ombre', nameKo: '레드 옴브레', prompt: 'RED OMBRE hair - dark roots gradually fading to red at the tips' },
 ];
 
 // 머리 질감 옵션

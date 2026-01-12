@@ -12,7 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAppStore, type HairStyle } from '../stores/useAppStore';
 import { useProcessingQueue } from '../stores/useProcessingQueue';
 import { getStylesByCategory } from '../data/hairStyles';
-import { colorCategories, getColorsByCategory } from '../data/hairColors';
+import { colorCategories, getColorsByCategory, hairColors } from '../data/hairColors';
 import ConsentModal from '../components/ConsentModal';
 import { useI18n } from '../i18n/useI18n';
 import { getAssetUrl } from '../config/assetConfig';
@@ -109,6 +109,7 @@ export default function MainMenu() {
   } = useAppStore();
   const { addToQueue, queue } = useProcessingQueue();
 
+  const [stream, setStream] = useState<MediaStream | null>(null);
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
   const [isCapturing, setIsCapturing] = useState(false);
   const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
@@ -122,8 +123,6 @@ export default function MainMenu() {
   const [showMenu, setShowMenu] = useState(false);
   const [showConsentModal, setShowConsentModal] = useState(false);
   const [showAddedToast, setShowAddedToast] = useState(false);
-  const [cameraReady, setCameraReady] = useState(false);
-  const streamRef = useRef<MediaStream | null>(null);
 
   useEffect(() => {
     if (!hasConsented) setShowConsentModal(true);
@@ -133,106 +132,27 @@ export default function MainMenu() {
     getStylesByCategory(gender, 'all')
   , [gender]);
 
-  const [cameraError, setCameraError] = useState<string | null>(null);
-
-  // 카메라 시작 함수
   const startCamera = useCallback(async (facing: 'user' | 'environment') => {
     try {
-      // 기존 스트림 정리
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
-        streamRef.current = null;
-      }
-      setCameraReady(false);
-      setCameraError(null);
-
-      // Check if getUserMedia is available
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        throw new Error('Camera not supported on this device');
-      }
-
-      // Android WebView에서 더 호환성 있는 설정
-      const constraints: MediaStreamConstraints = {
-        video: {
-          facingMode: facing,
-          width: { ideal: 1280, min: 640 },
-          height: { ideal: 720, min: 480 },
-        },
+      if (stream) stream.getTracks().forEach(track => track.stop());
+      const newStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: facing, width: { ideal: 1280 }, height: { ideal: 720 } },
         audio: false,
-      };
-
-      console.log('Requesting camera with constraints:', JSON.stringify(constraints));
-
-      const newStream = await navigator.mediaDevices.getUserMedia(constraints);
-
-      console.log('Camera stream obtained:', newStream.getVideoTracks().length, 'video tracks');
-
-      streamRef.current = newStream;
-
+      });
       if (videoRef.current) {
         videoRef.current.srcObject = newStream;
-
-        // 비디오가 로드될 때까지 대기
-        videoRef.current.onloadedmetadata = () => {
-          console.log('Video metadata loaded');
-          videoRef.current?.play()
-            .then(() => {
-              console.log('Video playing successfully');
-              setCameraReady(true);
-            })
-            .catch(err => {
-              console.error('Video play failed:', err);
-              setCameraError('카메라 재생에 실패했습니다.');
-            });
-        };
-
-        // 에러 핸들링
-        videoRef.current.onerror = (e) => {
-          console.error('Video element error:', e);
-          setCameraError('비디오 로드에 실패했습니다.');
-        };
+        await videoRef.current.play();
       }
+      setStream(newStream);
     } catch (error) {
       console.error('Camera access failed:', error);
-
-      // 사용자에게 친화적인 에러 메시지
-      if (error instanceof Error) {
-        if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
-          setCameraError('카메라 권한이 거부되었습니다. 설정에서 카메라 권한을 허용해주세요.');
-        } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
-          setCameraError('카메라를 찾을 수 없습니다.');
-        } else if (error.name === 'NotReadableError' || error.name === 'TrackStartError') {
-          setCameraError('카메라가 다른 앱에서 사용 중입니다.');
-        } else {
-          setCameraError(`카메라 오류: ${error.message}`);
-        }
-      } else {
-        setCameraError('카메라를 시작할 수 없습니다.');
-      }
     }
   }, []);
 
-  // 카메라 정리 함수
-  const stopCamera = useCallback(() => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-      streamRef.current = null;
-    }
-    setCameraReady(false);
-  }, []);
-
-  // 카메라 모드 변경 시 카메라 시작/정지
   useEffect(() => {
-    if (mode === 'camera') {
-      startCamera(facingMode);
-    } else {
-      stopCamera();
-    }
-
-    return () => {
-      stopCamera();
-    };
-  }, [facingMode, mode, startCamera, stopCamera]);
+    if (mode === 'camera') startCamera(facingMode);
+    return () => { if (stream) stream.getTracks().forEach(track => track.stop()); };
+  }, [facingMode, mode, startCamera]);
 
   const handleStyleToggle = (style: HairStyle) => {
     setCustomSelected(false);
@@ -250,7 +170,7 @@ export default function MainMenu() {
     reader.onload = (event) => {
       setUploadedPhoto(event.target?.result as string);
       setMode('photo');
-      stopCamera();
+      if (stream) { stream.getTracks().forEach(track => track.stop()); setStream(null); }
     };
     reader.readAsDataURL(file);
   };
@@ -289,11 +209,21 @@ export default function MainMenu() {
         setUseCustomMode(true);
         navigate('/custom');
       } else {
+        // Find color ID from selectedHairColor (hex) to connect to hairSettings.color
+        let updatedHairSettings = hairSettings;
+        if (selectedHairColor) {
+          const colorMatch = hairColors.find(c => c.hex === selectedHairColor);
+          if (colorMatch) {
+            updatedHairSettings = { ...hairSettings, color: colorMatch.id };
+            console.log('[MainMenu] Hair color applied:', colorMatch.nameKo, colorMatch.id);
+          }
+        }
+
         addToQueue(
           selectedStyles.map(styleId => ({
             styleId,
             userPhoto: photoData,
-            hairSettings,
+            hairSettings: updatedHairSettings,
           }))
         );
         setSelectedStyles([]);
@@ -314,41 +244,11 @@ export default function MainMenu() {
       {/* Camera View */}
       <div className="relative flex-1 min-h-0">
         {mode === 'camera' ? (
-          <>
-            <video
-              ref={videoRef}
-              autoPlay
-              playsInline
-              muted
-              className={`w-full h-full object-cover ${isMirrored ? 'scale-x-[-1]' : ''} ${cameraReady ? 'opacity-100' : 'opacity-0'}`}
-            />
-            {/* 카메라 로딩 중 또는 에러 표시 */}
-            {!cameraReady && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-black">
-                {cameraError ? (
-                  <>
-                    <div className="w-16 h-16 flex items-center justify-center mb-4">
-                      <svg className="w-12 h-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                      </svg>
-                    </div>
-                    <p className="text-white/80 text-sm text-center px-4 mb-4">{cameraError}</p>
-                    <button
-                      onClick={() => startCamera(facingMode)}
-                      className="px-4 py-2 bg-white/20 rounded-lg text-white text-sm hover:bg-white/30 transition-colors"
-                    >
-                      다시 시도
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <div className="w-16 h-16 border-4 border-white/20 border-t-white rounded-full animate-spin mb-4" />
-                    <p className="text-white/60 text-sm">카메라 로딩 중...</p>
-                  </>
-                )}
-              </div>
-            )}
-          </>
+          <video
+            ref={videoRef}
+            autoPlay playsInline muted
+            className={`w-full h-full object-cover ${isMirrored ? 'scale-x-[-1]' : ''}`}
+          />
         ) : uploadedPhoto && (
           <img src={uploadedPhoto} alt="" className="w-full h-full object-contain bg-black" />
         )}

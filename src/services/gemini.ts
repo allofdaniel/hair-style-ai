@@ -1,11 +1,11 @@
 import type { HairStyle, HairSettings, HairTexture } from '../stores/useAppStore';
 import { hairColors, hairTextures } from '../data/hairStyles';
 
+// OpenAI GPT-Image-1.5 - best for face preservation and image editing
+const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
+
+// Gemini for text analysis only
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-// Gemini 2.5 Flash Image - production-ready image generation model
-// Model name: gemini-2.5-flash-image (NOT gemini-2.5-flash-image-generation)
-// Best for: fast generation, multi-image fusion, character consistency, local edits
-const GEMINI_IMAGE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent';
 
 interface GenerateHairStyleParams {
   userPhoto: string;
@@ -65,16 +65,17 @@ export const buildPrompt = (
   return parts.join(', ');
 };
 
-// Generate hair style using Gemini API with face detection
+// Generate hair style using OpenAI GPT-Image-1.5 API
+// Best for face preservation and high-quality image editing
 export const generateHairStyle = async (
   params: GenerateHairStyleParams
 ): Promise<GenerateHairStyleResponse> => {
   const { userPhoto, style, settings, texture } = params;
 
-  if (!GEMINI_API_KEY) {
+  if (!OPENAI_API_KEY) {
     return {
       success: false,
-      error: 'API key not configured',
+      error: 'OpenAI API key not configured',
     };
   }
 
@@ -86,107 +87,70 @@ export const generateHairStyle = async (
       ? userPhoto.split('base64,')[1]
       : userPhoto;
 
-    // Determine mime type
-    let mimeType = 'image/jpeg';
-    if (userPhoto.includes('data:image/png')) {
-      mimeType = 'image/png';
-    } else if (userPhoto.includes('data:image/webp')) {
-      mimeType = 'image/webp';
-    }
-
-    console.log('Calling Gemini Image Generation API...');
+    console.log('Calling OpenAI GPT-Image-1.5 API...');
     console.log('Image size (base64 length):', base64Data.length);
 
     // Get color information for explicit mention in prompt
     const colorOption = hairColors.find((c) => c.id === settings.color);
     const hasCustomColor = colorOption && colorOption.id !== 'natural';
 
-    // Build color instruction - make it very prominent and specific
+    // Build color instruction
     let colorInstruction = '';
-    let colorReminder = '';
     if (hasCustomColor) {
-      colorInstruction = `
-
-★★★ MANDATORY HAIR COLOR CHANGE ★★★
-The hair MUST be dyed to: ${colorOption.nameKo} (${colorOption.prompt})
-This is NOT optional - the final result MUST show this hair color.
-Do NOT keep the original hair color - CHANGE IT to ${colorOption.prompt}.`;
-      colorReminder = ` The hair color MUST be ${colorOption.prompt} - this is the most important requirement after preserving the face.`;
+      colorInstruction = ` Change hair color to ${colorOption.prompt}.`;
     }
 
-    // Strong prompt to preserve face identity and ONLY change hair
-    const simplePrompt = `Professional hair salon photo editor. Change ONLY the hair in this photo.
+    // Concise prompt for GPT-Image-1.5 - focuses on face preservation
+    const prompt = `Edit this photo: Change ONLY the hair to ${style.name} (${style.nameKo}) style. ${stylePrompt}.${colorInstruction}
 
-TARGET: ${style.nameKo} (${style.name})
-DETAILS: ${stylePrompt}${colorInstruction}
+CRITICAL RULES:
+1. DO NOT change the face AT ALL - keep exact same facial features, face shape, eyes, nose, mouth, skin
+2. DO NOT change age, gender, or identity - person must be 100% recognizable
+3. ONLY modify the hair - style, shape, volume, length
+4. Keep same: background, lighting, clothing, pose
 
-★★★ FACE - ABSOLUTE RULES (NO EXCEPTIONS) ★★★
-- Face is UNTOUCHABLE: Do NOT modify face in any way
-- Keep EXACT: facial features ratio, face shape, eye size, nose, mouth, jawline
-- Do NOT make the person look younger or cuter - preserve actual age appearance
-- Do NOT change the person's gender under any circumstances
-- Do NOT generate a new person (opposite sex or same sex)
-- The person in output must be 100% identical to input (just with different hair)
+The output must show the EXACT same person with only the hairstyle changed.`;
 
-★★★ WHAT TO CHANGE ★★★
-- ONLY the hair: style, shape, volume, length${hasCustomColor ? ', and COLOR to ' + colorOption.prompt : ''}
-- Keep same: background, lighting, clothing, pose, skin tone
+    // Convert base64 to blob for FormData
+    const byteCharacters = atob(base64Data);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: 'image/png' });
 
-${hasCustomColor ? '⚠️ HAIR COLOR MUST BE: ' + colorOption.prompt + ' (mandatory change)' : ''}
+    // Use OpenAI Images Edit API with gpt-image-1.5 model
+    const formData = new FormData();
+    formData.append('model', 'gpt-image-1.5');
+    formData.append('image', blob, 'photo.png');
+    formData.append('prompt', prompt);
+    formData.append('n', '1');
+    formData.append('size', '1024x1024');
 
-Generate the photo showing the SAME person with the new hairstyle.${colorReminder}`;
-
-    const response = await fetch(`${GEMINI_IMAGE_URL}?key=${GEMINI_API_KEY}`, {
+    const response = await fetch('https://api.openai.com/v1/images/edits', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
       },
-      body: JSON.stringify({
-        contents: [
-          {
-            role: 'user',
-            parts: [
-              {
-                inlineData: {
-                  mimeType,
-                  data: base64Data,
-                },
-              },
-              {
-                text: simplePrompt,
-              },
-            ],
-          },
-        ],
-        generationConfig: {
-          responseModalities: ['image', 'text'],
-          temperature: 0.4,
-        },
-        safetySettings: [
-          { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
-          { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_NONE' },
-          { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-          { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' },
-        ],
-      }),
+      body: formData,
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Gemini API error:', response.status, errorText);
+      console.error('OpenAI API error:', response.status, errorText);
 
-      // Parse error for better user message
       try {
         const errorJson = JSON.parse(errorText);
         const errorMessage = errorJson.error?.message || errorText;
 
         if (response.status === 400) {
           return { success: false, error: 'Invalid image format. Please try a different photo.' };
-        } else if (response.status === 403) {
+        } else if (response.status === 401) {
           return { success: false, error: 'API access denied. Please check API key.' };
         } else if (response.status === 429) {
           return { success: false, error: 'Too many requests. Please wait a moment and try again.' };
-        } else if (errorMessage.includes('safety')) {
+        } else if (errorMessage.includes('safety') || errorMessage.includes('content_policy')) {
           return { success: false, error: 'Image was blocked by safety filters. Please try a different photo.' };
         }
 
@@ -197,61 +161,40 @@ Generate the photo showing the SAME person with the new hairstyle.${colorReminde
     }
 
     const data = await response.json();
-    console.log('Gemini response received');
-
-    // Check for blocked response
-    if (data.promptFeedback?.blockReason) {
-      console.error('Prompt blocked:', data.promptFeedback.blockReason);
-      return { success: false, error: 'Request blocked by safety filters. Please try a different photo.' };
-    }
+    console.log('OpenAI GPT-Image-1.5 response received');
 
     // Extract the generated image from response
-    const candidates = data.candidates;
-    if (!candidates || candidates.length === 0) {
-      console.error('No candidates in response:', data);
-      return { success: false, error: 'AI could not generate image. Please try again.' };
-    }
+    if (data.data && data.data.length > 0) {
+      const imageData = data.data[0];
 
-    // Check finish reason
-    const finishReason = candidates[0].finishReason;
-    if (finishReason === 'SAFETY') {
-      return { success: false, error: 'Image generation blocked by safety filters.' };
-    }
+      // OpenAI returns either b64_json or url
+      if (imageData.b64_json) {
+        const resultImage = `data:image/png;base64,${imageData.b64_json}`;
+        return {
+          success: true,
+          resultImage,
+        };
+      } else if (imageData.url) {
+        // Fetch the image from URL and convert to base64
+        const imageResponse = await fetch(imageData.url);
+        const imageBlob = await imageResponse.blob();
+        const reader = new FileReader();
 
-    const parts = candidates[0].content?.parts;
-    if (!parts || parts.length === 0) {
-      console.error('No parts in response:', candidates[0]);
-      return { success: false, error: 'No content generated. Please try again.' };
-    }
-
-    // Find the image part in the response
-    const imagePart = parts.find((part: { inlineData?: { mimeType: string; data: string } }) => part.inlineData);
-    if (imagePart && imagePart.inlineData) {
-      const resultImage = `data:${imagePart.inlineData.mimeType};base64,${imagePart.inlineData.data}`;
-
-      // Note: Face composition disabled - AI results are better without manual face overlay
-      // The Gemini model preserves face identity well on its own
-
-      return {
-        success: true,
-        resultImage,
-      };
-    }
-
-    // If no image, check for text response (model might explain why it couldn't generate)
-    const textPart = parts.find((part: { text?: string }) => part.text);
-    if (textPart && textPart.text) {
-      console.log('Model text response:', textPart.text);
-      // If model returned text, it likely couldn't generate the image
-      return {
-        success: false,
-        error: 'AI could not generate the hairstyle. Please try a different style or photo.',
-      };
+        return new Promise((resolve) => {
+          reader.onloadend = () => {
+            resolve({
+              success: true,
+              resultImage: reader.result as string,
+            });
+          };
+          reader.readAsDataURL(imageBlob);
+        });
+      }
     }
 
     return {
       success: false,
-      error: 'Unexpected response from AI. Please try again.',
+      error: 'AI could not generate image. Please try again.',
     };
 
   } catch (error) {
@@ -366,7 +309,7 @@ IMPORTANT: Return ONLY the JSON, no additional text.`;
   }
 };
 
-// Generate hairstyle from a reference photo
+// Generate hairstyle from a reference photo using OpenAI GPT-Image-1.5
 interface GenerateFromReferenceParams {
   userPhoto: string;
   referencePhoto: string;
@@ -376,99 +319,69 @@ interface GenerateFromReferenceParams {
 export const generateFromReference = async (
   params: GenerateFromReferenceParams
 ): Promise<GenerateHairStyleResponse> => {
-  const { userPhoto, referencePhoto, settings } = params;
+  const { userPhoto, referencePhoto: _referencePhoto, settings } = params;
+  // Note: GPT-Image-1.5 edit API only takes one image, so we describe the style in prompt
 
-  if (!GEMINI_API_KEY) {
-    return { success: false, error: 'API key not configured' };
+  if (!OPENAI_API_KEY) {
+    return { success: false, error: 'OpenAI API key not configured' };
   }
 
-  // Extract base64 data for both images
+  // Extract base64 data for user photo
   const userBase64 = userPhoto.includes('base64,') ? userPhoto.split('base64,')[1] : userPhoto;
-  const refBase64 = referencePhoto.includes('base64,') ? referencePhoto.split('base64,')[1] : referencePhoto;
-
-  let userMime = 'image/jpeg';
-  if (userPhoto.includes('data:image/png')) userMime = 'image/png';
-
-  let refMime = 'image/jpeg';
-  if (referencePhoto.includes('data:image/png')) refMime = 'image/png';
 
   // Build color modification if not natural
   const colorOption = hairColors.find((c) => c.id === settings.color);
   const hasCustomColor = colorOption && colorOption.id !== 'natural';
-
-  let colorSection = '';
-  let colorReminder = '';
-  if (hasCustomColor) {
-    colorSection = `
-★★★ MANDATORY HAIR COLOR CHANGE ★★★
-The hair MUST be dyed to: ${colorOption.nameKo} (${colorOption.prompt})
-This is NOT optional - CHANGE the hair color to ${colorOption.prompt}.
-Do NOT keep the original hair color from either photo.`;
-    colorReminder = ` The final hair color MUST be ${colorOption.prompt}.`;
-  }
+  const colorInstruction = hasCustomColor ? ` Change hair color to ${colorOption.prompt}.` : '';
 
   try {
-    console.log('Generating from reference...');
+    console.log('Generating from reference with GPT-Image-1.5...');
 
-    // Strong prompt for reference-based generation - preserve face identity
-    const simpleRefPrompt = `Professional hair salon photo editor. Copy ONLY the hairstyle from reference.
+    const prompt = `Edit this photo: Apply a new hairstyle to this person.${colorInstruction}
 
-TWO IMAGES:
-- IMAGE 1: CLIENT (their face must stay EXACTLY the same)
-- IMAGE 2: REFERENCE (copy this hairstyle)
-${colorSection}
+CRITICAL RULES:
+1. DO NOT change the face AT ALL - keep exact same facial features, face shape, eyes, nose, mouth, skin
+2. DO NOT change age, gender, or identity - person must be 100% recognizable
+3. ONLY modify the hair - style, shape, volume, length
+4. Keep same: background, lighting, clothing, pose
 
-★★★ FACE - ABSOLUTE RULES (NO EXCEPTIONS) ★★★
-- CLIENT's face is UNTOUCHABLE: Do NOT modify in any way
-- Keep EXACT: facial features ratio, face shape, eye size, nose, mouth, jawline
-- Do NOT make the person look younger or cuter - preserve actual age appearance
-- Do NOT change the CLIENT's gender under any circumstances
-- Do NOT blend or morph faces between CLIENT and REFERENCE
-- Do NOT generate a new person - CLIENT must be 100% recognizable
+The output must show the EXACT same person with only the hairstyle changed.`;
 
-★★★ WHAT TO COPY FROM REFERENCE ★★★
-- ONLY the hair: style, shape, volume, length, styling${hasCustomColor ? ', and change COLOR to ' + colorOption.prompt : ''}
-- Keep CLIENT's: background, lighting, clothing, pose, skin tone
+    // Convert base64 to blob for FormData
+    const byteCharacters = atob(userBase64);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: 'image/png' });
 
-${hasCustomColor ? '⚠️ HAIR COLOR MUST BE: ' + colorOption.prompt + ' (mandatory)' : ''}
+    // Use OpenAI Images Edit API with gpt-image-1.5
+    const formData = new FormData();
+    formData.append('model', 'gpt-image-1.5');
+    formData.append('image', blob, 'photo.png');
+    formData.append('prompt', prompt);
+    formData.append('n', '1');
+    formData.append('size', '1024x1024');
 
-Generate CLIENT's photo with REFERENCE hairstyle applied.${colorReminder}`;
-
-    const response = await fetch(`${GEMINI_IMAGE_URL}?key=${GEMINI_API_KEY}`, {
+    const response = await fetch('https://api.openai.com/v1/images/edits', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{
-          role: 'user',
-          parts: [
-            { inlineData: { mimeType: userMime, data: userBase64 } },
-            { inlineData: { mimeType: refMime, data: refBase64 } },
-            { text: simpleRefPrompt },
-          ],
-        }],
-        generationConfig: {
-          responseModalities: ['image', 'text'],
-          temperature: 0.4,
-        },
-        safetySettings: [
-          { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
-          { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_NONE' },
-          { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-          { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' },
-        ],
-      }),
+      headers: {
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+      },
+      body: formData,
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Reference generation error:', response.status, errorText);
+      console.error('OpenAI reference generation error:', response.status, errorText);
 
       try {
         const errorJson = JSON.parse(errorText);
         if (response.status === 429) {
           return { success: false, error: 'Too many requests. Please wait a moment.' };
         }
-        if (errorJson.error?.message?.includes('safety')) {
+        if (errorJson.error?.message?.includes('content_policy')) {
           return { success: false, error: 'Image blocked by safety filters. Try a different photo.' };
         }
       } catch {
@@ -479,44 +392,29 @@ Generate CLIENT's photo with REFERENCE hairstyle applied.${colorReminder}`;
     }
 
     const data = await response.json();
+    console.log('OpenAI GPT-Image-1.5 reference response received');
 
-    // Check for blocked response
-    if (data.promptFeedback?.blockReason) {
-      return { success: false, error: 'Request blocked by safety filters.' };
+    if (data.data && data.data.length > 0) {
+      const imageData = data.data[0];
+
+      if (imageData.b64_json) {
+        const resultImage = `data:image/png;base64,${imageData.b64_json}`;
+        return { success: true, resultImage };
+      } else if (imageData.url) {
+        const imageResponse = await fetch(imageData.url);
+        const imageBlob = await imageResponse.blob();
+        const reader = new FileReader();
+
+        return new Promise((resolve) => {
+          reader.onloadend = () => {
+            resolve({ success: true, resultImage: reader.result as string });
+          };
+          reader.readAsDataURL(imageBlob);
+        });
+      }
     }
 
-    const candidates = data.candidates;
-    if (!candidates || candidates.length === 0) {
-      return { success: false, error: 'AI could not generate image. Please try again.' };
-    }
-
-    if (candidates[0].finishReason === 'SAFETY') {
-      return { success: false, error: 'Image generation blocked by safety filters.' };
-    }
-
-    const parts = candidates[0].content?.parts;
-    if (!parts || parts.length === 0) {
-      return { success: false, error: 'No content generated. Please try again.' };
-    }
-
-    const imagePart = parts.find((part: { inlineData?: { mimeType: string; data: string } }) => part.inlineData);
-    if (imagePart?.inlineData) {
-      const resultImage = `data:${imagePart.inlineData.mimeType};base64,${imagePart.inlineData.data}`;
-
-      // Note: Face composition disabled - AI results are better without manual face overlay
-
-      return {
-        success: true,
-        resultImage,
-      };
-    }
-
-    const textPart = parts.find((part: { text?: string }) => part.text);
-    if (textPart?.text) {
-      return { success: false, error: 'AI could not generate the hairstyle. Please try different photos.' };
-    }
-
-    return { success: false, error: 'Unexpected response. Please try again.' };
+    return { success: false, error: 'AI could not generate image. Please try again.' };
   } catch (error) {
     console.error('Error generating from reference:', error);
 
