@@ -1,9 +1,9 @@
 {
-  "name": "looksim",
+  "name": "beforecut",
   "private": true,
-  "version": "1.0.4",
-  "description": "AI 외모 시뮬레이션 - 헤어스타일, 체중, 피부 시술, 메이크업 변화를 미리 확인",
-  "author": "LookSim Team",
+  "version": "1.0.5",
+  "description": "AI 헤어스타일 시뮬레이션 - 미용실 가기 전 헤어스타일 미리보기",
+  "author": "BeforeCut Team",
   "license": "UNLICENSED",
   "type": "module",
   "scripts": {

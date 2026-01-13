@@ -2,10 +2,10 @@ import { useNavigate } from 'react-router-dom';
 
 export default function Terms() {
   const navigate = useNavigate();
-  const lastUpdated = '2024년 12월 22일';
-  const appName = 'LookSim';
-  const companyName = 'LookSim';
-  const contactEmail = 'support@looksim.app';
+  const lastUpdated = '2025년 1월 13일';
+  const appName = 'BeforeCut';
+  const companyName = 'BeforeCut';
+  const contactEmail = 'beforecut.app@gmail.com';
 
   return (
     <div className="min-h-screen bg-[#0a0a12] safe-area-top safe-area-bottom">
