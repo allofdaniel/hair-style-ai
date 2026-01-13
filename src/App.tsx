@@ -8,7 +8,7 @@ import ProcessingIndicator from './components/ProcessingIndicator';
 import { trackPageView } from './services/analytics';
 import { initPageSEO } from './services/seo';
 import { useI18n } from './i18n/useI18n';
-import { admobService } from './services/admob';
+// import { admobService } from './services/admob'; // Disabled for initial release
 import { initializeRevenueCat } from './services/revenuecat';
 
 // 온보딩 상태 관리 컴포넌트
@@ -103,9 +103,9 @@ function PageTracker() {
 }
 
 function App() {
-  // AdMob 및 RevenueCat 초기화
+  // RevenueCat 초기화 (AdMob disabled for initial release)
   useEffect(() => {
-    admobService.initialize();
+    // admobService.initialize(); // Disabled - no AdMob account yet
     initializeRevenueCat();
   }, []);
 
