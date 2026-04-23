@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 이미지 최적화 서비스
  * - WebP 형식 지원 감지 및 자동 변환
  * - 연결 품질에 따른 적응형 이미지 품질
@@ -9,6 +9,7 @@
 
 import { getConnectionStatus, getOptimalImageQuality } from './networkResilience';
 
+import { logger } from './logger';
 // 이미지 포맷 지원 캐시
 let webpSupported: boolean | null = null;
 let avifSupported: boolean | null = null;
@@ -271,7 +272,7 @@ export class ProgressiveImageLoader {
       this.loadedImages.add(src);
       this.observer?.unobserve(img);
     } catch (error) {
-      console.error('[ImageOptimization] Failed to load image:', error);
+      logger.error('[ImageOptimization] Failed to load image:', error);
     }
   }
 
@@ -310,7 +311,7 @@ export const ImageCache = {
       const response = new Response(blob);
       await cache.put(url, response);
     } catch (error) {
-      console.error('[ImageCache] Failed to cache image:', error);
+      logger.error('[ImageCache] Failed to cache image:', error);
     }
   },
 
@@ -325,7 +326,7 @@ export const ImageCache = {
         return await response.blob();
       }
     } catch (error) {
-      console.error('[ImageCache] Failed to get cached image:', error);
+      logger.error('[ImageCache] Failed to get cached image:', error);
     }
     return null;
   },
@@ -352,7 +353,7 @@ export const ImageCache = {
         }
       }
     } catch (error) {
-      console.error('[ImageCache] Failed to cleanup cache:', error);
+      logger.error('[ImageCache] Failed to cleanup cache:', error);
     }
   },
 
@@ -498,3 +499,4 @@ export default {
   estimateBase64Size,
   isImageTooLarge,
 };
+

@@ -1,16 +1,47 @@
+import { logger } from './logger';
 /**
  * n8n Backend Service
  *
  * Uses n8n workflow automation to test multiple AI models for hair generation.
- * Proxmox n8n server: http://192.168.50.88:5678
  */
 
 import type { HairStyle, HairSettings, HairTexture } from '../stores/useAppStore';
 import { buildPrompt } from './hairGeneration';
+import { resilientFetch } from './networkResilience';
 
-// n8n server configuration
-const N8N_BASE_URL = import.meta.env.VITE_N8N_URL || 'http://192.168.50.88:5678';
+const isDebug = import.meta.env.DEV || import.meta.env.MODE === 'test';
+
+const debugLog = (...args: unknown[]): void => {
+  if (isDebug) {
+    logger.log(...args);
+  }
+};
+
+const parseN8nUrl = (): string => {
+  const envUrl = (import.meta.env.VITE_N8N_URL || '').trim();
+  if (!envUrl) return '';
+
+  try {
+    const parsed = new URL(envUrl);
+    if (!['http:', 'https:'].includes(parsed.protocol)) return '';
+    return parsed.toString().replace(/\/$/, '');
+  } catch {
+    return '';
+  }
+};
+
+const N8N_BASE_URL = parseN8nUrl();
 const N8N_WEBHOOK_PATH = '/webhook/hair-style-generate';
+const N8N_RETRY_CONFIG = {
+  maxRetries: 2,
+  baseDelay: 1200,
+  maxDelay: 15000,
+  retryableStatuses: [408, 429, 500, 502, 503, 504],
+};
+
+const fetchWithRetry = (url: string, options: RequestInit): Promise<Response> => {
+  return resilientFetch(url, options, N8N_RETRY_CONFIG);
+};
 
 interface N8nGenerateParams {
   userPhoto: string;
@@ -32,12 +63,36 @@ interface N8nGenerateResponse {
   error?: string;
 }
 
+const isN8nConfigured = (): boolean => {
+  return Boolean(N8N_BASE_URL);
+};
+
+const requireN8nConfig = (): { ok: boolean; error?: string } => {
+  if (!isN8nConfigured()) {
+    return {
+      ok: false,
+      error: 'n8n backend URL is not configured. Please set VITE_N8N_URL in environment variables.',
+    };
+  }
+
+  return { ok: true };
+};
+
 /**
  * Generate hairstyle using n8n backend
  */
 export async function generateWithN8n(
   params: N8nGenerateParams
 ): Promise<N8nGenerateResponse> {
+  const config = requireN8nConfig();
+  if (!config.ok) {
+    logger.error('[n8n]', config.error);
+    return {
+      success: false,
+      error: config.error,
+    };
+  }
+
   const { userPhoto, style, settings, texture, model = 'openai' } = params;
 
   const stylePrompt = buildPrompt(style, settings, texture);
@@ -56,12 +111,13 @@ CRITICAL RULES:
 
 Generate the image with the new hairstyle applied.`;
 
-  try {
-    console.log('[n8n] Sending request to n8n backend...');
-    console.log('[n8n] URL:', `${N8N_BASE_URL}${N8N_WEBHOOK_PATH}`);
-    console.log('[n8n] Model:', model);
+  const endpoint = `${N8N_BASE_URL}${N8N_WEBHOOK_PATH}`;
 
-    const response = await fetch(`${N8N_BASE_URL}${N8N_WEBHOOK_PATH}`, {
+  try {
+    debugLog('[n8n] Sending request to n8n backend...');
+    debugLog('[n8n] Model:', model);
+
+    const response = await fetchWithRetry(endpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -82,7 +138,8 @@ Generate the image with the new hairstyle applied.`;
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('[n8n] Error:', response.status, errorText);
+      logger.error('[n8n] Error:', response.status);
+      logger.error('[n8n] Error body:', errorText.slice(0, 200));
       return {
         success: false,
         error: `n8n backend error: ${response.status}`,
@@ -90,7 +147,11 @@ Generate the image with the new hairstyle applied.`;
     }
 
     const data = await response.json();
-    console.log('[n8n] Response received:', data);
+    debugLog('[n8n] Response received:', {
+      hasData: !!data,
+      hasUrl: !!(data?.data || data?.url || data?.image),
+      keys: Object.keys(data || {}).slice(0, 5),
+    });
 
     // Handle different response formats from n8n
     if (data.data && Array.isArray(data.data)) {
@@ -137,7 +198,7 @@ Generate the image with the new hairstyle applied.`;
     };
 
   } catch (error) {
-    console.error('[n8n] Request failed:', error);
+    logger.error('[n8n] Request failed:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'n8n request failed',
@@ -153,8 +214,17 @@ export async function testN8nConnection(): Promise<{
   url: string;
   error?: string;
 }> {
+  const config = requireN8nConfig();
+  if (!config.ok) {
+    return {
+      connected: false,
+      url: '',
+      error: config.error,
+    };
+  }
+
   try {
-    const response = await fetch(`${N8N_BASE_URL}/healthz`, {
+    const response = await fetchWithRetry(`${N8N_BASE_URL}/healthz`, {
       method: 'GET',
       signal: AbortSignal.timeout(5000),
     });

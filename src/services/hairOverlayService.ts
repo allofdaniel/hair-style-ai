@@ -1,40 +1,50 @@
+import { logger } from './logger';
 /**
  * Hair Overlay Service - OpenAI GPT-Image-1.5
  *
- * OpenAI가 얼굴 보존을 잘 하므로 마스크 블렌딩 제거
- * AI 결과를 그대로 사용
- * 앞머리 + 뒷머리 동시 생성 지원
+ * OpenAI가 ?�굴 보존?????��?�?마스??블렌???�거
+ * AI 결과�?그�?�??�용
+ * ?�머�?+ ?�머�??�시 ?�성 지??
  */
 
 import type { HairStyle, HairSettings } from '../stores/useAppStore';
 import { generateHairStyle, generateFromReference, generateBackView } from './openai';
 
+const isDebug = import.meta.env.DEV || import.meta.env.MODE === 'test';
+
+const debugLog = (...args: unknown[]): void => {
+  if (isDebug) {
+    logger.log(...args);
+  }
+};
+
 interface GenerateResult {
   success: boolean;
   resultImage?: string;
-  backViewImage?: string;  // 뒷머리 이미지
+  backViewImage?: string;  // ?�머�??��?지
   error?: string;
 }
 
 /**
- * 메인 함수 - OpenAI GPT-Image-1.5 직접 사용
- * 앞머리 + 뒷머리 동시 생성
+ * 메인 ?�수 - OpenAI GPT-Image-1.5 직접 ?�용
+ * ?�머�?+ ?�머�??�시 ?�성
  */
 export async function applyHairOverlay(params: {
   userPhoto: string;
   style: HairStyle;
   settings: HairSettings;
   hairMask?: string;
-  generateBackView?: boolean;  // 뒷머리도 생성할지 여부
+  generateBackView?: boolean;  // ?�머리도 ?�성?��? ?��? (기본: false - ?�도 ?�상)
 }): Promise<GenerateResult> {
+  // ?�머�??�동 ?�성 ?�성??
   const { userPhoto, style, settings, generateBackView: shouldGenerateBackView = true } = params;
 
   try {
-    console.log('=== Hair Generation with OpenAI GPT-Image-1.5 ===');
-    console.log('Style:', style.name);
-    console.log('Generate back view:', shouldGenerateBackView);
+    debugLog('=== Hair Generation with OpenAI GPT-Image-1.5 ===');
+    debugLog('Style:', style.name);
+    debugLog('Generate back view:', shouldGenerateBackView);
 
-    // 1. 앞머리 (정면) 생성
+    // 1. ?�머�?(?�면) ?�성
     const openaiResult = await generateHairStyle({
       userPhoto,
       style,
@@ -45,13 +55,13 @@ export async function applyHairOverlay(params: {
       return { success: false, error: openaiResult.error || 'Failed to generate hairstyle' };
     }
 
-    // AI 결과에 워터마크 추가
+    // AI 결과???�터마크 추�?
     const frontResult = await addWatermark(openaiResult.resultImage);
 
-    // 2. 뒷머리 생성 (옵션)
+    // 2. ?�머�??�성 (?�션)
     let backResult: string | undefined;
     if (shouldGenerateBackView) {
-      console.log('=== Generating Back View ===');
+      debugLog('=== Generating Back View ===');
       const backViewResult = await generateBackView({
         userPhoto,
         frontResultImage: openaiResult.resultImage,
@@ -61,14 +71,14 @@ export async function applyHairOverlay(params: {
 
       if (backViewResult.success && backViewResult.resultImage) {
         backResult = await addWatermark(backViewResult.resultImage);
-        console.log('Back view generated successfully');
+        debugLog('Back view generated successfully');
       } else {
-        console.warn('Failed to generate back view:', backViewResult.error);
-        // 뒷머리 실패해도 앞머리는 반환
+        logger.warn('Failed to generate back view:', backViewResult.error);
+        // ?�머�??�패?�도 ?�머리는 반환
       }
     }
 
-    console.log('=== Success! ===');
+    debugLog('=== Success! ===');
     return {
       success: true,
       resultImage: frontResult,
@@ -76,13 +86,13 @@ export async function applyHairOverlay(params: {
     };
 
   } catch (error) {
-    console.error('Error:', error);
+    logger.error('Error:', error);
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 }
 
 /**
- * 레퍼런스 기반 헤어 변환
+ * ?�퍼?�스 기반 ?�어 변??
  */
 export async function applyReferenceOverlay(params: {
   userPhoto: string;
@@ -93,7 +103,7 @@ export async function applyReferenceOverlay(params: {
   const { userPhoto, referencePhoto, settings } = params;
 
   try {
-    console.log('=== Reference-Based Hair Generation with OpenAI ===');
+    debugLog('=== Reference-Based Hair Generation with OpenAI ===');
 
     const openaiResult = await generateFromReference({
       userPhoto,
@@ -105,47 +115,70 @@ export async function applyReferenceOverlay(params: {
       return { success: false, error: openaiResult.error || 'Failed to generate hairstyle from reference' };
     }
 
-    // AI 결과 직접 사용
+    // AI 결과 직접 ?�용
     const finalResult = await addWatermark(openaiResult.resultImage);
 
     return { success: true, resultImage: finalResult };
 
   } catch (error) {
-    console.error('Error:', error);
+    logger.error('Error:', error);
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 }
 
 /**
- * 워터마크 추가
+ * ?�터마크 추�?
+ * ?�?�아??추�??�여 무한 ?��?방�?
  */
 async function addWatermark(imageData: string): Promise<string> {
   return new Promise((resolve) => {
+    // 10�??�?�아???�정
+    const timeout = setTimeout(() => {
+      logger.warn('addWatermark timeout - returning original');
+      resolve(imageData);
+    }, 10000);
+
     const img = new Image();
     img.onload = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = img.width;
-      canvas.height = img.height;
-      const ctx = canvas.getContext('2d')!;
+      clearTimeout(timeout);
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
 
-      ctx.drawImage(img, 0, 0);
+        if (!ctx) {
+          logger.warn('addWatermark: canvas context is null, returning original');
+          resolve(imageData);
+          return;
+        }
 
-      const fontSize = Math.max(14, Math.floor(img.width * 0.025));
-      ctx.font = `${fontSize}px Arial`;
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-      ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
-      ctx.lineWidth = 1;
+        ctx.drawImage(img, 0, 0);
 
-      const text = 'HairStyle AI';
-      const textWidth = ctx.measureText(text).width;
+        const fontSize = Math.max(14, Math.floor(img.width * 0.025));
+        ctx.font = `${fontSize}px Arial`;
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
+        ctx.lineWidth = 1;
 
-      // 우측 하단에만 워터마크
-      ctx.strokeText(text, img.width - textWidth - 15, img.height - 15);
-      ctx.fillText(text, img.width - textWidth - 15, img.height - 15);
+        const text = 'HairStyle AI';
+        const textWidth = ctx.measureText(text).width;
 
-      resolve(canvas.toDataURL('image/jpeg', 0.92));
+        // ?�측 ?�단?�만 ?�터마크
+        ctx.strokeText(text, img.width - textWidth - 15, img.height - 15);
+        ctx.fillText(text, img.width - textWidth - 15, img.height - 15);
+
+        resolve(canvas.toDataURL('image/jpeg', 0.92));
+      } catch (err) {
+        logger.warn('addWatermark error:', err);
+        resolve(imageData);
+      }
     };
-    img.onerror = () => resolve(imageData);
+    img.onerror = () => {
+      clearTimeout(timeout);
+      logger.warn('addWatermark img.onerror - returning original');
+      resolve(imageData);
+    };
     img.src = imageData;
   });
 }

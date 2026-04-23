@@ -1,9 +1,10 @@
-/**
+﻿/**
  * Sentry 에러 모니터링 서비스
  * 프로덕션 환경에서 에러 추적 및 성능 모니터링
  */
 import * as Sentry from '@sentry/react';
 
+import { logger } from './logger';
 // Sentry DSN (환경변수에서 가져옴)
 const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN;
 
@@ -13,13 +14,13 @@ const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN;
 export const initSentry = (): void => {
   // DSN이 없으면 초기화하지 않음
   if (!SENTRY_DSN) {
-    console.log('[Sentry] DSN not configured, error monitoring disabled');
+    logger.log('[Sentry] DSN not configured, error monitoring disabled');
     return;
   }
 
   // 개발 환경에서는 기본적으로 비활성화
   if (import.meta.env.DEV && !import.meta.env.VITE_ENABLE_SENTRY_DEV) {
-    console.log('[Sentry] Disabled in development');
+    logger.log('[Sentry] Disabled in development');
     return;
   }
 
@@ -131,7 +132,7 @@ export const setTags = (tags: Record<string, string>): void => {
  */
 export const captureError = (error: Error, context?: Record<string, unknown>): void => {
   if (!SENTRY_DSN) {
-    console.error('[Error]', error, context);
+    logger.error('[Error]', error, context);
     return;
   }
 
@@ -148,7 +149,7 @@ export const captureMessage = (
   level: 'fatal' | 'error' | 'warning' | 'info' | 'debug' = 'info'
 ): void => {
   if (!SENTRY_DSN) {
-    console.log(`[${level}]`, message);
+    logger.log(`[${level}]`, message);
     return;
   }
 
@@ -244,3 +245,4 @@ export default {
   withProfiler: withSentryProfiler,
   helpers: SentryHelpers,
 };
+

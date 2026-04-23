@@ -1,7 +1,7 @@
+import { logger } from './logger';
 /**
- * IndexedDB 기반 저장소 서비스
- *
- * localStorage의 5MB 제한을 극복하고 모바일에서 안정적인 저장을 제공
+ * IndexedDB 기반 ?�?�소 ?�비?? *
+ * localStorage??5MB ?�한??극복?�고 모바?�에???�정?�인 ?�?�을 ?�공
  */
 
 const DB_NAME = 'looksim-db';
@@ -14,8 +14,8 @@ const STORE_PHOTOS = 'photos';
 
 export interface HistoryItem {
   id: string;
-  original: string;      // base64 이미지
-  result: string;        // base64 이미지
+  original: string;      // base64 ?��?지
+  result: string;        // base64 ?��?지
   styleName: string;
   styleNameKo: string;
   date: string;          // ISO string
@@ -23,8 +23,7 @@ export interface HistoryItem {
 
 export interface SavedResult {
   id: string;
-  thumbnail: string;     // 압축된 썸네일
-  fullImage: string;     // 원본 이미지
+  thumbnail: string;     // ?�축???�네??  fullImage: string;     // ?�본 ?��?지
   styleName: string;
   styleNameKo: string;
   date: string;
@@ -33,8 +32,7 @@ export interface SavedResult {
 let dbInstance: IDBDatabase | null = null;
 
 /**
- * IndexedDB 연결 초기화
- */
+ * IndexedDB ?�결 초기?? */
 function openDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     if (dbInstance) {
@@ -45,7 +43,7 @@ function openDB(): Promise<IDBDatabase> {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
 
     request.onerror = () => {
-      console.error('IndexedDB 열기 실패:', request.error);
+      logger.error('IndexedDB ?�기 ?�패:', request.error);
       reject(request.error);
     };
 
@@ -57,19 +55,19 @@ function openDB(): Promise<IDBDatabase> {
     request.onupgradeneeded = (event) => {
       const db = (event.target as IDBOpenDBRequest).result;
 
-      // 기록 저장소
+      // 기록 ?�?�소
       if (!db.objectStoreNames.contains(STORE_HISTORY)) {
         const historyStore = db.createObjectStore(STORE_HISTORY, { keyPath: 'id' });
         historyStore.createIndex('date', 'date', { unique: false });
       }
 
-      // 저장된 결과물 저장소
+      // ?�?�된 결과�??�?�소
       if (!db.objectStoreNames.contains(STORE_RESULTS)) {
         const resultsStore = db.createObjectStore(STORE_RESULTS, { keyPath: 'id' });
         resultsStore.createIndex('date', 'date', { unique: false });
       }
 
-      // 사진 저장소 (큰 이미지)
+      // ?�진 ?�?�소 (???��?지)
       if (!db.objectStoreNames.contains(STORE_PHOTOS)) {
         db.createObjectStore(STORE_PHOTOS, { keyPath: 'id' });
       }
@@ -78,8 +76,7 @@ function openDB(): Promise<IDBDatabase> {
 }
 
 /**
- * 히스토리 저장
- */
+ * ?�스?�리 ?�?? */
 export async function saveHistory(item: Omit<HistoryItem, 'id'>): Promise<string> {
   const db = await openDB();
   const id = `history-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -92,7 +89,7 @@ export async function saveHistory(item: Omit<HistoryItem, 'id'>): Promise<string
     const request = store.add(record);
 
     request.onsuccess = () => {
-      // 최대 20개만 유지
+      // 최�? 20개만 ?��?
       cleanupOldRecords(STORE_HISTORY, 20);
       resolve(id);
     };
@@ -101,7 +98,7 @@ export async function saveHistory(item: Omit<HistoryItem, 'id'>): Promise<string
 }
 
 /**
- * 모든 히스토리 조회
+ * 모든 ?�스?�리 조회
  */
 export async function getAllHistory(): Promise<HistoryItem[]> {
   const db = await openDB();
@@ -110,7 +107,7 @@ export async function getAllHistory(): Promise<HistoryItem[]> {
     const transaction = db.transaction([STORE_HISTORY], 'readonly');
     const store = transaction.objectStore(STORE_HISTORY);
     const index = store.index('date');
-    const request = index.openCursor(null, 'prev'); // 최신순 정렬
+    const request = index.openCursor(null, 'prev'); // 최신???�렬
 
     const results: HistoryItem[] = [];
 
@@ -128,7 +125,7 @@ export async function getAllHistory(): Promise<HistoryItem[]> {
 }
 
 /**
- * 히스토리 삭제
+ * ?�스?�리 ??��
  */
 export async function deleteHistory(id: string): Promise<void> {
   const db = await openDB();
@@ -144,8 +141,39 @@ export async function deleteHistory(id: string): Promise<void> {
 }
 
 /**
- * 결과물 저장
+ * 모든 ?�스?�리 ??��
  */
+export async function clearAllHistory(): Promise<void> {
+  const db = await openDB();
+
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([STORE_HISTORY], 'readwrite');
+    const store = transaction.objectStore(STORE_HISTORY);
+    const request = store.clear();
+
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+  });
+}
+
+/**
+ * ?�스?�리 개수 조회
+ */
+export async function getHistoryCount(): Promise<number> {
+  const db = await openDB();
+
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([STORE_HISTORY], 'readonly');
+    const store = transaction.objectStore(STORE_HISTORY);
+    const request = store.count();
+
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+/**
+ * 결과�??�?? */
 export async function saveResult(item: Omit<SavedResult, 'id'>): Promise<string> {
   const db = await openDB();
   const id = `result-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -158,7 +186,7 @@ export async function saveResult(item: Omit<SavedResult, 'id'>): Promise<string>
     const request = store.add(record);
 
     request.onsuccess = () => {
-      // 최대 50개만 유지
+      // 최�? 50개만 ?��?
       cleanupOldRecords(STORE_RESULTS, 50);
       resolve(id);
     };
@@ -167,7 +195,7 @@ export async function saveResult(item: Omit<SavedResult, 'id'>): Promise<string>
 }
 
 /**
- * 모든 결과물 조회
+ * 모든 결과�?조회
  */
 export async function getAllResults(): Promise<SavedResult[]> {
   const db = await openDB();
@@ -176,7 +204,7 @@ export async function getAllResults(): Promise<SavedResult[]> {
     const transaction = db.transaction([STORE_RESULTS], 'readonly');
     const store = transaction.objectStore(STORE_RESULTS);
     const index = store.index('date');
-    const request = index.openCursor(null, 'prev'); // 최신순 정렬
+    const request = index.openCursor(null, 'prev'); // 최신???�렬
 
     const results: SavedResult[] = [];
 
@@ -194,7 +222,7 @@ export async function getAllResults(): Promise<SavedResult[]> {
 }
 
 /**
- * 결과물 삭제
+ * 결과�???��
  */
 export async function deleteResult(id: string): Promise<void> {
   const db = await openDB();
@@ -210,7 +238,7 @@ export async function deleteResult(id: string): Promise<void> {
 }
 
 /**
- * 모든 결과물 삭제
+ * 모든 결과�???��
  */
 export async function clearAllResults(): Promise<void> {
   const db = await openDB();
@@ -226,7 +254,7 @@ export async function clearAllResults(): Promise<void> {
 }
 
 /**
- * 오래된 레코드 정리
+ * ?�래???�코???�리
  */
 async function cleanupOldRecords(storeName: string, maxCount: number): Promise<void> {
   const db = await openDB();
@@ -243,7 +271,7 @@ async function cleanupOldRecords(storeName: string, maxCount: number): Promise<v
         return;
       }
 
-      // 오래된 것부터 삭제
+      // ?�래??것�?????��
       const index = store.index('date');
       const deleteCount = count - maxCount;
       let deleted = 0;
@@ -264,7 +292,8 @@ async function cleanupOldRecords(storeName: string, maxCount: number): Promise<v
 }
 
 /**
- * 이미지 압축 유틸리티
+ * ?��?지 ?�축 ?�틸리티
+ * ?�?�아??추�??�여 무한 ?��?방�?
  */
 export function compressImage(
   base64: string,
@@ -272,28 +301,44 @@ export function compressImage(
   quality: number = 0.7
 ): Promise<string> {
   return new Promise((resolve) => {
+    // 10�??�?�아???�정 - ?�무 ?�래 걸리�??�본 반환
+    const timeout = setTimeout(() => {
+      logger.warn('compressImage timeout - returning original');
+      resolve(base64);
+    }, 10000);
+
     const img = new Image();
     img.onload = () => {
-      const canvas = document.createElement('canvas');
-      const ratio = Math.min(maxWidth / img.width, maxWidth / img.height);
-      canvas.width = img.width * ratio;
-      canvas.height = img.height * ratio;
+      clearTimeout(timeout);
+      try {
+        const canvas = document.createElement('canvas');
+        const ratio = Math.min(maxWidth / img.width, maxWidth / img.height);
+        canvas.width = img.width * ratio;
+        canvas.height = img.height * ratio;
 
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        resolve(canvas.toDataURL('image/jpeg', quality));
-      } else {
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        } else {
+          resolve(base64);
+        }
+      } catch (err) {
+        logger.warn('compressImage error:', err);
         resolve(base64);
       }
     };
-    img.onerror = () => resolve(base64);
+    img.onerror = () => {
+      clearTimeout(timeout);
+      logger.warn('compressImage img.onerror - returning original');
+      resolve(base64);
+    };
     img.src = base64;
   });
 }
 
 /**
- * 저장소 사용량 확인
+ * ?�?�소 ?�용???�인
  */
 export async function getStorageUsage(): Promise<{ used: number; quota: number }> {
   if ('storage' in navigator && 'estimate' in navigator.storage) {
@@ -307,7 +352,7 @@ export async function getStorageUsage(): Promise<{ used: number; quota: number }
 }
 
 /**
- * IndexedDB 지원 여부 확인
+ * IndexedDB 지???��? ?�인
  */
 export function isIndexedDBSupported(): boolean {
   return 'indexedDB' in window;

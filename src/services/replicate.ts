@@ -1,7 +1,19 @@
 import type { HairStyle, HairSettings, HairTexture } from '../stores/useAppStore';
 import { hairColors, hairTextures } from '../data/hairStyles';
+import { resilientFetch } from './networkResilience';
+import { logger } from './logger';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+const REPLICATE_RETRY_CONFIG = {
+  maxRetries: 2,
+  baseDelay: 1200,
+  maxDelay: 15000,
+  retryableStatuses: [408, 429, 500, 502, 503, 504],
+};
+
+const fetchWithRetry = (url: string, options: RequestInit): Promise<Response> => {
+  return resilientFetch(url, options, REPLICATE_RETRY_CONFIG);
+};
 
 interface GenerateHairStyleParams {
   userPhoto: string;
@@ -73,7 +85,7 @@ export const generateHairStyle = async (
   const prompt = buildPrompt(style, settings, texture);
 
   try {
-    const response = await fetch(`${API_BASE_URL}/generate`, {
+    const response = await fetchWithRetry(`${API_BASE_URL}/generate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -102,7 +114,7 @@ export const generateHairStyle = async (
       resultImage: data.output || data.resultImage,
     };
   } catch (error) {
-    console.error('Error generating hair style:', error);
+    logger.error('Error generating hair style:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error occurred',
@@ -129,7 +141,7 @@ export const analyzeHairTexture = async (
   imageBase64: string
 ): Promise<HairTexture | null> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/analyze-texture`, {
+    const response = await fetchWithRetry(`${API_BASE_URL}/analyze-texture`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -144,7 +156,7 @@ export const analyzeHairTexture = async (
     const data = await response.json();
     return data.texture as HairTexture;
   } catch (error) {
-    console.error('Error analyzing hair texture:', error);
+    logger.error('Error analyzing hair texture:', error);
     return null;
   }
 };
@@ -152,7 +164,7 @@ export const analyzeHairTexture = async (
 // Check API status
 export const checkApiStatus = async (): Promise<boolean> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/health`);
+    const response = await fetchWithRetry(`${API_BASE_URL}/health`, { method: 'GET' });
     return response.ok;
   } catch {
     return false;

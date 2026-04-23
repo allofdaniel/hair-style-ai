@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "stitch": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "stitch-mcp-auto"
+      ],
+      "env": {
+        "GOOGLE_CLOUD_PROJECT": "homeassistant-474704"
+      }
+    }
+  }
+}

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Hair Inpainting Service
  *
  * 핵심 원칙: 머리 영역만 마스킹 → 그 부분만 AI가 새로 생성 → 얼굴/몸은 원본 유지
@@ -13,6 +13,8 @@
 import type { HairStyle, HairSettings } from '../stores/useAppStore';
 import { hairColors } from '../data/hairStyles';
 
+import { logger } from './logger';
+import { resilientFetch } from './networkResilience';
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 const GEMINI_IMAGE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent';
 
@@ -46,18 +48,18 @@ export async function applyHairInpainting(params: {
   }
 
   try {
-    console.log('Step 1: Detecting face bounds...');
+    logger.log('Step 1: Detecting face bounds...');
 
     // 1. 얼굴 경계 감지
     const faceBounds = await detectFaceBounds(userPhoto);
-    console.log('Face bounds:', faceBounds);
+    logger.log('Face bounds:', faceBounds);
 
-    console.log('Step 2: Creating hair mask...');
+    logger.log('Step 2: Creating hair mask...');
 
     // 2. 머리 영역 마스크 생성
     const { maskedImage } = await createHairMask(userPhoto, faceBounds);
 
-    console.log('Step 3: Inpainting hair area...');
+    logger.log('Step 3: Inpainting hair area...');
 
     // 3. 마스크된 영역에 새 헤어스타일 생성
     const result = await inpaintHairArea(userPhoto, maskedImage, style, settings, faceBounds);
@@ -66,7 +68,7 @@ export async function applyHairInpainting(params: {
       return result;
     }
 
-    console.log('Inpainting complete!');
+    logger.log('Inpainting complete!');
 
     return {
       success: true,
@@ -74,7 +76,7 @@ export async function applyHairInpainting(params: {
     };
 
   } catch (error) {
-    console.error('Hair inpainting error:', error);
+    logger.error('Hair inpainting error:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -104,11 +106,11 @@ IMPORTANT: foreheadY should be where the actual forehead SKIN starts, NOT where 
 Values are normalized 0-1 relative to image dimensions.`;
 
   try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+    const response = await resilientFetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent`,
       {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': GEMINI_API_KEY },
         body: JSON.stringify({
           contents: [{
             role: 'user',
@@ -133,7 +135,7 @@ Values are normalized 0-1 relative to image dimensions.`;
       }
     }
   } catch (error) {
-    console.error('Face detection error:', error);
+    logger.error('Face detection error:', error);
   }
 
   // 폴백 값
@@ -301,9 +303,9 @@ ABSOLUTE RULES - VIOLATION IS FAILURE:
 Generate the image with ONLY the hair changed to the new style.`;
 
   try {
-    const response = await fetch(`${GEMINI_IMAGE_URL}?key=${GEMINI_API_KEY}`, {
+    const response = await resilientFetch(`${GEMINI_IMAGE_URL}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': GEMINI_API_KEY },
       body: JSON.stringify({
         contents: [{
           role: 'user',
@@ -327,7 +329,7 @@ Generate the image with ONLY the hair changed to the new style.`;
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Gemini error:', response.status, errorText);
+      logger.error('Gemini error:', response.status, errorText);
 
       if (response.status === 429) {
         return { success: false, error: 'Too many requests. Please wait.' };
@@ -369,7 +371,7 @@ Generate the image with ONLY the hair changed to the new style.`;
     return { success: false, error: 'No image in response' };
 
   } catch (error) {
-    console.error('Inpainting error:', error);
+    logger.error('Inpainting error:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Inpainting failed',
@@ -494,12 +496,12 @@ export async function applyReferenceInpainting(params: {
   }
 
   try {
-    console.log('Step 1: Detecting face bounds...');
+    logger.log('Step 1: Detecting face bounds...');
     const faceBounds = await detectFaceBounds(userPhoto);
 
-    console.log('Step 2: Analyzing reference hairstyle...');
+    logger.log('Step 2: Analyzing reference hairstyle...');
 
-    console.log('Step 3: Inpainting with reference...');
+    logger.log('Step 3: Inpainting with reference...');
     const result = await inpaintWithReference(userPhoto, referencePhoto, settings, faceBounds);
 
     if (!result.success) {
@@ -512,7 +514,7 @@ export async function applyReferenceInpainting(params: {
     };
 
   } catch (error) {
-    console.error('Reference inpainting error:', error);
+    logger.error('Reference inpainting error:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -558,9 +560,9 @@ ABSOLUTE RULES:
 Generate the image with the reference hairstyle applied while keeping the face identical.`;
 
   try {
-    const response = await fetch(`${GEMINI_IMAGE_URL}?key=${GEMINI_API_KEY}`, {
+    const response = await resilientFetch(`${GEMINI_IMAGE_URL}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': GEMINI_API_KEY },
       body: JSON.stringify({
         contents: [{
           role: 'user',
@@ -585,7 +587,7 @@ Generate the image with the reference hairstyle applied while keeping the face i
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Gemini reference error:', response.status, errorText);
+      logger.error('Gemini reference error:', response.status, errorText);
       return { success: false, error: `API error: ${response.status}` };
     }
 
@@ -608,7 +610,9 @@ Generate the image with the reference hairstyle applied while keeping the face i
     return { success: false, error: 'No image in response' };
 
   } catch (error) {
-    console.error('Reference inpainting error:', error);
+    logger.error('Reference inpainting error:', error);
     return { success: false, error: error instanceof Error ? error.message : 'Failed' };
   }
 }
+
+

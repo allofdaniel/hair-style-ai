@@ -1,3 +1,4 @@
+import { logger } from './logger';
 /**
  * Hair Segmentation Service using Hugging Face API
  *
@@ -5,8 +6,28 @@
  * No API key required for basic usage (rate limited).
  */
 
+import { resilientFetch } from './networkResilience';
 const HF_FACE_PARSING_URL = 'https://api-inference.huggingface.co/models/jonathandinu/face-parsing';
 const HF_API_KEY = import.meta.env.VITE_HF_API_KEY || ''; // Optional, increases rate limit
+
+const RETRY_CONFIG = {
+  maxRetries: 2,
+  baseDelay: 1200,
+  maxDelay: 12000,
+  retryableStatuses: [408, 429, 500, 502, 503, 504],
+};
+
+const fetchWithRetry = (url: string, options: RequestInit): Promise<Response> => {
+  return resilientFetch(url, options, RETRY_CONFIG);
+};
+
+const isDebug = import.meta.env.DEV || import.meta.env.MODE === 'test';
+
+const debugLog = (...args: unknown[]): void => {
+  if (isDebug) {
+    logger.log(...args);
+  }
+};
 
 interface SegmentationResult {
   success: boolean;
@@ -19,7 +40,7 @@ interface SegmentationResult {
  */
 export async function segmentHair(imageBase64: string): Promise<SegmentationResult> {
   try {
-    console.log('Starting hair segmentation with Hugging Face...');
+    debugLog('Starting hair segmentation with Hugging Face...');
 
     // Convert base64 to blob
     const base64Data = imageBase64.includes('base64,')
@@ -42,7 +63,7 @@ export async function segmentHair(imageBase64: string): Promise<SegmentationResu
       headers['Authorization'] = `Bearer ${HF_API_KEY}`;
     }
 
-    const response = await fetch(HF_FACE_PARSING_URL, {
+    const response = await fetchWithRetry(HF_FACE_PARSING_URL, {
       method: 'POST',
       headers,
       body: blob,
@@ -53,7 +74,7 @@ export async function segmentHair(imageBase64: string): Promise<SegmentationResu
       if (response.status === 503) {
         const data = await response.json();
         if (data.error?.includes('loading')) {
-          console.log('Model is loading, waiting...');
+          debugLog('Model is loading, waiting...');
           // Wait and retry
           await new Promise(r => setTimeout(r, 20000));
           return segmentHair(imageBase64);
@@ -61,16 +82,16 @@ export async function segmentHair(imageBase64: string): Promise<SegmentationResu
       }
 
       const errorText = await response.text();
-      console.error('HF API error:', response.status, errorText);
+      logger.error('HF API error:', response.status, errorText);
 
       // Fallback to simple mask
-      console.log('Falling back to face-detection based mask');
+      debugLog('Falling back to face-detection based mask');
       return await createFallbackMask(imageBase64);
     }
 
     // Parse the segmentation result
     const result = await response.json();
-    console.log('Face parsing result received');
+    debugLog('Face parsing result received');
 
     // The model returns segments with labels
     // We need to find the "hair" segment and create a mask
@@ -79,10 +100,10 @@ export async function segmentHair(imageBase64: string): Promise<SegmentationResu
     return { success: true, hairMask };
 
   } catch (error) {
-    console.error('Hair segmentation error:', error);
+    logger.error('Hair segmentation error:', error);
 
     // Fallback to simple mask
-    console.log('Error occurred, falling back to simple mask');
+    debugLog('Error occurred, falling back to simple mask');
     return await createFallbackMask(imageBase64);
   }
 }
@@ -130,7 +151,7 @@ async function createHairMaskFromSegments(
         maskImg.src = `data:image/png;base64,${hairSegment.mask}`;
       } else {
         // No hair segment found, use fallback
-        console.log('No hair segment found, using fallback mask');
+        debugLog('No hair segment found, using fallback mask');
         createFallbackMaskCanvas(ctx, canvas.width, canvas.height);
         resolve(canvas.toDataURL('image/png'));
       }
@@ -282,7 +303,7 @@ export async function compositeHairOntoOriginal(
       // Step 4: Put the composited pixels back
       ctx.putImageData(resultData, 0, 0);
 
-      console.log('Compositing complete - face from original, hair from generated');
+      debugLog('Compositing complete - face from original, hair from generated');
       resolve(canvas.toDataURL('image/png'));
     };
 
@@ -330,11 +351,14 @@ export async function createHairMaskWithGemini(imageBase64: string): Promise<Seg
 Values are normalized 0-1. faceTop is where forehead skin starts (NOT hairline).`;
 
   try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+    const response = await fetchWithRetry(
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent',
       {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': GEMINI_API_KEY,
+        },
         body: JSON.stringify({
           contents: [{
             role: 'user',
@@ -352,7 +376,7 @@ Values are normalized 0-1. faceTop is where forehead skin starts (NOT hairline).
     );
 
     if (!response.ok) {
-      console.error('Gemini face detection failed');
+      logger.error('Gemini face detection failed');
       return createFallbackMask(imageBase64);
     }
 
@@ -364,7 +388,7 @@ Values are normalized 0-1. faceTop is where forehead skin starts (NOT hairline).
     }
 
     const face = JSON.parse(textPart.text);
-    console.log('Face detected:', face);
+    debugLog('Face detected:', face);
 
     // Create mask based on face position
     return new Promise((resolve) => {
@@ -424,7 +448,7 @@ Values are normalized 0-1. faceTop is where forehead skin starts (NOT hairline).
     });
 
   } catch (error) {
-    console.error('Gemini mask creation error:', error);
+    logger.error('Gemini mask creation error:', error);
     return createFallbackMask(imageBase64);
   }
 }

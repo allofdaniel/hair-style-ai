@@ -1,11 +1,35 @@
 import type { HairStyle, HairSettings, HairTexture } from '../stores/useAppStore';
 import { hairColors, hairTextures } from '../data/hairStyles';
+import { resilientFetch } from './networkResilience';
+import { logger } from './logger';
 
 const STABILITY_API_KEY = import.meta.env.VITE_STABILITY_API_KEY;
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
 // Stability AI Inpainting endpoints
 const STABILITY_INPAINT_URL = 'https://api.stability.ai/v2beta/stable-image/edit/inpaint';
+const GEMINI_RETRY_CONFIG = {
+  maxRetries: 2,
+  baseDelay: 1200,
+  maxDelay: 12000,
+  retryableStatuses: [408, 429, 500, 502, 503, 504],
+};
+
+const fetchWithRetry = (url: string, options: RequestInit): Promise<Response> => {
+  return resilientFetch(url, options, GEMINI_RETRY_CONFIG);
+};
+
+const isDebug = import.meta.env.DEV || import.meta.env.MODE === 'test';
+
+const debugLog = (...args: unknown[]): void => {
+  if (isDebug) {
+    logger.log(...args);
+  }
+};
+
+const summarizeFaceBox = (faceBox: { x: number; y: number; width: number; height: number }): string => (
+  `x=${faceBox.x.toFixed(3)}, y=${faceBox.y.toFixed(3)}, w=${faceBox.width.toFixed(3)}, h=${faceBox.height.toFixed(3)}`
+);
 
 interface GenerateHairStyleParams {
   userPhoto: string;
@@ -110,27 +134,33 @@ IMPORTANT:
 Return ONLY the JSON, no explanation.`;
 
   try {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{
-          role: 'user',
-          parts: [
-            { inlineData: { mimeType, data: base64Data } },
-            { text: prompt },
-          ],
-        }],
-        generationConfig: {
-          responseMimeType: 'application/json',
-          temperature: 0.1,
+    const response = await fetchWithRetry(
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': GEMINI_API_KEY,
         },
-      }),
-    });
+        body: JSON.stringify({
+          contents: [{
+            role: 'user',
+            parts: [
+              { inlineData: { mimeType, data: base64Data } },
+              { text: prompt },
+            ],
+          }],
+          generationConfig: {
+            responseMimeType: 'application/json',
+            temperature: 0.1,
+          },
+        }),
+      }
+    );
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Face detection error:', response.status, errorText);
+      logger.error('Face detection error:', response.status, errorText);
       return { success: false, error: `Face detection failed: ${response.status}` };
     }
 
@@ -139,13 +169,13 @@ Return ONLY the JSON, no explanation.`;
 
     if (textPart?.text) {
       const faceBox = JSON.parse(textPart.text);
-      console.log('Detected face box:', faceBox);
+      debugLog('Detected face box:', summarizeFaceBox(faceBox));
       return { success: true, faceBox };
     }
 
     return { success: false, error: 'No face detected' };
   } catch (error) {
-    console.error('Face detection error:', error);
+    logger.error('Face detection error:', error);
     return { success: false, error: error instanceof Error ? error.message : 'Face detection failed' };
   }
 }
@@ -156,13 +186,13 @@ async function generateHairMask(userPhoto: string): Promise<{ success: boolean; 
     // Step 1: Detect face position
     const faceResult = await detectFacePosition(userPhoto);
     if (!faceResult.success || !faceResult.faceBox) {
-      console.error('Face detection failed, using fallback top-portion mask');
+      logger.error('Face detection failed, using fallback top-portion mask');
       // Fallback: mask top 40% of image
       return await createSimpleMask(userPhoto, 0.4);
     }
 
     const { x, y, width, height } = faceResult.faceBox;
-    console.log(`Face detected at: x=${x}, y=${y}, w=${width}, h=${height}`);
+    debugLog(`Face detected: ${summarizeFaceBox({ x, y, width, height })}`);
 
     // Step 2: Create mask using Canvas
     // Hair area = everything ABOVE the face (y < faceTop)
@@ -242,7 +272,7 @@ async function generateHairMask(userPhoto: string): Promise<{ success: boolean; 
       img.src = userPhoto;
     });
   } catch (error) {
-    console.error('Mask generation error:', error);
+    logger.error('Mask generation error:', error);
     return { success: false, error: error instanceof Error ? error.message : 'Mask generation failed' };
   }
 }
@@ -316,17 +346,17 @@ export const generateHairStyleWithInpainting = async (
   const stylePrompt = buildPrompt(style, settings, texture);
 
   try {
-    console.log('Step 1: Generating hair mask with Gemini...');
+    debugLog('Step 1: Generating hair mask with Gemini...');
 
     // Step 1: Generate hair mask using Gemini
     const maskResult = await generateHairMask(userPhoto);
     if (!maskResult.success || !maskResult.maskImage) {
-      console.error('Mask generation failed:', maskResult.error);
+      logger.error('Mask generation failed:', maskResult.error);
       return { success: false, error: `Hair mask generation failed: ${maskResult.error}` };
     }
 
-    console.log('Mask generated successfully');
-    console.log('Step 2: Calling Stability AI inpainting...');
+    debugLog('Mask generated successfully');
+    debugLog('Step 2: Calling Stability AI inpainting...');
 
     // Step 2: Use Stability AI inpainting with the mask
     const userMimeType = getMimeType(userPhoto);
@@ -346,7 +376,7 @@ export const generateHairStyleWithInpainting = async (
     formData.append('negative_prompt', 'blurry, distorted face, changed face, different person, bad hair, unnatural, artifacts');
     formData.append('output_format', 'png');
 
-    const response = await fetch(STABILITY_INPAINT_URL, {
+    const response = await fetchWithRetry(STABILITY_INPAINT_URL, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${STABILITY_API_KEY}`,
@@ -357,7 +387,7 @@ export const generateHairStyleWithInpainting = async (
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Stability AI error:', response.status, errorText);
+      logger.error('Stability AI error:', response.status, errorText);
 
       if (response.status === 401) {
         return { success: false, error: 'Invalid Stability AI API key. Please check your API key.' };
@@ -379,7 +409,7 @@ export const generateHairStyleWithInpainting = async (
     const resultBlob = await response.blob();
     const resultBase64 = await blobToBase64(resultBlob);
 
-    console.log('Inpainting completed successfully');
+    debugLog('Inpainting completed successfully');
 
     return {
       success: true,
@@ -387,7 +417,7 @@ export const generateHairStyleWithInpainting = async (
     };
 
   } catch (error) {
-    console.error('Error in inpainting process:', error);
+    logger.error('Error in inpainting process:', error);
 
     if (error instanceof TypeError && error.message.includes('fetch')) {
       return { success: false, error: 'Network error. Please check your internet connection.' };
@@ -427,7 +457,7 @@ export const generateFromReferenceWithInpainting = async (
   }
 
   try {
-    console.log('Step 1: Analyzing reference hairstyle...');
+    debugLog('Step 1: Analyzing reference hairstyle...');
 
     // First, analyze the reference photo to understand the hairstyle
     const analysisResult = await analyzeReferenceForInpainting(referencePhoto);
@@ -435,8 +465,8 @@ export const generateFromReferenceWithInpainting = async (
       return { success: false, error: 'Could not analyze reference hairstyle' };
     }
 
-    console.log('Reference analysis:', analysisResult.description);
-    console.log('Step 2: Generating hair mask...');
+    debugLog('Reference analysis:', analysisResult.description);
+    debugLog('Step 2: Generating hair mask...');
 
     // Generate hair mask
     const maskResult = await generateHairMask(userPhoto);
@@ -444,8 +474,8 @@ export const generateFromReferenceWithInpainting = async (
       return { success: false, error: `Hair mask generation failed: ${maskResult.error}` };
     }
 
-    console.log('Mask generated successfully');
-    console.log('Step 3: Calling Stability AI inpainting...');
+    debugLog('Mask generated successfully');
+    debugLog('Step 3: Calling Stability AI inpainting...');
 
     // Build color modifier
     const colorOption = hairColors.find((c) => c.id === settings.color);
@@ -473,7 +503,7 @@ export const generateFromReferenceWithInpainting = async (
     formData.append('negative_prompt', 'blurry, distorted face, changed face, different person, bad hair, unnatural, artifacts');
     formData.append('output_format', 'png');
 
-    const response = await fetch(STABILITY_INPAINT_URL, {
+    const response = await fetchWithRetry(STABILITY_INPAINT_URL, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${STABILITY_API_KEY}`,
@@ -484,7 +514,7 @@ export const generateFromReferenceWithInpainting = async (
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Stability AI error:', response.status, errorText);
+      logger.error('Stability AI error:', response.status, errorText);
 
       if (response.status === 401) {
         return { success: false, error: 'Invalid Stability AI API key.' };
@@ -498,7 +528,7 @@ export const generateFromReferenceWithInpainting = async (
     const resultBlob = await response.blob();
     const resultBase64 = await blobToBase64(resultBlob);
 
-    console.log('Reference-based inpainting completed successfully');
+    debugLog('Reference-based inpainting completed successfully');
 
     return {
       success: true,
@@ -506,7 +536,7 @@ export const generateFromReferenceWithInpainting = async (
     };
 
   } catch (error) {
-    console.error('Error in reference inpainting:', error);
+    logger.error('Error in reference inpainting:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -541,22 +571,28 @@ Format your response as a single prompt-friendly sentence, like:
 Return ONLY the description, no additional text.`;
 
   try {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{
-          role: 'user',
-          parts: [
-            { inlineData: { mimeType, data: base64Data } },
-            { text: prompt },
-          ],
-        }],
-        generationConfig: {
-          temperature: 0.3,
+    const response = await fetchWithRetry(
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': GEMINI_API_KEY,
         },
-      }),
-    });
+        body: JSON.stringify({
+          contents: [{
+            role: 'user',
+            parts: [
+              { inlineData: { mimeType, data: base64Data } },
+              { text: prompt },
+            ],
+          }],
+          generationConfig: {
+            temperature: 0.3,
+          },
+        }),
+      }
+    );
 
     if (!response.ok) {
       return { success: false, error: `API Error: ${response.status}` };
@@ -571,7 +607,7 @@ Return ONLY the description, no additional text.`;
 
     return { success: false, error: 'No description generated' };
   } catch (error) {
-    console.error('Reference analysis error:', error);
+    logger.error('Reference analysis error:', error);
     return { success: false, error: error instanceof Error ? error.message : 'Analysis failed' };
   }
 }

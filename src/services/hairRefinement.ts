@@ -1,3 +1,5 @@
+﻿import { logger } from './logger';
+import { resilientFetch } from './networkResilience';
 /**
  * 헤어스타일 미세 조정 서비스
  * 생성된 결과물을 텍스트 명령으로 조정
@@ -254,11 +256,11 @@ The before and after should look 85-95% identical with only small refinements.
 
 Generate the subtly refined image now.`;
 
-    console.log('Refining hairstyle with:', adjustmentPrompts);
+    logger.log('Refining hairstyle with:', adjustmentPrompts);
 
-    const response = await fetch(`${GEMINI_IMAGE_URL}?key=${GEMINI_API_KEY}`, {
+    const response = await resilientFetch(`${GEMINI_IMAGE_URL}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': GEMINI_API_KEY },
       body: JSON.stringify({
         contents: [{
           role: 'user',
@@ -282,7 +284,7 @@ Generate the subtly refined image now.`;
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Refinement API error:', response.status, errorText);
+      logger.error('Refinement API error:', response.status, errorText);
       if (response.status === 429) {
         return { success: false, error: '요청이 너무 많습니다. 잠시 후 다시 시도해주세요.' };
       }
@@ -307,10 +309,14 @@ Generate the subtly refined image now.`;
 
     return { success: false, error: 'AI가 이미지를 생성하지 못했습니다.' };
   } catch (error) {
-    console.error('Refinement error:', error);
+    logger.error('Refinement error:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.',
     };
   }
 };
+
+
+
+

@@ -2,9 +2,12 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../stores/useAppStore';
 import { generateCustomHairStyle } from '../services/openai';
+import { useI18n } from '../i18n/useI18n';
+import Toast from '../components/Toast';
 
 export default function ProcessingCustom() {
   const navigate = useNavigate();
+  const { t } = useI18n();
   const {
     userPhoto,
     customSettings,
@@ -14,7 +17,9 @@ export default function ProcessingCustom() {
   } = useAppStore();
 
   const [progress, setProgress] = useState(0);
-  const [statusText, setStatusText] = useState('설정 분석 중...');
+  const [statusText, setStatusText] = useState('');
+  const [showErrorToast, setShowErrorToast] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     if (!userPhoto) {
@@ -29,13 +34,13 @@ export default function ProcessingCustom() {
 
       try {
         setProgress(10);
-        setStatusText('커스텀 설정 적용 중...');
+        setStatusText(t('ai_tip_applying'));
 
         await new Promise((r) => setTimeout(r, 500));
         if (isCancelled) return;
 
         setProgress(30);
-        setStatusText('AI 이미지 생성 중...');
+        setStatusText(t('ai_tip_analyzing'));
 
         const result = await generateCustomHairStyle({
           userPhoto,
@@ -45,18 +50,17 @@ export default function ProcessingCustom() {
         if (isCancelled) return;
 
         setProgress(90);
-        setStatusText('마무리 중...');
+        setStatusText(t('ai_tip_finalizing'));
 
         if (result.success && result.resultImage) {
           setResultImage(result.resultImage);
 
-          // 결과를 localStorage에 저장
           localStorage.setItem(
             'multiResults',
             JSON.stringify([
               {
                 styleId: 'custom',
-                styleName: '커스텀 스타일',
+                styleName: t('custom_style'),
                 resultImage: result.resultImage,
               },
             ])
@@ -67,13 +71,15 @@ export default function ProcessingCustom() {
 
           navigate('/result');
         } else {
-          alert(result.error || '스타일 생성에 실패했습니다. 다시 시도해주세요.');
-          navigate('/custom');
+          setErrorMessage(result.error || t('style_generation_failed'));
+          setShowErrorToast(true);
+          setTimeout(() => navigate('/custom'), 2000);
         }
       } catch (error) {
         console.error('Error processing custom style:', error);
-        alert('오류가 발생했습니다. 다시 시도해주세요.');
-        navigate('/custom');
+        setErrorMessage(t('error_occurred'));
+        setShowErrorToast(true);
+        setTimeout(() => navigate('/custom'), 2000);
       } finally {
         setIsProcessing(false);
         setUseCustomMode(false);
@@ -117,7 +123,7 @@ export default function ProcessingCustom() {
             <defs>
               <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#8B5CF6" />
-                <stop offset="50%" stopColor="#EC4899" />
+                <stop offset="50%" stopColor="#E91E63" />
                 <stop offset="100%" stopColor="#F59E0B" />
               </linearGradient>
             </defs>
@@ -176,9 +182,17 @@ export default function ProcessingCustom() {
 
         {/* Footer text */}
         <p className="mt-4 text-xs text-white/30 text-center">
-          잠시만 기다려주세요 • 약 15-30초 소요
+          {t('please_wait')}
         </p>
       </div>
+
+      {/* Error Toast */}
+      <Toast
+        message={errorMessage}
+        type="error"
+        visible={showErrorToast}
+        onClose={() => setShowErrorToast(false)}
+      />
     </div>
   );
 }

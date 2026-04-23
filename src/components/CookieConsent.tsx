@@ -59,7 +59,7 @@ export const canUseMarketing = (): boolean => {
 const consentTranslations = {
   ko: {
     title: '개인정보 보호',
-    description: 'LookSim은 더 나은 서비스를 위해 쿠키를 사용합니다. 필수 쿠키는 앱 작동에 필요하며, 분석 및 마케팅 쿠키는 선택 사항입니다.',
+    description: 'BeforeCut은 더 나은 서비스를 위해 쿠키를 사용합니다. 필수 쿠키는 앱 작동에 필요하며, 분석 및 마케팅 쿠키는 선택 사항입니다.',
     necessary: '필수 쿠키',
     necessary_desc: '앱 기본 기능에 필수',
     analytics: '분석 쿠키',
@@ -76,7 +76,7 @@ const consentTranslations = {
   },
   en: {
     title: 'Privacy Settings',
-    description: 'LookSim uses cookies to improve your experience. Essential cookies are required for the app to function. Analytics and marketing cookies are optional.',
+    description: 'BeforeCut uses cookies to improve your experience. Essential cookies are required for the app to function. Analytics and marketing cookies are optional.',
     necessary: 'Essential Cookies',
     necessary_desc: 'Required for basic app functionality',
     analytics: 'Analytics Cookies',
@@ -93,7 +93,7 @@ const consentTranslations = {
   },
   es: {
     title: 'Configuración de Privacidad',
-    description: 'LookSim utiliza cookies para mejorar tu experiencia. Las cookies esenciales son necesarias. Las cookies de análisis y marketing son opcionales.',
+    description: 'BeforeCut utiliza cookies para mejorar tu experiencia. Las cookies esenciales son necesarias. Las cookies de análisis y marketing son opcionales.',
     necessary: 'Cookies Esenciales',
     necessary_desc: 'Necesarias para el funcionamiento',
     analytics: 'Cookies de Análisis',
@@ -110,7 +110,7 @@ const consentTranslations = {
   },
   pt: {
     title: 'Configurações de Privacidade',
-    description: 'O LookSim usa cookies para melhorar sua experiência. Cookies essenciais são necessários. Cookies de análise e marketing são opcionais.',
+    description: 'O BeforeCut usa cookies para melhorar sua experiência. Cookies essenciais são necessários. Cookies de análise e marketing são opcionais.',
     necessary: 'Cookies Essenciais',
     necessary_desc: 'Necessários para funcionamento',
     analytics: 'Cookies de Análise',
@@ -127,7 +127,7 @@ const consentTranslations = {
   },
   fr: {
     title: 'Paramètres de Confidentialité',
-    description: 'LookSim utilise des cookies pour améliorer votre expérience. Les cookies essentiels sont requis. Les cookies analytiques et marketing sont optionnels.',
+    description: 'BeforeCut utilise des cookies pour améliorer votre expérience. Les cookies essentiels sont requis. Les cookies analytiques et marketing sont optionnels.',
     necessary: 'Cookies Essentiels',
     necessary_desc: 'Requis pour le fonctionnement',
     analytics: 'Cookies Analytiques',
@@ -144,7 +144,7 @@ const consentTranslations = {
   },
   de: {
     title: 'Datenschutzeinstellungen',
-    description: 'LookSim verwendet Cookies zur Verbesserung Ihrer Erfahrung. Essentielle Cookies sind erforderlich. Analyse- und Marketing-Cookies sind optional.',
+    description: 'BeforeCut verwendet Cookies zur Verbesserung Ihrer Erfahrung. Essentielle Cookies sind erforderlich. Analyse- und Marketing-Cookies sind optional.',
     necessary: 'Essentielle Cookies',
     necessary_desc: 'Für die Grundfunktionen erforderlich',
     analytics: 'Analyse-Cookies',
@@ -161,7 +161,7 @@ const consentTranslations = {
   },
   ar: {
     title: 'إعدادات الخصوصية',
-    description: 'يستخدم LookSim ملفات تعريف الارتباط لتحسين تجربتك. ملفات تعريف الارتباط الأساسية مطلوبة. ملفات التحليل والتسويق اختيارية.',
+    description: 'يستخدم BeforeCut ملفات تعريف الارتباط لتحسين تجربتك. ملفات تعريف الارتباط الأساسية مطلوبة. ملفات التحليل والتسويق اختيارية.',
     necessary: 'ملفات أساسية',
     necessary_desc: 'مطلوبة للوظائف الأساسية',
     analytics: 'ملفات التحليل',
@@ -178,7 +178,7 @@ const consentTranslations = {
   },
   zh: {
     title: '隐私设置',
-    description: 'LookSim使用Cookie来改善您的体验。必要Cookie是应用运行所必需的。分析和营销Cookie是可选的。',
+    description: 'BeforeCut使用Cookie来改善您的体验。必要Cookie是应用运行所必需的。分析和营销Cookie是可选的。',
     necessary: '必要Cookie',
     necessary_desc: '应用基本功能所需',
     analytics: '分析Cookie',
@@ -195,7 +195,7 @@ const consentTranslations = {
   },
   ja: {
     title: 'プライバシー設定',
-    description: 'LookSimはお客様の体験を向上させるためにCookieを使用しています。必須Cookieはアプリの動作に必要です。分析・マーケティングCookieはオプションです。',
+    description: 'BeforeCutはお客様の体験を向上させるためにCookieを使用しています。必須Cookieはアプリの動作に必要です。分析・マーケティングCookieはオプションです。',
     necessary: '必須Cookie',
     necessary_desc: '基本機能に必要',
     analytics: '分析Cookie',
@@ -212,7 +212,7 @@ const consentTranslations = {
   },
   th: {
     title: 'การตั้งค่าความเป็นส่วนตัว',
-    description: 'LookSim ใช้คุกกี้เพื่อปรับปรุงประสบการณ์ของคุณ คุกกี้ที่จำเป็นต้องใช้สำหรับการทำงานของแอป คุกกี้วิเคราะห์และการตลาดเป็นทางเลือก',
+    description: 'BeforeCut ใช้คุกกี้เพื่อปรับปรุงประสบการณ์ของคุณ คุกกี้ที่จำเป็นต้องใช้สำหรับการทำงานของแอป คุกกี้วิเคราะห์และการตลาดเป็นทางเลือก',
     necessary: 'คุกกี้ที่จำเป็น',
     necessary_desc: 'จำเป็นสำหรับฟังก์ชันพื้นฐาน',
     analytics: 'คุกกี้วิเคราะห์',
@@ -229,7 +229,7 @@ const consentTranslations = {
   },
   vi: {
     title: 'Cài đặt Quyền riêng tư',
-    description: 'LookSim sử dụng cookie để cải thiện trải nghiệm của bạn. Cookie thiết yếu là bắt buộc. Cookie phân tích và tiếp thị là tùy chọn.',
+    description: 'BeforeCut sử dụng cookie để cải thiện trải nghiệm của bạn. Cookie thiết yếu là bắt buộc. Cookie phân tích và tiếp thị là tùy chọn.',
     necessary: 'Cookie Thiết yếu',
     necessary_desc: 'Cần thiết cho chức năng cơ bản',
     analytics: 'Cookie Phân tích',
@@ -246,7 +246,7 @@ const consentTranslations = {
   },
   id: {
     title: 'Pengaturan Privasi',
-    description: 'LookSim menggunakan cookie untuk meningkatkan pengalaman Anda. Cookie penting diperlukan. Cookie analitik dan pemasaran bersifat opsional.',
+    description: 'BeforeCut menggunakan cookie untuk meningkatkan pengalaman Anda. Cookie penting diperlukan. Cookie analitik dan pemasaran bersifat opsional.',
     necessary: 'Cookie Penting',
     necessary_desc: 'Diperlukan untuk fungsi dasar',
     analytics: 'Cookie Analitik',
@@ -263,7 +263,7 @@ const consentTranslations = {
   },
   hi: {
     title: 'गोपनीयता सेटिंग्स',
-    description: 'LookSim आपके अनुभव को बेहतर बनाने के लिए कुकीज़ का उपयोग करता है। आवश्यक कुकीज़ अनिवार्य हैं। विश्लेषण और मार्केटिंग कुकीज़ वैकल्पिक हैं।',
+    description: 'BeforeCut आपके अनुभव को बेहतर बनाने के लिए कुकीज़ का उपयोग करता है। आवश्यक कुकीज़ अनिवार्य हैं। विश्लेषण और मार्केटिंग कुकीज़ वैकल्पिक हैं।',
     necessary: 'आवश्यक कुकीज़',
     necessary_desc: 'बुनियादी कार्यों के लिए आवश्यक',
     analytics: 'विश्लेषण कुकीज़',

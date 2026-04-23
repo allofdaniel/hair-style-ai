@@ -13,7 +13,8 @@ import { useAppStore } from '../stores/useAppStore';
 import { applyHairOverlay } from '../services/hairOverlayService';
 import { hairStyles } from '../data/hairStyles';
 import { saveHistory, compressImage } from '../services/storage';
-import { useI18n } from '../i18n/useI18n';
+import { useI18n, type TranslationKey } from '../i18n/useI18n';
+import Toast from '../components/Toast';
 
 interface ProcessingResult {
   styleId: string;
@@ -22,12 +23,12 @@ interface ProcessingResult {
   backViewImage?: string;
 }
 
-const AI_TIPS = [
-  { icon: '✨', text: 'AI가 당신의 얼굴 특징을 분석하고 있어요' },
-  { icon: '🎨', text: '선택한 헤어스타일을 자연스럽게 적용 중이에요' },
-  { icon: '💇', text: '머리카락 결과 디테일을 조정하고 있어요' },
-  { icon: '🪄', text: '마무리 터치를 더하는 중이에요' },
-  { icon: '📸', text: '최상의 결과를 위해 조금만 기다려주세요' },
+const AI_TIPS_KEYS = [
+  { icon: '✨', key: 'ai_tip_analyzing' },
+  { icon: '🎨', key: 'ai_tip_applying' },
+  { icon: '💇', key: 'ai_tip_quality' },
+  { icon: '🪄', key: 'ai_tip_almost' },
+  { icon: '📸', key: 'ai_tip_finalizing' },
 ];
 
 export default function Processing() {
@@ -40,12 +41,35 @@ export default function Processing() {
   const [currentStyleName, setCurrentStyleName] = useState('');
   const [totalStyles, setTotalStyles] = useState(1);
   const [currentTip, setCurrentTip] = useState(0);
+  const [showErrorToast, setShowErrorToast] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [showRetryButton, setShowRetryButton] = useState(false);
   const processingRef = useRef(false);
+  const cancelRef = useRef(false);
+
+  // 취소 버튼 핸들러
+  const handleCancel = () => {
+    cancelRef.current = true;
+    setIsProcessing(false);
+    navigate('/');
+  };
+
+  // 재시도 버튼 핸들러
+  const handleRetry = () => {
+    setShowRetryButton(false);
+    setShowErrorToast(false);
+    setErrorMessage('');
+    setProgress(0);
+    processingRef.current = false;
+    cancelRef.current = false;
+    // 페이지 리로드로 재시도
+    window.location.reload();
+  };
 
   // Tip rotation
   useEffect(() => {
     const tipInterval = setInterval(() => {
-      setCurrentTip(prev => (prev + 1) % AI_TIPS.length);
+      setCurrentTip(prev => (prev + 1) % AI_TIPS_KEYS.length);
     }, 4000);
     return () => clearInterval(tipInterval);
   }, []);
@@ -58,12 +82,17 @@ export default function Processing() {
 
     processingRef.current = true;
 
-    const savedStyleIds = localStorage.getItem('selectedStyleIds');
     let styleIds: string[] = [];
-    if (savedStyleIds) {
-      try { styleIds = JSON.parse(savedStyleIds); } catch { styleIds = selectedStyle ? [selectedStyle.id] : []; }
-    } else if (selectedStyle) {
-      styleIds = [selectedStyle.id];
+    try {
+      const savedStyleIds = localStorage.getItem('selectedStyleIds');
+      if (savedStyleIds) {
+        try { styleIds = JSON.parse(savedStyleIds); } catch { styleIds = selectedStyle ? [selectedStyle.id] : []; }
+      } else if (selectedStyle) {
+        styleIds = [selectedStyle.id];
+      }
+    } catch (storageErr) {
+      console.warn('Failed to read selectedStyleIds from localStorage:', storageErr);
+      if (selectedStyle) styleIds = [selectedStyle.id];
     }
 
     if (styleIds.length === 0) { navigate('/'); return; }
@@ -76,7 +105,7 @@ export default function Processing() {
       const processedResults: ProcessingResult[] = [];
 
       for (let i = 0; i < styleIds.length; i++) {
-        if (isCancelled) return;
+        if (isCancelled || cancelRef.current) return;
 
         const styleId = styleIds[i];
         const style = hairStyles.find(s => s.id === styleId);
@@ -88,26 +117,31 @@ export default function Processing() {
         const baseProgress = (i / styleIds.length) * 100;
         setProgress(baseProgress + 10);
 
-        try {
-          const progressInterval = setInterval(() => {
-            setProgress(prev => {
-              const maxProgress = Math.min(baseProgress + 85, 99);
-              if (prev >= maxProgress) {
-                clearInterval(progressInterval);
-                return maxProgress;
-              }
-              return Math.min(prev + Math.random() * 5, maxProgress);
-            });
-          }, 500);
+        const progressInterval = setInterval(() => {
+          setProgress(prev => {
+            const maxProgress = Math.min(baseProgress + 85, 99);
+            if (prev >= maxProgress) {
+              clearInterval(progressInterval);
+              return maxProgress;
+            }
+            return Math.min(prev + Math.random() * 5, maxProgress);
+          });
+        }, 500);
 
+        try {
+          console.log('>>> Starting applyHairOverlay...');
           const result = await applyHairOverlay({ userPhoto, style, settings: hairSettings });
+          console.log('>>> applyHairOverlay returned:', result.success);
 
           clearInterval(progressInterval);
+          console.log('>>> Interval cleared');
 
-          if (isCancelled) return;
+          if (isCancelled || cancelRef.current) return;
+          console.log('>>> Setting progress to 95%');
           setProgress(baseProgress + 95);
 
           if (result.success && result.resultImage) {
+            console.log('>>> Result success, resultImage length:', result.resultImage.length);
             processedResults.push({
               styleId: style.id,
               styleName: style.nameKo,
@@ -116,8 +150,16 @@ export default function Processing() {
             });
 
             try {
+              if (isCancelled || cancelRef.current) return;
+              console.log('>>> Compressing original...');
               const compressedOriginal = await compressImage(userPhoto, 600, 0.8);
+              if (isCancelled || cancelRef.current) return;
+              console.log('>>> Original compressed, length:', compressedOriginal.length);
+              console.log('>>> Compressing result...');
               const compressedResult = await compressImage(result.resultImage, 600, 0.8);
+              if (isCancelled || cancelRef.current) return;
+              console.log('>>> Result compressed, length:', compressedResult.length);
+              console.log('>>> Saving history...');
               await saveHistory({
                 original: compressedOriginal,
                 result: compressedResult,
@@ -125,12 +167,25 @@ export default function Processing() {
                 styleNameKo: style.nameKo,
                 date: new Date().toISOString(),
               });
+              if (isCancelled || cancelRef.current) return;
+              console.log('>>> History saved!');
             } catch (storageError) {
-              console.warn('History save failed:', storageError);
+              console.warn('>>> History save failed:', storageError);
             }
+            console.log('>>> Style processing complete!');
+          } else {
+            console.error(`Style ${style.name} failed:`, result.error);
+            setErrorMessage(result.error || '이미지 생성 실패');
+            setShowErrorToast(true);
+            setShowRetryButton(true);
           }
         } catch (error) {
           console.error(`Error processing style ${style.name}:`, error);
+          setErrorMessage(error instanceof Error ? error.message : '알 수 없는 오류');
+          setShowErrorToast(true);
+          setShowRetryButton(true);
+        } finally {
+          clearInterval(progressInterval);
         }
 
         setProgress(Math.min(((i + 1) / styleIds.length) * 100, 100));
@@ -138,14 +193,22 @@ export default function Processing() {
 
       if (isCancelled) return;
 
+      console.log('>>> All styles processed. Results count:', processedResults.length);
       if (processedResults.length > 0) {
+        console.log('>>> Setting result image and navigating...');
         setResultImage(processedResults[0].resultImage);
-        localStorage.setItem('multiResults', JSON.stringify(processedResults));
-        localStorage.removeItem('selectedStyleIds');
+        try {
+          localStorage.setItem('multiResults', JSON.stringify(processedResults));
+          localStorage.removeItem('selectedStyleIds');
+        } catch (storageErr) {
+          console.warn('Failed to save results to localStorage:', storageErr);
+        }
+        console.log('>>> Navigating to /result');
         navigate('/result');
       } else {
-        alert(t('generation_failed'));
-        navigate('/');
+        console.log('>>> No results, showing error');
+        setShowErrorToast(true);
+        setTimeout(() => navigate('/'), 2000);
       }
 
       setIsProcessing(false);
@@ -183,7 +246,7 @@ export default function Processing() {
           {/* Center Icon */}
           <div className="absolute inset-0 flex items-center justify-center">
             <span className="text-4xl animate-pulse transition-all duration-500">
-              {AI_TIPS[currentTip].icon}
+              {AI_TIPS_KEYS[currentTip].icon}
             </span>
           </div>
         </div>
@@ -219,7 +282,7 @@ export default function Processing() {
 
         {/* AI Tip */}
         <p className="text-subheadline text-[var(--color-label-secondary)] min-h-[40px] transition-all duration-500 animate-fade-in" key={currentTip}>
-          {AI_TIPS[currentTip].text}
+          {t(AI_TIPS_KEYS[currentTip].key as TranslationKey)}
         </p>
 
         {/* Multi Style Indicator */}
@@ -241,10 +304,45 @@ export default function Processing() {
         )}
       </div>
 
-      {/* Bottom Notice */}
-      <p className="absolute bottom-8 text-footnote text-[var(--color-label-tertiary)] safe-area-bottom">
-        {t('please_wait') || '잠시만 기다려주세요...'}
-      </p>
+      {/* Bottom Buttons */}
+      <div className="absolute bottom-8 flex flex-col items-center gap-3 safe-area-bottom">
+        {showRetryButton ? (
+          <div className="flex gap-3">
+            <button
+              onClick={handleCancel}
+              className="px-6 py-3 rounded-xl bg-[var(--color-fill-secondary)] text-[var(--color-label-secondary)] font-medium transition-all active:scale-95"
+            >
+              {t('cancel') || '취소'}
+            </button>
+            <button
+              onClick={handleRetry}
+              className="px-6 py-3 rounded-xl bg-[var(--color-blue)] text-white font-medium transition-all active:scale-95"
+            >
+              {t('retry') || '다시 시도'}
+            </button>
+          </div>
+        ) : (
+          <>
+            <p className="text-footnote text-[var(--color-label-tertiary)]">
+              {t('please_wait') || '잠시만 기다려주세요...'}
+            </p>
+            <button
+              onClick={handleCancel}
+              className="px-4 py-2 text-footnote text-[var(--color-label-tertiary)] underline transition-opacity hover:opacity-70"
+            >
+              {t('cancel') || '취소'}
+            </button>
+          </>
+        )}
+      </div>
+
+      {/* Error Toast */}
+      <Toast
+        message={errorMessage || t('generation_failed')}
+        type="error"
+        visible={showErrorToast}
+        onClose={() => setShowErrorToast(false)}
+      />
     </div>
   );
 }

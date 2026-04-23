@@ -1,0 +1,197 @@
+{
+  "timestamp": "2026-01-28T10:37:09.974Z",
+  "summary": {
+    "totalStyles": 194,
+    "validThumbnails": 172,
+    "nullOrEmpty": 22,
+    "brokenLinks": 0,
+    "healthPercentage": 88.66
+  },
+  "nullOrEmptyThumbnails": [
+    {
+      "styleId": "m-사이드-스웹",
+      "name": "m-사이드-스웹",
+      "nameKo": "m-사이드-스웹",
+      "thumbnail": "(null)"
+    },
+    {
+      "styleId": "m-멀렛",
+      "name": "m-멀렛",
+      "nameKo": "m-멀렛",
+      "thumbnail": "(null)"
+    },
+    {
+      "styleId": "m-메시-헤어",
+      "name": "m-메시-헤어",
+      "nameKo": "m-메시-헤어",
+      "thumbnail": "(null)"
+    },
+    {
+      "styleId": "m-포마드",
+      "name": "m-포마드",
+      "nameKo": "m-포마드",
+      "thumbnail": "(null)"
+    },
+    {
+      "styleId": "m-사무라이번",
+      "name": "m-사무라이번",
+      "nameKo": "m-사무라이번",
+      "thumbnail": "(null)"
+    },
+    {
+      "styleId": "m-브라질리안-서퍼",
+      "name": "m-브라질리안-서퍼",
+      "nameKo": "m-브라질리안-서퍼",
+      "thumbnail": "(null)"
+    },
+    {
+      "styleId": "m-콜롬비안-컬",
+      "name": "m-콜롬비안-컬",
+      "nameKo": "m-콜롬비안-컬",
+      "thumbnail": "(null)"
+    },
+    {
+      "styleId": "m-호스트-클럽",
+      "name": "m-호스트-클럽",
+      "nameKo": "m-호스트-클럽",
+      "thumbnail": "(null)"
+    },
+    {
+      "styleId": "m-중국-사이드파트",
+      "name": "m-중국-사이드파트",
+      "nameKo": "m-중국-사이드파트",
+      "thumbnail": "(null)"
+    },
+    {
+      "styleId": "m-인도-페이드",
+      "name": "m-인도-페이드",
+      "nameKo": "m-인도-페이드",
+      "thumbnail": "(null)"
+    },
+    {
+      "styleId": "m-컬리-탑-페이드",
+      "name": "m-컬리-탑-페이드",
+      "nameKo": "m-컬리-탑-페이드",
+      "thumbnail": "(null)"
+    },
+    {
+      "styleId": "m-템플-페이드",
+      "name": "m-템플-페이드",
+      "nameKo": "m-템플-페이드",
+      "thumbnail": "(null)"
+    },
+    {
+      "styleId": "f-할리우드-웨이브",
+      "name": "f-할리우드-웨이브",
+      "nameKo": "f-할리우드-웨이브",
+      "thumbnail": "(null)"
+    },
+    {
+      "styleId": "f-로맨틱-업두",
+      "name": "f-로맨틱-업두",
+      "nameKo": "f-로맨틱-업두",
+      "thumbnail": "(null)"
+    },
+    {
+      "styleId": "f-kpop-레이어드",
+      "name": "f-kpop-레이어드",
+      "nameKo": "f-kpop-레이어드",
+      "thumbnail": "(null)"
+    },
+    {
+      "styleId": "f-중국-고전",
+      "name": "f-중국-고전",
+      "nameKo": "f-중국-고전",
+      "thumbnail": "(null)"
+    },
+    {
+      "styleId": "f-갸루",
+      "name": "f-갸루",
+      "nameKo": "f-갸루",
+      "thumbnail": "(null)"
+    },
+    {
+      "styleId": "f-울짱",
+      "name": "f-울짱",
+      "nameKo": "f-울짱",
+      "thumbnail": "(null)"
+    },
+    {
+      "styleId": "f-애니메-트윈테일",
+      "name": "f-애니메-트윈테일",
+      "nameKo": "f-애니메-트윈테일",
+      "thumbnail": "(null)"
+    },
+    {
+      "styleId": "f-인디안-브레이드",
+      "name": "f-인디안-브레이드",
+      "nameKo": "f-인디안-브레이드",
+      "thumbnail": "(null)"
+    },
+    {
+      "styleId": "f-마를리-트위스트",
+      "name": "f-마를리-트위스트",
+      "nameKo": "f-마를리-트위스트",
+      "thumbnail": "(null)"
+    },
+    {
+      "styleId": "f-노트리스-브레이드",
+      "name": "f-노트리스-브레이드",
+      "nameKo": "f-노트리스-브레이드",
+      "thumbnail": "(null)"
+    }
+  ],
+  "brokenThumbnails": [],
+  "validThumbnails": [
+    {
+      "styleId": "m-레게톤-트위스트",
+      "name": "Reggaeton Twist",
+      "thumbnail": "/hairstyles/male/reggaeton-twist.jpg"
+    },
+    {
+      "styleId": "m-아프로",
+      "name": "아프로",
+      "thumbnail": "/hairstyles/male/afro.jpg"
+    },
+    {
+      "styleId": "m-kpop-쉼표머리",
+      "name": "K-Pop Comma Hair",
+      "thumbnail": "/hairstyles/male/kpop-comma-hair.jpg"
+    },
+    {
+      "styleId": "m-멕시칸-포마드",
+      "name": "멕시칸 포마드",
+      "thumbnail": "/hairstyles/male/mexican-pomade.jpg"
+    },
+    {
+      "styleId": "m-쉼표머리",
+      "name": "Comma Hair",
+      "thumbnail": "/hairstyles/male/comma-hair.jpg"
+    },
+    {
+      "styleId": "m-포마드-다운펌",
+      "name": "포마드 다운펌",
+      "thumbnail": "/hairstyles/male/포마드-다운펌.jpg"
+    },
+    {
+      "styleId": "m-필리핀-포마드",
+      "name": "Philippine Pomade",
+      "thumbnail": "/hairstyles/male/필리핀-포마드.jpg"
+    },
+    {
+      "styleId": "m-jpop-visual",
+      "name": "jpop visual",
+      "thumbnail": "/hairstyles/male/jpop-visual.jpg"
+    },
+    {
+      "styleId": "m-사무라이-번",
+      "name": "사무라이 번",
+      "thumbnail": "/hairstyles/male/samurai-bun.jpg"
+    },
+    {
+      "styleId": "m-호스트-클럽-스타일",
+      "name": "호스트 클럽 스타일",
+      "thumbnail": "/hairstyles/male/호스트-클럽-스타일.jpg"
+    }
+  ]
+}

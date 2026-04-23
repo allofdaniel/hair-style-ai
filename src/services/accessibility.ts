@@ -1,21 +1,25 @@
+﻿import { logger } from './logger';
 /**
- * 접근성 서비스
- * - 스크린 리더 지원
- * - 키보드 네비게이션
- * - 포커스 관리
- * - 감소된 동작 지원
- */
+ * ?묎렐???쒕퉬?? * - ?ㅽ겕由?由щ뜑 吏?? * - ?ㅻ낫???ㅻ퉬寃뚯씠?? * - ?ъ빱??愿由? * - 媛먯냼???숈옉 吏?? */
 
 /**
- * 스크린 리더를 위한 라이브 영역 알림
+ * ?ㅽ겕由?由щ뜑瑜??꾪븳 ?쇱씠釉??곸뿭 ?뚮┝
  */
+const isDebug = import.meta.env.DEV || import.meta.env.MODE === 'test';
+
+const debugLog = (...args: unknown[]): void => {
+  if (isDebug) {
+    logger.log(...args);
+  }
+};
+
 export function announceToScreenReader(
   message: string,
   priority: 'polite' | 'assertive' = 'polite'
 ): void {
   if (typeof document === 'undefined') return;
 
-  // 기존 라이브 영역 찾기 또는 생성
+  // 湲곗〈 ?쇱씠釉??곸뿭 李얘린 ?먮뒗 ?앹꽦
   let liveRegion = document.getElementById('sr-live-region');
 
   if (!liveRegion) {
@@ -39,7 +43,7 @@ export function announceToScreenReader(
     document.body.appendChild(liveRegion);
   }
 
-  // 메시지 업데이트 (비워졌다가 다시 채워져야 스크린 리더가 읽음)
+  // 硫붿떆吏 ?낅뜲?댄듃 (鍮꾩썙議뚮떎媛 ?ㅼ떆 梨꾩썙?몄빞 ?ㅽ겕由?由щ뜑媛 ?쎌쓬)
   liveRegion.textContent = '';
   setTimeout(() => {
     liveRegion!.textContent = message;
@@ -47,7 +51,7 @@ export function announceToScreenReader(
 }
 
 /**
- * 키보드 포커스 트랩 (모달용)
+ * ?ㅻ낫???ъ빱???몃옪 (紐⑤떖??
  */
 export function trapFocus(element: HTMLElement): () => void {
   const focusableElements = element.querySelectorAll<HTMLElement>(
@@ -78,14 +82,14 @@ export function trapFocus(element: HTMLElement): () => void {
   element.addEventListener('keydown', handleKeydown);
   firstFocusable?.focus();
 
-  // 정리 함수 반환
+  // ?뺣━ ?⑥닔 諛섑솚
   return () => {
     element.removeEventListener('keydown', handleKeydown);
   };
 }
 
 /**
- * 이전 포커스 저장 및 복원
+ * ?댁쟾 ?ъ빱?????諛?蹂듭썝
  */
 let previouslyFocusedElement: HTMLElement | null = null;
 
@@ -101,7 +105,7 @@ export function restoreFocus(): void {
 }
 
 /**
- * 감소된 동작 미디어 쿼리 확인
+ * 媛먯냼???숈옉 誘몃뵒??荑쇰━ ?뺤씤
  */
 export function prefersReducedMotion(): boolean {
   if (typeof window === 'undefined') return false;
@@ -109,7 +113,7 @@ export function prefersReducedMotion(): boolean {
 }
 
 /**
- * 감소된 동작 변경 감지
+ * 媛먯냼???숈옉 蹂寃?媛먯?
  */
 export function watchReducedMotion(callback: (prefersReduced: boolean) => void): () => void {
   if (typeof window === 'undefined') return () => {};
@@ -119,14 +123,14 @@ export function watchReducedMotion(callback: (prefersReduced: boolean) => void):
   const handler = (e: MediaQueryListEvent) => callback(e.matches);
   mediaQuery.addEventListener('change', handler);
 
-  // 초기값 호출
+  // 珥덇린媛??몄텧
   callback(mediaQuery.matches);
 
   return () => mediaQuery.removeEventListener('change', handler);
 }
 
 /**
- * 고대비 모드 확인
+ * 怨좊?鍮?紐⑤뱶 ?뺤씤
  */
 export function prefersHighContrast(): boolean {
   if (typeof window === 'undefined') return false;
@@ -134,7 +138,7 @@ export function prefersHighContrast(): boolean {
 }
 
 /**
- * 다크 모드 확인
+ * ?ㅽ겕 紐⑤뱶 ?뺤씤
  */
 export function prefersDarkMode(): boolean {
   if (typeof window === 'undefined') return false;
@@ -142,7 +146,7 @@ export function prefersDarkMode(): boolean {
 }
 
 /**
- * 다크 모드 변경 감지
+ * ?ㅽ겕 紐⑤뱶 蹂寃?媛먯?
  */
 export function watchDarkMode(callback: (prefersDark: boolean) => void): () => void {
   if (typeof window === 'undefined') return () => {};
@@ -158,8 +162,7 @@ export function watchDarkMode(callback: (prefersDark: boolean) => void): () => v
 }
 
 /**
- * 포커스 표시 스타일 관리
- * 마우스 사용자에게는 포커스 링 숨기고, 키보드 사용자에게만 표시
+ * ?ъ빱???쒖떆 ?ㅽ???愿由? * 留덉슦???ъ슜?먯뿉寃뚮뒗 ?ъ빱??留??④린怨? ?ㅻ낫???ъ슜?먯뿉寃뚮쭔 ?쒖떆
  */
 export function setupFocusVisible(): () => void {
   if (typeof document === 'undefined') return () => {};
@@ -195,15 +198,15 @@ export function setupFocusVisible(): () => void {
   document.addEventListener('focus', handleFocus, true);
   document.addEventListener('blur', handleBlur, true);
 
-  // CSS 스타일 추가
+  // CSS ?ㅽ???異붽?
   const style = document.createElement('style');
   style.textContent = `
-    /* 기본 포커스 스타일 제거 (키보드 사용자 외) */
+    /* 湲곕낯 ?ъ빱???ㅽ????쒓굅 (?ㅻ낫???ъ슜???? */
     :focus:not([data-focus-visible]) {
       outline: none;
     }
 
-    /* 키보드 사용자용 포커스 스타일 */
+    /* ?ㅻ낫???ъ슜?먯슜 ?ъ빱???ㅽ???*/
     [data-focus-visible] {
       outline: 2px solid #3182f6;
       outline-offset: 2px;
@@ -221,7 +224,7 @@ export function setupFocusVisible(): () => void {
 }
 
 /**
- * 스킵 링크 설정
+ * ?ㅽ궢 留곹겕 ?ㅼ젙
  */
 export function setupSkipLinks(): void {
   if (typeof document === 'undefined') return;
@@ -243,45 +246,44 @@ export function setupSkipLinks(): void {
 }
 
 /**
- * 접근성 초기화
- */
+ * ?묎렐??珥덇린?? */
 export function initAccessibility(): void {
   if (typeof window === 'undefined') return;
 
   setupFocusVisible();
   setupSkipLinks();
 
-  // 감소된 동작 모드에서 애니메이션 비활성화
+  // 媛먯냼???숈옉 紐⑤뱶?먯꽌 ?좊땲硫붿씠??鍮꾪솢?깊솕
   watchReducedMotion((prefersReduced) => {
     document.documentElement.classList.toggle('reduce-motion', prefersReduced);
   });
 
-  // 고대비 모드 클래스 추가
+  // 怨좊?鍮?紐⑤뱶 ?대옒??異붽?
   if (prefersHighContrast()) {
     document.documentElement.classList.add('high-contrast');
   }
 }
 
 /**
- * ARIA 속성 헬퍼
+ * ARIA ?띿꽦 ?ы띁
  */
 export const ariaHelpers = {
-  // 버튼이 눌린 상태
+  // 踰꾪듉???뚮┛ ?곹깭
   setPressed: (element: HTMLElement, pressed: boolean) => {
     element.setAttribute('aria-pressed', String(pressed));
   },
 
-  // 확장/축소 상태
+  // ?뺤옣/異뺤냼 ?곹깭
   setExpanded: (element: HTMLElement, expanded: boolean) => {
     element.setAttribute('aria-expanded', String(expanded));
   },
 
-  // 선택된 상태
+  // ?좏깮???곹깭
   setSelected: (element: HTMLElement, selected: boolean) => {
     element.setAttribute('aria-selected', String(selected));
   },
 
-  // 비활성화 상태
+  // 鍮꾪솢?깊솕 ?곹깭
   setDisabled: (element: HTMLElement, disabled: boolean) => {
     element.setAttribute('aria-disabled', String(disabled));
     if (disabled) {
@@ -291,17 +293,17 @@ export const ariaHelpers = {
     }
   },
 
-  // 로딩 상태
+  // 濡쒕뵫 ?곹깭
   setBusy: (element: HTMLElement, busy: boolean) => {
     element.setAttribute('aria-busy', String(busy));
   },
 
-  // 현재 상태 (네비게이션)
+  // ?꾩옱 ?곹깭 (?ㅻ퉬寃뚯씠??
   setCurrent: (element: HTMLElement, current: 'page' | 'step' | 'location' | 'date' | 'time' | 'true' | 'false') => {
     element.setAttribute('aria-current', current);
   },
 
-  // 에러 상태
+  // ?먮윭 ?곹깭
   setInvalid: (element: HTMLElement, invalid: boolean, errorMessage?: string) => {
     element.setAttribute('aria-invalid', String(invalid));
     if (errorMessage) {
@@ -310,35 +312,33 @@ export const ariaHelpers = {
     }
   },
 
-  // 라벨 연결
+  // ?쇰꺼 ?곌껐
   setLabelledBy: (element: HTMLElement, labelId: string) => {
     element.setAttribute('aria-labelledby', labelId);
   },
 
-  // 설명 연결
+  // ?ㅻ챸 ?곌껐
   setDescribedBy: (element: HTMLElement, descriptionId: string) => {
     element.setAttribute('aria-describedby', descriptionId);
   },
 
-  // 숨김 상태
+  // ?④? ?곹깭
   setHidden: (element: HTMLElement, hidden: boolean) => {
     element.setAttribute('aria-hidden', String(hidden));
   },
 };
 
 /**
- * 접근성 테스트 도우미 (개발 모드용)
+ * ?묎렐???뚯뒪???꾩슦誘?(媛쒕컻 紐⑤뱶??
  */
 export function runA11yAudit(): void {
-  if (process.env.NODE_ENV !== 'development') return;
+  if (!import.meta.env.DEV) return;
 
-  // 이미지 alt 속성 검사
   const imagesWithoutAlt = document.querySelectorAll('img:not([alt])');
   if (imagesWithoutAlt.length > 0) {
-    console.warn('[A11y] Images without alt attribute:', imagesWithoutAlt);
+    logger.warn('[A11y] Images without alt attribute:', imagesWithoutAlt);
   }
 
-  // 버튼/링크 접근성 이름 검사
   const interactiveElements = document.querySelectorAll('button, a, [role="button"]');
   interactiveElements.forEach((el) => {
     const hasAccessibleName =
@@ -348,11 +348,10 @@ export function runA11yAudit(): void {
       el.getAttribute('title');
 
     if (!hasAccessibleName) {
-      console.warn('[A11y] Interactive element without accessible name:', el);
+      logger.warn('[A11y] Interactive element without accessible name:', el);
     }
   });
 
-  // 폼 필드 라벨 검사
   const formFields = document.querySelectorAll('input, select, textarea');
   formFields.forEach((field) => {
     const id = field.getAttribute('id');
@@ -362,15 +361,17 @@ export function runA11yAudit(): void {
       (id && document.querySelector(`label[for="${id}"]`));
 
     if (!hasLabel) {
-      console.warn('[A11y] Form field without label:', field);
+      logger.warn('[A11y] Form field without label:', field);
     }
   });
 
-  // 색상 대비 경고 (기본적인 체크만)
+  // ?됱긽 ?鍮?寃쎄퀬 (湲곕낯?곸씤 泥댄겕留?
   const lowContrastElements = document.querySelectorAll('[style*="color"]');
   if (lowContrastElements.length > 0) {
-    console.info('[A11y] Elements with inline color styles (check contrast manually):', lowContrastElements.length);
+    logger.info('[A11y] Elements with inline color styles (check contrast manually):', lowContrastElements.length);
   }
 
-  console.log('[A11y] Audit complete');
+  debugLog('[A11y] Audit complete');
 }
+
+

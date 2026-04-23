@@ -11,6 +11,6 @@
   </defs>
   <rect width="1200" height="630" fill="url(#bg)"/>
   <text x="600" y="250" dominant-baseline="middle" text-anchor="middle" font-size="120" fill="url(#accent)">✨</text>
-  <text x="600" y="380" dominant-baseline="middle" text-anchor="middle" font-family="Arial, sans-serif" font-size="72" font-weight="bold" fill="url(#accent)">LookSim</text>
+  <text x="600" y="380" dominant-baseline="middle" text-anchor="middle" font-family="Arial, sans-serif" font-size="72" font-weight="bold" fill="url(#accent)">BeforeCut</text>
   <text x="600" y="480" dominant-baseline="middle" text-anchor="middle" font-family="Arial, sans-serif" font-size="32" fill="#9ca3af">AI 외모 시뮬레이션</text>
 </svg>

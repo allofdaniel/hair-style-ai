@@ -3,9 +3,22 @@ import { initGA, trackPageView, trackEvent, Analytics } from './analytics';
 
 describe('Analytics Service', () => {
   beforeEach(() => {
-    // gtag mock 초기화
+    // gtag mock initialization
     window.gtag = vi.fn();
     window.dataLayer = [];
+
+    window.localStorage.getItem = vi.fn().mockReturnValue(
+      JSON.stringify({
+        necessary: true,
+        analytics: true,
+        marketing: false,
+        personalization: false,
+        timestamp: Date.now(),
+        version: '1.0',
+      })
+    );
+
+    initGA();
   });
 
   afterEach(() => {
@@ -13,11 +26,9 @@ describe('Analytics Service', () => {
   });
 
   describe('initGA', () => {
-    it('should not initialize in development without flag', () => {
-      // 개발 환경에서는 console.log만 호출되어야 함
-      initGA();
-      // gtag가 빈 함수로 설정되었는지 확인
+    it('should initialize and keep window.gtag available in test mode', () => {
       expect(window.dataLayer).toBeDefined();
+      expect(typeof window.gtag).toBe('function');
     });
   });
 

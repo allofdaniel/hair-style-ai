@@ -9,6 +9,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { useI18n, type Language } from '../i18n/useI18n';
 import { Analytics } from '../services/analytics';
+import { resilientFetch } from '../services/networkResilience';
+import { logger } from '../services/logger';
 
 // 공유 텍스트 (다국어)
 const SHARE_TEXTS: Record<Language, Record<string, string>> = {
@@ -24,7 +26,7 @@ const SHARE_TEXTS: Record<Language, Record<string, string>> = {
     share_line: 'LINE',
     copied: '복사됨!',
     saved: '저장됨!',
-    share_message: 'AI로 새로운 헤어스타일을 체험해보세요! #LookSim',
+    share_message: 'AI로 새로운 헤어스타일을 체험해보세요! #BeforeCut',
     cancel: '취소',
   },
   en: {
@@ -39,7 +41,7 @@ const SHARE_TEXTS: Record<Language, Record<string, string>> = {
     share_line: 'LINE',
     copied: 'Copied!',
     saved: 'Saved!',
-    share_message: 'Try new hairstyles with AI! #LookSim',
+    share_message: 'Try new hairstyles with AI! #BeforeCut',
     cancel: 'Cancel',
   },
   zh: {
@@ -54,7 +56,7 @@ const SHARE_TEXTS: Record<Language, Record<string, string>> = {
     share_line: 'LINE',
     copied: '已复制！',
     saved: '已保存！',
-    share_message: '用AI尝试新发型！#LookSim',
+    share_message: '用AI尝试新发型！#BeforeCut',
     cancel: '取消',
   },
   ja: {
@@ -69,7 +71,7 @@ const SHARE_TEXTS: Record<Language, Record<string, string>> = {
     share_line: 'LINE',
     copied: 'コピーしました！',
     saved: '保存しました！',
-    share_message: 'AIで新しいヘアスタイルを試そう！#LookSim',
+    share_message: 'AIで新しいヘアスタイルを試そう！#BeforeCut',
     cancel: 'キャンセル',
   },
   es: {
@@ -84,7 +86,7 @@ const SHARE_TEXTS: Record<Language, Record<string, string>> = {
     share_line: 'LINE',
     copied: '¡Copiado!',
     saved: '¡Guardado!',
-    share_message: '¡Prueba nuevos peinados con IA! #LookSim',
+    share_message: '¡Prueba nuevos peinados con IA! #BeforeCut',
     cancel: 'Cancelar',
   },
   pt: {
@@ -99,7 +101,7 @@ const SHARE_TEXTS: Record<Language, Record<string, string>> = {
     share_line: 'LINE',
     copied: 'Copiado!',
     saved: 'Salvo!',
-    share_message: 'Experimente novos penteados com IA! #LookSim',
+    share_message: 'Experimente novos penteados com IA! #BeforeCut',
     cancel: 'Cancelar',
   },
   fr: {
@@ -114,7 +116,7 @@ const SHARE_TEXTS: Record<Language, Record<string, string>> = {
     share_line: 'LINE',
     copied: 'Copié !',
     saved: 'Enregistré !',
-    share_message: 'Essayez de nouvelles coiffures avec l\'IA ! #LookSim',
+    share_message: 'Essayez de nouvelles coiffures avec l\'IA ! #BeforeCut',
     cancel: 'Annuler',
   },
   de: {
@@ -129,7 +131,7 @@ const SHARE_TEXTS: Record<Language, Record<string, string>> = {
     share_line: 'LINE',
     copied: 'Kopiert!',
     saved: 'Gespeichert!',
-    share_message: 'Probiere neue Frisuren mit KI! #LookSim',
+    share_message: 'Probiere neue Frisuren mit KI! #BeforeCut',
     cancel: 'Abbrechen',
   },
   th: {
@@ -144,7 +146,7 @@ const SHARE_TEXTS: Record<Language, Record<string, string>> = {
     share_line: 'LINE',
     copied: 'คัดลอกแล้ว!',
     saved: 'บันทึกแล้ว!',
-    share_message: 'ลองทรงผมใหม่ด้วย AI! #LookSim',
+    share_message: 'ลองทรงผมใหม่ด้วย AI! #BeforeCut',
     cancel: 'ยกเลิก',
   },
   vi: {
@@ -159,7 +161,7 @@ const SHARE_TEXTS: Record<Language, Record<string, string>> = {
     share_line: 'LINE',
     copied: 'Đã sao chép!',
     saved: 'Đã lưu!',
-    share_message: 'Thử kiểu tóc mới với AI! #LookSim',
+    share_message: 'Thử kiểu tóc mới với AI! #BeforeCut',
     cancel: 'Hủy',
   },
   id: {
@@ -174,7 +176,7 @@ const SHARE_TEXTS: Record<Language, Record<string, string>> = {
     share_line: 'LINE',
     copied: 'Disalin!',
     saved: 'Disimpan!',
-    share_message: 'Coba gaya rambut baru dengan AI! #LookSim',
+    share_message: 'Coba gaya rambut baru dengan AI! #BeforeCut',
     cancel: 'Batal',
   },
   hi: {
@@ -189,7 +191,7 @@ const SHARE_TEXTS: Record<Language, Record<string, string>> = {
     share_line: 'LINE',
     copied: 'कॉपी हो गया!',
     saved: 'सेव हो गया!',
-    share_message: 'AI से नया हेयरस्टाइल ट्राई करें! #LookSim',
+    share_message: 'AI से नया हेयरस्टाइल ट्राई करें! #BeforeCut',
     cancel: 'रद्द करें',
   },
   ar: {
@@ -204,7 +206,7 @@ const SHARE_TEXTS: Record<Language, Record<string, string>> = {
     share_line: 'LINE',
     copied: 'تم النسخ!',
     saved: 'تم الحفظ!',
-    share_message: 'جرب تسريحات جديدة بالذكاء الاصطناعي! #LookSim',
+    share_message: 'جرب تسريحات جديدة بالذكاء الاصطناعي! #BeforeCut',
     cancel: 'إلغاء',
   },
 };
@@ -277,7 +279,7 @@ export default function ShareSheet({ imageUrl, styleName, onClose }: ShareSheetP
   // 공유 메시지에 스타일 이름 포함
   const getShareMessage = () => {
     if (styleName) {
-      return `${texts.share_message.replace('#LookSim', '')}${styleName} #LookSim`;
+      return `${texts.share_message.replace('#BeforeCut', '')}${styleName} #BeforeCut`;
     }
     return texts.share_message;
   };
@@ -301,7 +303,7 @@ export default function ShareSheet({ imageUrl, styleName, onClose }: ShareSheetP
       showFeedback(texts.saved);
       Analytics.resultSaved('image');
     } catch (error) {
-      console.error('Failed to save image:', error);
+      logger.error('Failed to save image:', error);
     }
   };
 
@@ -330,14 +332,14 @@ export default function ShareSheet({ imageUrl, styleName, onClose }: ShareSheetP
     try {
       const shareMessage = getShareMessage();
       const shareData: ShareData = {
-        title: 'LookSim - AI Hair Simulator',
+        title: 'BeforeCut - AI Hair Simulator',
         text: shareMessage,
         url: APP_URL,
       };
 
       // 이미지가 있으면 파일로 공유
       if (imageUrl && 'files' in navigator) {
-        const response = await fetch(imageUrl);
+        const response = await resilientFetch(imageUrl);
         const blob = await response.blob();
         const safeStyleName = styleName?.replace(/[^a-zA-Z0-9가-힣]/g, '-') || 'hairstyle';
         const file = new File([blob], `looksim-${safeStyleName}.png`, { type: 'image/png' });
@@ -348,7 +350,7 @@ export default function ShareSheet({ imageUrl, styleName, onClose }: ShareSheetP
       Analytics.resultShared('native');
     } catch (error) {
       if ((error as Error).name !== 'AbortError') {
-        console.error('Share failed:', error);
+        logger.error('Share failed:', error);
       }
     }
   };

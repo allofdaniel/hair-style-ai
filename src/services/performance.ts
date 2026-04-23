@@ -1,12 +1,10 @@
+import { logger } from './logger';
 /**
- * 성능 최적화 서비스
- * - Core Web Vitals 모니터링
- * - 이미지 lazy loading
- * - 메모리 관리
- * - 번들 크기 최적화
- */
+ * ?�능 최적???�비?? * - Core Web Vitals 모니?�링
+ * - ?��?지 lazy loading
+ * - 메모�?관�? * - 번들 ?�기 최적?? */
 
-// Web Vitals 타입 정의
+// Web Vitals ?�???�의
 interface Metric {
   name: string;
   value: number;
@@ -15,8 +13,16 @@ interface Metric {
   rating: 'good' | 'needs-improvement' | 'poor';
 }
 
-// Core Web Vitals 임계값 (참고용으로 export)
-// web-vitals v4+에서는 FID가 INP로 대체됨
+const isDebug = import.meta.env.DEV || import.meta.env.MODE === 'test';
+
+const debugLog = (...args: unknown[]): void => {
+  if (isDebug) {
+    logger.log(...args);
+  }
+};
+
+// Core Web Vitals ?�계�?(참고?�으�?export)
+// web-vitals v4+?�서??FID가 INP�??�체됨
 export const THRESHOLDS = {
   LCP: { good: 2500, poor: 4000 }, // Largest Contentful Paint
   CLS: { good: 0.1, poor: 0.25 },  // Cumulative Layout Shift
@@ -26,24 +32,23 @@ export const THRESHOLDS = {
 };
 
 /**
- * Web Vitals 모니터링 초기화
- */
+ * Web Vitals 모니?�링 초기?? */
 export async function initWebVitals(onMetric?: (metric: Metric) => void) {
   if (typeof window === 'undefined') return;
 
   try {
-    // 동적 import로 web-vitals 로드 (번들 크기 최적화)
-    // web-vitals v4+에서는 FID가 INP로 대체됨
+    // ?�적 import�?web-vitals 로드 (번들 ?�기 최적??
+    // web-vitals v4+?�서??FID가 INP�??�체됨
     const { onLCP, onCLS, onFCP, onTTFB, onINP } = await import('web-vitals');
 
     const reportMetric = (metric: Metric) => {
-      // 콘솔에 로그
-      console.log(`[Web Vitals] ${metric.name}:`, metric.value, `(${metric.rating})`);
+      // 콘솔??로그
+      debugLog(`[Web Vitals] ${metric.name}:`, metric.value, `(${metric.rating})`);
 
-      // Analytics에 전송
+      // Analytics???�송
       sendToAnalytics(metric);
 
-      // 콜백 호출
+      // 콜백 ?�출
       onMetric?.(metric);
     };
 
@@ -53,12 +58,12 @@ export async function initWebVitals(onMetric?: (metric: Metric) => void) {
     onTTFB(reportMetric);
     onINP(reportMetric);
   } catch (error) {
-    console.warn('Web Vitals not available:', error);
+    logger.warn('Web Vitals not available:', error);
   }
 }
 
 /**
- * Analytics에 메트릭 전송
+ * Analytics??메트�??�송
  */
 function sendToAnalytics(metric: Metric) {
   if (typeof window !== 'undefined' && (window as unknown as { gtag?: (...args: unknown[]) => void }).gtag) {
@@ -72,7 +77,7 @@ function sendToAnalytics(metric: Metric) {
 }
 
 /**
- * 이미지 Intersection Observer 기반 lazy loading
+ * ?��?지 Intersection Observer 기반 lazy loading
  */
 export function createImageObserver(options?: IntersectionObserverInit): IntersectionObserver | null {
   if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
@@ -93,14 +98,14 @@ export function createImageObserver(options?: IntersectionObserverInit): Interse
       }
     });
   }, {
-    rootMargin: '50px 0px', // 50px 전에 미리 로드
+    rootMargin: '50px 0px', // 50px ?�에 미리 로드
     threshold: 0.01,
     ...options,
   });
 }
 
 /**
- * 이미지 프리로드
+ * ?��?지 ?�리로드
  */
 export function preloadImage(src: string): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -112,14 +117,14 @@ export function preloadImage(src: string): Promise<void> {
 }
 
 /**
- * 중요 이미지 프리로드 (LCP 최적화)
+ * 중요 ?��?지 ?�리로드 (LCP 최적??
  */
 export function preloadCriticalImages(urls: string[]): Promise<void[]> {
   return Promise.all(urls.map(preloadImage));
 }
 
 /**
- * 메모리 관리 - Blob URL 정리
+ * 메모�?관�?- Blob URL ?�리
  */
 const blobUrls = new Set<string>();
 
@@ -142,7 +147,7 @@ export function revokeAllBlobUrls(): void {
 }
 
 /**
- * 이미지 압축 (클라이언트 사이드)
+ * ?��?지 ?�축 (?�라?�언???�이??
  */
 export async function compressImage(
   file: File | Blob,
@@ -169,14 +174,14 @@ export async function compressImage(
 
       let { width, height } = img;
 
-      // 리사이징 계산
+      // 리사?�징 계산
       if (width > maxWidth || height > maxHeight) {
         const ratio = Math.min(maxWidth / width, maxHeight / height);
         width *= ratio;
         height *= ratio;
       }
 
-      // Canvas로 압축
+      // Canvas�??�축
       const canvas = document.createElement('canvas');
       canvas.width = width;
       canvas.height = height;
@@ -212,7 +217,7 @@ export async function compressImage(
 }
 
 /**
- * 리소스 힌트 추가 (preconnect, prefetch)
+ * 리소???�트 추�? (preconnect, prefetch)
  */
 export function addResourceHint(
   type: 'preconnect' | 'prefetch' | 'preload' | 'dns-prefetch',
@@ -221,7 +226,7 @@ export function addResourceHint(
 ): void {
   if (typeof document === 'undefined') return;
 
-  // 이미 존재하는지 확인
+  // ?��? 존재?�는지 ?�인
   if (document.querySelector(`link[href="${href}"]`)) return;
 
   const link = document.createElement('link');
@@ -239,7 +244,7 @@ export function addResourceHint(
 }
 
 /**
- * API 프리커넥트 설정
+ * API ?�리커넥???�정
  */
 export function setupPreconnects(): void {
   // Google APIs
@@ -255,7 +260,7 @@ export function setupPreconnects(): void {
 }
 
 /**
- * 디바운스 함수
+ * ?�바?�스 ?�수
  */
 export function debounce<T extends (...args: unknown[]) => unknown>(
   fn: T,
@@ -270,7 +275,7 @@ export function debounce<T extends (...args: unknown[]) => unknown>(
 }
 
 /**
- * 쓰로틀 함수
+ * ?�로?� ?�수
  */
 export function throttle<T extends (...args: unknown[]) => unknown>(
   fn: T,
@@ -290,7 +295,7 @@ export function throttle<T extends (...args: unknown[]) => unknown>(
 }
 
 /**
- * Idle 콜백 (낮은 우선순위 작업용)
+ * Idle 콜백 (??? ?�선?�위 ?�업??
  */
 export function runWhenIdle(callback: () => void, timeout = 2000): void {
   if ('requestIdleCallback' in window) {
@@ -301,7 +306,7 @@ export function runWhenIdle(callback: () => void, timeout = 2000): void {
 }
 
 /**
- * 메모리 사용량 모니터링 (Chrome에서만 작동)
+ * 메모�??�용??모니?�링 (Chrome?�서�??�동)
  */
 export function getMemoryInfo(): { usedJSHeapSize: number; totalJSHeapSize: number } | null {
   if (typeof window !== 'undefined' && 'performance' in window) {
@@ -317,7 +322,7 @@ export function getMemoryInfo(): { usedJSHeapSize: number; totalJSHeapSize: numb
 }
 
 /**
- * 성능 마크 및 측정
+ * ?�능 마크 �?측정
  */
 export function markPerformance(name: string): void {
   if (typeof performance !== 'undefined') {
@@ -339,8 +344,7 @@ export function measurePerformance(name: string, startMark: string, endMark: str
 }
 
 /**
- * 네비게이션 타이밍 데이터
- */
+ * ?�비게이???�?�밍 ?�이?? */
 export function getNavigationTiming(): Record<string, number> | null {
   if (typeof performance !== 'undefined' && 'getEntriesByType' in performance) {
     const [navigation] = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
@@ -360,28 +364,27 @@ export function getNavigationTiming(): Record<string, number> | null {
 }
 
 /**
- * 성능 초기화
- */
+ * ?�능 초기?? */
 export function initPerformanceMonitoring(): void {
   if (typeof window === 'undefined') return;
 
-  // 프리커넥트 설정
+  // ?�리커넥???�정
   setupPreconnects();
 
-  // Web Vitals 모니터링
+  // Web Vitals 모니?�링
   initWebVitals();
 
-  // 페이지 로드 완료 후 성능 데이터 로깅
+  // ?�이지 로드 ?�료 ???�능 ?�이??로깅
   window.addEventListener('load', () => {
     runWhenIdle(() => {
       const timing = getNavigationTiming();
       if (timing) {
-        console.log('[Performance] Navigation Timing:', timing);
+        debugLog('[Performance] Navigation Timing:', timing);
       }
 
       const memory = getMemoryInfo();
       if (memory) {
-        console.log('[Performance] Memory:', {
+        debugLog('[Performance] Memory:', {
           used: `${(memory.usedJSHeapSize / 1024 / 1024).toFixed(2)} MB`,
           total: `${(memory.totalJSHeapSize / 1024 / 1024).toFixed(2)} MB`,
         });
@@ -389,7 +392,7 @@ export function initPerformanceMonitoring(): void {
     });
   });
 
-  // 페이지 언로드 시 Blob URL 정리
+  // ?�이지 ?�로????Blob URL ?�리
   window.addEventListener('beforeunload', () => {
     revokeAllBlobUrls();
   });

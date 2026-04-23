@@ -1,12 +1,10 @@
+import { logger } from './logger';
 /**
- * Google Analytics 4 트래킹 서비스
- * GA4 측정 ID: 환경변수에서 설정
- * GDPR/CCPA 준수: 사용자 동의 후에만 트래킹
+ * Analytics service (GA4) with environment + consent safety checks.
  */
-
 import { canUseAnalytics, canUseMarketing } from '../components/CookieConsent';
 
-// GA4 이벤트 타입 정의
+// GA4 event shape
 interface GAEvent {
   action: string;
   category: string;
@@ -14,21 +12,25 @@ interface GAEvent {
   value?: number;
 }
 
-// 페이지뷰 이벤트 타입
 interface PageViewEvent {
   page_path: string;
   page_title: string;
   page_location: string;
 }
 
-// 사용자 속성 타입
 interface UserProperties {
   language?: string;
   theme?: string;
   user_type?: 'new' | 'returning';
 }
 
-// gtag 전역 타입 선언
+interface ConsentPayload {
+  analytics_storage: 'denied' | 'granted';
+  ad_storage: 'denied' | 'granted';
+  ad_user_data: 'denied' | 'granted';
+  ad_personalization: 'denied' | 'granted';
+}
+
 declare global {
   interface Window {
     gtag: (...args: unknown[]) => void;
@@ -36,56 +38,138 @@ declare global {
   }
 }
 
-// GA 측정 ID (환경변수에서 가져옴)
-const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID || 'G-XXXXXXXXXX';
+const GA_MEASUREMENT_ID = (import.meta.env.VITE_GA_MEASUREMENT_ID || '').trim();
+const isDebug = import.meta.env.DEV || import.meta.env.MODE === 'test';
 
-/**
- * GA4 스크립트 초기화
- */
-export const initGA = (): void => {
-  // 이미 초기화된 경우 스킵
-  if (typeof window.gtag === 'function') return;
+const debugLog = (...args: unknown[]): void => {
+  if (isDebug) {
+    logger.log(...args);
+  }
+};
+const IS_DEV_ANALYTICS = import.meta.env.DEV && import.meta.env.VITE_ENABLE_GA_DEV === 'true';
+const IS_TEST = import.meta.env.MODE === 'test';
+const GA_ID_PATTERN = /^G-[A-Z0-9]{6,}$/i;
+const VALID_GA_ID = GA_ID_PATTERN.test(GA_MEASUREMENT_ID);
+const RESOLVED_GA_ID = VALID_GA_ID ? GA_MEASUREMENT_ID : (IS_TEST ? 'G-TESTMODE' : '');
+const CONSENT_SCRIPT_ID = 'google-tag-manager-gtag';
 
-  // 개발 환경에서는 GA 비활성화 옵션
-  if (import.meta.env.DEV && !import.meta.env.VITE_ENABLE_GA_DEV) {
-    console.log('[Analytics] GA disabled in development');
-    // 빈 함수로 대체
-    window.gtag = () => {};
-    window.dataLayer = [];
+const getConsentPayload = (): ConsentPayload => {
+  return {
+    analytics_storage: canUseAnalytics() ? 'granted' : 'denied',
+    ad_storage: canUseMarketing() ? 'granted' : 'denied',
+    ad_user_data: canUseMarketing() ? 'granted' : 'denied',
+    ad_personalization: canUseMarketing() ? 'granted' : 'denied',
+  };
+};
+
+const shouldEnableTracking = (): boolean => {
+  if (IS_TEST) return true;
+  if (IS_DEV_ANALYTICS) return true;
+  return canUseAnalytics();
+};
+
+const setNoopGtag = (): void => {
+  window.gtag = () => {
+    window.dataLayer = window.dataLayer || [];
+  };
+  window.dataLayer = window.dataLayer || [];
+};
+
+let isInitialized = false;
+let isListenerRegistered = false;
+let isTrackingEnabled = false;
+
+const applyConsentUpdate = (): void => {
+  if (typeof window?.gtag !== 'function') return;
+
+  const payload = getConsentPayload();
+
+  window.gtag('consent', 'update', payload);
+};
+
+const handleConsentUpdated = (): void => {
+  if (shouldEnableTracking()) {
+    isTrackingEnabled = true;
+    if (!isInitialized) {
+      initGA();
+      return;
+    }
+    applyConsentUpdate();
     return;
   }
 
-  // dataLayer 초기화
-  window.dataLayer = window.dataLayer || [];
-  window.gtag = function (...args: unknown[]) {
-    window.dataLayer.push(args);
-  };
-
-  // GA 스크립트 로드
-  const script = document.createElement('script');
-  script.async = true;
-  script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
-  document.head.appendChild(script);
-
-  // GA 초기 설정
-  window.gtag('js', new Date());
-  window.gtag('config', GA_MEASUREMENT_ID, {
-    send_page_view: false, // SPA이므로 수동으로 페이지뷰 전송
-    anonymize_ip: true, // IP 익명화 (GDPR 준수)
-    cookie_flags: 'SameSite=None;Secure', // 보안 쿠키
-  });
+  isTrackingEnabled = false;
+  setNoopGtag();
+  isInitialized = false;
 };
 
 /**
- * 페이지뷰 트래킹 (동의 확인)
+ * Initialize GA script/config with consent + env checks.
  */
-export const trackPageView = (pageData?: Partial<PageViewEvent>): void => {
-  // GDPR/CCPA: 동의 확인
-  if (!canUseAnalytics()) {
-    console.log('[Analytics] Tracking disabled - no consent');
+export const initGA = (): void => {
+  if (typeof window === 'undefined' || typeof document === 'undefined') return;
+
+  if (!isListenerRegistered) {
+    window.addEventListener('consent-updated', handleConsentUpdated);
+    isListenerRegistered = true;
+  }
+
+  if (!shouldEnableTracking()) {
+    isTrackingEnabled = false;
+    setNoopGtag();
     return;
   }
 
+  if (!RESOLVED_GA_ID) {
+    isTrackingEnabled = false;
+    setNoopGtag();
+    logger.warn('[Analytics] GA initialization blocked: missing/invalid VITE_GA_MEASUREMENT_ID');
+    return;
+  }
+
+  if (typeof window.gtag === 'function' && isInitialized) return;
+
+  window.dataLayer = window.dataLayer || [];
+  if (typeof window.gtag !== 'function') {
+    window.gtag = (...args: unknown[]) => {
+      window.dataLayer.push(args);
+    };
+  }
+
+  // Avoid injecting script twice.
+  if (!document.getElementById(CONSENT_SCRIPT_ID)) {
+    const script = document.createElement('script');
+    script.id = CONSENT_SCRIPT_ID;
+    script.async = true;
+    script.src = `https://www.googletagmanager.com/gtag/js?id=${RESOLVED_GA_ID}`;
+    document.head.appendChild(script);
+  }
+
+  const payload = getConsentPayload();
+
+  window.gtag('consent', 'default', payload);
+  window.gtag('js', new Date());
+  window.gtag('config', RESOLVED_GA_ID, {
+    send_page_view: false,
+    anonymize_ip: true,
+    cookie_flags: 'SameSite=None;Secure',
+  });
+
+  applyConsentUpdate();
+
+  isInitialized = true;
+  isTrackingEnabled = true;
+
+  if (import.meta.env.DEV && !IS_DEV_ANALYTICS) {
+    debugLog('[Analytics] GA disabled in development');
+  }
+};
+
+/**
+ * Track page view (privacy gated)
+ */
+export const trackPageView = (pageData?: Partial<PageViewEvent>): void => {
+  if (!isTrackingEnabled || !shouldEnableTracking()) return;
   if (typeof window.gtag !== 'function') return;
 
   const data: PageViewEvent = {
@@ -98,12 +182,10 @@ export const trackPageView = (pageData?: Partial<PageViewEvent>): void => {
 };
 
 /**
- * 커스텀 이벤트 트래킹 (동의 확인)
+ * Track standard event (privacy gated)
  */
 export const trackEvent = (event: GAEvent): void => {
-  // GDPR/CCPA: 동의 확인
-  if (!canUseAnalytics()) return;
-
+  if (!isTrackingEnabled || !canUseAnalytics()) return;
   if (typeof window.gtag !== 'function') return;
 
   window.gtag('event', event.action, {
@@ -114,12 +196,10 @@ export const trackEvent = (event: GAEvent): void => {
 };
 
 /**
- * 마케팅 이벤트 트래킹 (마케팅 동의 필요)
+ * Track marketing events (privacy gated)
  */
 export const trackMarketingEvent = (event: GAEvent): void => {
-  // GDPR/CCPA: 마케팅 동의 확인
-  if (!canUseMarketing()) return;
-
+  if (!isTrackingEnabled || !canUseMarketing()) return;
   if (typeof window.gtag !== 'function') return;
 
   window.gtag('event', event.action, {
@@ -130,17 +210,16 @@ export const trackMarketingEvent = (event: GAEvent): void => {
 };
 
 /**
- * 사용자 속성 설정
+ * Set user properties (privacy gated)
  */
 export const setUserProperties = (properties: UserProperties): void => {
+  if (!isTrackingEnabled || !shouldEnableTracking()) return;
   if (typeof window.gtag !== 'function') return;
 
   window.gtag('set', 'user_properties', properties);
 };
 
-// 앱 특화 이벤트 헬퍼 함수들
 export const Analytics = {
-  // 시뮬레이션 시작
   simulationStarted: (type: string, styleId?: string) => {
     trackEvent({
       action: 'simulation_started',
@@ -150,17 +229,15 @@ export const Analytics = {
     });
   },
 
-  // 시뮬레이션 완료
   simulationCompleted: (type: string, duration: number) => {
     trackEvent({
       action: 'simulation_completed',
       category: 'simulation',
       label: type,
-      value: Math.round(duration / 1000), // 초 단위
+      value: Math.round(duration / 1000),
     });
   },
 
-  // 시뮬레이션 실패
   simulationFailed: (type: string, error: string) => {
     trackEvent({
       action: 'simulation_failed',
@@ -169,7 +246,6 @@ export const Analytics = {
     });
   },
 
-  // 사진 촬영/업로드
   photoCapture: (source: 'camera' | 'gallery') => {
     trackEvent({
       action: 'photo_capture',
@@ -178,7 +254,6 @@ export const Analytics = {
     });
   },
 
-  // 헤어스타일 선택
   styleSelected: (styleId: string, gender: string) => {
     trackEvent({
       action: 'style_selected',
@@ -187,7 +262,6 @@ export const Analytics = {
     });
   },
 
-  // 결과 저장
   resultSaved: (type: string) => {
     trackEvent({
       action: 'result_saved',
@@ -196,7 +270,6 @@ export const Analytics = {
     });
   },
 
-  // 결과 공유
   resultShared: (method: string) => {
     trackEvent({
       action: 'result_shared',
@@ -205,7 +278,6 @@ export const Analytics = {
     });
   },
 
-  // 기능 사용
   featureUsed: (feature: string) => {
     trackEvent({
       action: 'feature_used',
@@ -214,7 +286,6 @@ export const Analytics = {
     });
   },
 
-  // 설정 변경
   settingChanged: (setting: string, value: string) => {
     trackEvent({
       action: 'setting_changed',
@@ -223,7 +294,6 @@ export const Analytics = {
     });
   },
 
-  // 에러 발생
   errorOccurred: (errorType: string, errorMessage: string) => {
     trackEvent({
       action: 'error_occurred',
@@ -232,7 +302,6 @@ export const Analytics = {
     });
   },
 
-  // PWA 설치
   pwaInstalled: () => {
     trackEvent({
       action: 'pwa_installed',
@@ -241,7 +310,6 @@ export const Analytics = {
     });
   },
 
-  // 오프라인 사용
   offlineUsed: () => {
     trackEvent({
       action: 'offline_used',

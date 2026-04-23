@@ -1,35 +1,34 @@
 /**
- * Result Page - Apple Human Interface Guidelines
- * - 44pt 최소 터치 타겟
- * - 시스템 색상 사용
- * - 라이트/다크 모드 지원
- * - 깔끔하고 미니멀한 디자인
+ * Result Page - Stitch Premium Design
+ * Before/After 비교, 앞머리/뒷머리 전환
  */
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../stores/useAppStore';
 import { generateBackView } from '../services/openai';
 import { hairStyles } from '../data/hairStyles';
+import { resilientFetch } from '../services/networkResilience';
+import { logger } from '../services/logger';
 import ShareSheet from '../components/ShareSheet';
 import RatingPrompt, { shouldShowRatingPrompt, incrementSimulationCount } from '../components/RatingPrompt';
 import HairRefinementPanel from '../components/HairRefinementPanel';
 import { useI18n, type Language } from '../i18n/useI18n';
+import Toast from '../components/Toast';
 
-// 결과 페이지 다국어 텍스트
 const RESULT_TEXTS: Record<Language, Record<string, string>> = {
-  ko: { result: '결과', before: 'Before', after: 'After', frontView: '앞머리', backView: '뒷머리', generating: '생성 중...', generate: '(생성)', save: '저장', saveAll: '전체', tryAnother: '다른 스타일 시도하기', saved: '저장 완료!', compare: '비교', slider: '슬라이더', backViewLabel: '뒷모습', refine: '미세 조정' },
-  en: { result: 'Result', before: 'Before', after: 'After', frontView: 'Front', backView: 'Back', generating: 'Generating...', generate: '(Generate)', save: 'Save', saveAll: 'All', tryAnother: 'Try Another Style', saved: 'Saved!', compare: 'Compare', slider: 'Slider', backViewLabel: 'Back View', refine: 'Fine Tune' },
-  zh: { result: '结果', before: '之前', after: '之后', frontView: '正面', backView: '背面', generating: '生成中...', generate: '(生成)', save: '保存', saveAll: '全部', tryAnother: '尝试其他风格', saved: '已保存!', compare: '对比', slider: '滑块', backViewLabel: '背面' },
-  ja: { result: '結果', before: 'Before', after: 'After', frontView: '前', backView: '後ろ', generating: '生成中...', generate: '(生成)', save: '保存', saveAll: '全て', tryAnother: '他のスタイルを試す', saved: '保存完了!', compare: '比較', slider: 'スライダー', backViewLabel: '後ろ姿' },
-  es: { result: 'Resultado', before: 'Antes', after: 'Después', frontView: 'Frente', backView: 'Atrás', generating: 'Generando...', generate: '(Generar)', save: 'Guardar', saveAll: 'Todo', tryAnother: 'Probar Otro Estilo', saved: '¡Guardado!', compare: 'Comparar', slider: 'Control', backViewLabel: 'Vista Posterior' },
-  pt: { result: 'Resultado', before: 'Antes', after: 'Depois', frontView: 'Frente', backView: 'Atrás', generating: 'Gerando...', generate: '(Gerar)', save: 'Salvar', saveAll: 'Tudo', tryAnother: 'Tentar Outro Estilo', saved: 'Salvo!', compare: 'Comparar', slider: 'Controle', backViewLabel: 'Vista Traseira' },
-  fr: { result: 'Résultat', before: 'Avant', after: 'Après', frontView: 'Face', backView: 'Dos', generating: 'Génération...', generate: '(Générer)', save: 'Sauvegarder', saveAll: 'Tout', tryAnother: 'Essayer un Autre Style', saved: 'Sauvegardé!', compare: 'Comparer', slider: 'Curseur', backViewLabel: 'Vue Arrière' },
-  de: { result: 'Ergebnis', before: 'Vorher', after: 'Nachher', frontView: 'Vorne', backView: 'Hinten', generating: 'Wird erstellt...', generate: '(Erstellen)', save: 'Speichern', saveAll: 'Alle', tryAnother: 'Anderen Stil Probieren', saved: 'Gespeichert!', compare: 'Vergleich', slider: 'Regler', backViewLabel: 'Rückansicht' },
-  th: { result: 'ผลลัพธ์', before: 'ก่อน', after: 'หลัง', frontView: 'ด้านหน้า', backView: 'ด้านหลัง', generating: 'กำลังสร้าง...', generate: '(สร้าง)', save: 'บันทึก', saveAll: 'ทั้งหมด', tryAnother: 'ลองสไตล์อื่น', saved: 'บันทึกแล้ว!', compare: 'เปรียบเทียบ', slider: 'ตัวเลื่อน', backViewLabel: 'มุมหลัง' },
-  vi: { result: 'Kết quả', before: 'Trước', after: 'Sau', frontView: 'Phía trước', backView: 'Phía sau', generating: 'Đang tạo...', generate: '(Tạo)', save: 'Lưu', saveAll: 'Tất cả', tryAnother: 'Thử Kiểu Khác', saved: 'Đã lưu!', compare: 'So sánh', slider: 'Thanh trượt', backViewLabel: 'Mặt sau' },
-  id: { result: 'Hasil', before: 'Sebelum', after: 'Sesudah', frontView: 'Depan', backView: 'Belakang', generating: 'Membuat...', generate: '(Buat)', save: 'Simpan', saveAll: 'Semua', tryAnother: 'Coba Gaya Lain', saved: 'Tersimpan!', compare: 'Bandingkan', slider: 'Penggeser', backViewLabel: 'Tampak Belakang' },
-  hi: { result: 'परिणाम', before: 'पहले', after: 'बाद में', frontView: 'सामने', backView: 'पीछे', generating: 'बना रहा है...', generate: '(बनाएं)', save: 'सहेजें', saveAll: 'सभी', tryAnother: 'अन्य स्टाइल आज़माएं', saved: 'सहेजा गया!', compare: 'तुलना', slider: 'स्लाइडर', backViewLabel: 'पीछे का दृश्य' },
-  ar: { result: 'النتيجة', before: 'قبل', after: 'بعد', frontView: 'أمامي', backView: 'خلفي', generating: 'جاري الإنشاء...', generate: '(إنشاء)', save: 'حفظ', saveAll: 'الكل', tryAnother: 'جرب ستايل آخر', saved: 'تم الحفظ!', compare: 'مقارنة', slider: 'المنزلق', backViewLabel: 'منظر خلفي' },
+  ko: { result: '시뮬레이션 결과', single: '단일 결과', compare: '비교하기', slider: '슬라이더', before: 'Before', after: 'After', frontView: '앞머리', backView: '뒷머리 (AI 생성)', generating: '생성 중...', refine: '미세 조정', save: '이미지 저장', tryAnother: '다른 스타일 시도하기', saved: '저장 완료!', backViewFailed: '뒷머리 생성에 실패했습니다.', errorOccurred: '오류가 발생했습니다.' },
+  en: { result: 'Simulation Result', single: 'Single', compare: 'Compare', slider: 'Slider', before: 'Before', after: 'After', frontView: 'Front', backView: 'Back (AI Generated)', generating: 'Generating...', refine: 'Fine Tune', save: 'Save Image', tryAnother: 'Try Another Style', saved: 'Saved!', backViewFailed: 'Back view generation failed.', errorOccurred: 'An error occurred.' },
+  zh: { result: '模拟结果', single: '单一结果', compare: '对比', slider: '滑块', before: '之前', after: '之后', frontView: '正面', backView: '背面 (AI生成)', generating: '生成中...', refine: '微调', save: '保存图片', tryAnother: '尝试其他风格', saved: '已保存!', backViewFailed: '背面生成失败。', errorOccurred: '发生错误。' },
+  ja: { result: 'シミュレーション結果', single: '単一結果', compare: '比較', slider: 'スライダー', before: 'Before', after: 'After', frontView: '前髪', backView: '後ろ髪 (AI生成)', generating: '生成中...', refine: '微調整', save: '画像を保存', tryAnother: '他のスタイルを試す', saved: '保存完了!', backViewFailed: '後ろ髪の生成に失敗しました。', errorOccurred: 'エラーが発生しました。' },
+  es: { result: 'Resultado de Simulación', single: 'Individual', compare: 'Comparar', slider: 'Control', before: 'Antes', after: 'Después', frontView: 'Frente', backView: 'Atrás (IA)', generating: 'Generando...', refine: 'Ajuste Fino', save: 'Guardar Imagen', tryAnother: 'Probar Otro Estilo', saved: '¡Guardado!', backViewFailed: 'Falló la generación de vista trasera.', errorOccurred: 'Ocurrió un error.' },
+  pt: { result: 'Resultado da Simulação', single: 'Individual', compare: 'Comparar', slider: 'Controle', before: 'Antes', after: 'Depois', frontView: 'Frente', backView: 'Atrás (IA)', generating: 'Gerando...', refine: 'Ajuste Fino', save: 'Salvar Imagem', tryAnother: 'Tentar Outro Estilo', saved: 'Salvo!', backViewFailed: 'Falha ao gerar vista traseira.', errorOccurred: 'Ocorreu um erro.' },
+  fr: { result: 'Résultat de Simulation', single: 'Simple', compare: 'Comparer', slider: 'Curseur', before: 'Avant', after: 'Après', frontView: 'Face', backView: 'Dos (IA)', generating: 'Génération...', refine: 'Affiner', save: 'Sauvegarder', tryAnother: 'Essayer un Autre Style', saved: 'Sauvegardé!', backViewFailed: 'Échec de la génération de la vue arrière.', errorOccurred: 'Une erreur est survenue.' },
+  de: { result: 'Simulationsergebnis', single: 'Einzeln', compare: 'Vergleichen', slider: 'Regler', before: 'Vorher', after: 'Nachher', frontView: 'Vorne', backView: 'Hinten (KI)', generating: 'Wird erstellt...', refine: 'Feinabstimmung', save: 'Bild Speichern', tryAnother: 'Anderen Stil Probieren', saved: 'Gespeichert!', backViewFailed: 'Rückansicht-Generierung fehlgeschlagen.', errorOccurred: 'Ein Fehler ist aufgetreten.' },
+  th: { result: 'ผลการจำลอง', single: 'เดี่ยว', compare: 'เปรียบเทียบ', slider: 'ตัวเลื่อน', before: 'ก่อน', after: 'หลัง', frontView: 'ด้านหน้า', backView: 'ด้านหลัง (AI)', generating: 'กำลังสร้าง...', refine: 'ปรับแต่ง', save: 'บันทึกรูป', tryAnother: 'ลองสไตล์อื่น', saved: 'บันทึกแล้ว!', backViewFailed: 'สร้างมุมหลังไม่สำเร็จ', errorOccurred: 'เกิดข้อผิดพลาด' },
+  vi: { result: 'Kết quả Mô phỏng', single: 'Đơn lẻ', compare: 'So sánh', slider: 'Thanh trượt', before: 'Trước', after: 'Sau', frontView: 'Phía trước', backView: 'Phía sau (AI)', generating: 'Đang tạo...', refine: 'Tinh chỉnh', save: 'Lưu ảnh', tryAnother: 'Thử Kiểu Khác', saved: 'Đã lưu!', backViewFailed: 'Tạo mặt sau thất bại.', errorOccurred: 'Đã xảy ra lỗi.' },
+  id: { result: 'Hasil Simulasi', single: 'Tunggal', compare: 'Bandingkan', slider: 'Penggeser', before: 'Sebelum', after: 'Sesudah', frontView: 'Depan', backView: 'Belakang (AI)', generating: 'Membuat...', refine: 'Sesuaikan', save: 'Simpan Gambar', tryAnother: 'Coba Gaya Lain', saved: 'Tersimpan!', backViewFailed: 'Gagal membuat tampak belakang.', errorOccurred: 'Terjadi kesalahan.' },
+  hi: { result: 'सिमुलेशन परिणाम', single: 'एकल', compare: 'तुलना', slider: 'स्लाइडर', before: 'पहले', after: 'बाद में', frontView: 'सामने', backView: 'पीछे (AI)', generating: 'बना रहा है...', refine: 'फाइन ट्यून', save: 'छवि सहेजें', tryAnother: 'अन्य स्टाइल आज़माएं', saved: 'सहेजा गया!', backViewFailed: 'पीछे का दृश्य बनाने में विफल।', errorOccurred: 'एक त्रुटि हुई।' },
+  ar: { result: 'نتيجة المحاكاة', single: 'مفرد', compare: 'مقارنة', slider: 'المنزلق', before: 'قبل', after: 'بعد', frontView: 'أمامي', backView: 'خلفي (AI)', generating: 'جاري الإنشاء...', refine: 'ضبط دقيق', save: 'حفظ الصورة', tryAnother: 'جرب ستايل آخر', saved: 'تم الحفظ!', backViewFailed: 'فشل إنشاء المنظر الخلفي.', errorOccurred: 'حدث خطأ.' },
 };
 
 interface MultiResult {
@@ -45,68 +44,58 @@ export default function Result() {
   const { language } = useI18n();
   const texts = RESULT_TEXTS[language] || RESULT_TEXTS.en;
   const { userPhoto, resultImage, reset, hairSettings } = useAppStore();
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndex] = useState(0);
   const [results, setResults] = useState<MultiResult[]>([]);
   const [showSaveSuccess, setShowSaveSuccess] = useState(false);
   const [sliderPosition, setSliderPosition] = useState(50);
-  const [viewMode, setViewMode] = useState<'result' | 'compare' | 'slider'>('result');
+  const [viewMode, setViewMode] = useState<'single' | 'compare' | 'slider'>('compare');
   const [hairView, setHairView] = useState<'front' | 'back'>('front');
   const [isGeneratingBack, setIsGeneratingBack] = useState(false);
   const [showShareSheet, setShowShareSheet] = useState(false);
   const [showRatingPrompt, setShowRatingPrompt] = useState(false);
   const [showRefinementPanel, setShowRefinementPanel] = useState(false);
+  const [showErrorToast, setShowErrorToast] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const sliderRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     incrementSimulationCount();
     const timer = setTimeout(() => {
-      if (shouldShowRatingPrompt()) {
-        setShowRatingPrompt(true);
-      }
+      if (shouldShowRatingPrompt()) setShowRatingPrompt(true);
     }, 3000);
     return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
-    const savedResults = localStorage.getItem('multiResults');
-    if (savedResults) {
-      try {
+    try {
+      const savedResults = localStorage.getItem('multiResults');
+      if (savedResults) {
         const parsed = JSON.parse(savedResults) as MultiResult[];
         setResults(parsed);
         localStorage.removeItem('multiResults');
-      } catch {
-        if (resultImage) {
-          setResults([{ styleId: 'single', styleName: '스타일', resultImage }]);
-        }
+      } else if (resultImage) {
+        setResults([{ styleId: 'single', styleName: '스타일', resultImage }]);
       }
-    } else if (resultImage) {
-      setResults([{ styleId: 'single', styleName: '스타일', resultImage }]);
+    } catch {
+      if (resultImage) setResults([{ styleId: 'single', styleName: '스타일', resultImage }]);
     }
   }, [resultImage]);
 
   const currentResult = results[currentIndex];
   const backViewImg = currentResult?.backViewImage || currentResult?.backImage;
-  const displayImage = hairView === 'back' && backViewImg
-    ? backViewImg
-    : currentResult?.resultImage;
+  const displayImage = hairView === 'back' && backViewImg ? backViewImg : currentResult?.resultImage;
 
   const handleGenerateBack = async () => {
     if (!currentResult || isGeneratingBack) return;
-
     if (currentResult.backViewImage || currentResult.backImage) {
       setHairView('back');
       return;
     }
 
     setIsGeneratingBack(true);
-
     try {
       const style = hairStyles.find(s => s.id === currentResult.styleId);
-      if (!style) {
-        console.error('Style not found:', currentResult.styleId);
-        setIsGeneratingBack(false);
-        return;
-      }
+      if (!style) { setIsGeneratingBack(false); return; }
 
       const result = await generateBackView({
         userPhoto: userPhoto || '',
@@ -117,70 +106,71 @@ export default function Result() {
 
       if (result.success && result.resultImage) {
         setResults(prev => prev.map((r, idx) =>
-          idx === currentIndex
-            ? { ...r, backImage: result.resultImage }
-            : r
+          idx === currentIndex ? { ...r, backImage: result.resultImage } : r
         ));
         setHairView('back');
       } else {
-        console.error('Back view generation failed:', result.error);
-        alert('뒷머리 생성에 실패했습니다. 다시 시도해주세요.');
+        setErrorMessage(texts.backViewFailed);
+        setShowErrorToast(true);
       }
-    } catch (error) {
-      console.error('Error generating back view:', error);
-      alert('오류가 발생했습니다.');
+    } catch {
+      setErrorMessage(texts.errorOccurred);
+      setShowErrorToast(true);
     } finally {
       setIsGeneratingBack(false);
     }
   };
 
-  const handleStartOver = () => {
-    reset();
-    navigate('/');
-  };
+  const handleStartOver = () => { reset(); navigate('/'); };
 
   const handleSave = async () => {
     if (!displayImage) return;
     try {
-      const link = document.createElement('a');
-      link.href = displayImage;
-      link.download = `hairstyle-${currentResult?.styleName || 'result'}-${Date.now()}.png`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      const fileName = `hairstyle-${currentResult?.styleName || 'result'}-${Date.now()}.png`;
+
+      // data URL을 직접 blob으로 변환 (fetch 없이)
+      let blob: Blob;
+      if (displayImage.startsWith('data:')) {
+        const [header, base64Data] = displayImage.split(',');
+        const mimeMatch = header.match(/data:([^;]+)/);
+        const mimeType = mimeMatch ? mimeMatch[1] : 'image/png';
+        const binaryString = atob(base64Data);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+        blob = new Blob([bytes], { type: mimeType });
+      } else {
+        // URL인 경우 fetch 사용
+        const response = await resilientFetch(displayImage);
+        blob = await response.blob();
+      }
+
+      const file = new File([blob], fileName, { type: blob.type || 'image/png' });
+
+      // Try navigator.share with file (works in Capacitor/Android WebView)
+      if (navigator.share && navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ files: [file] });
+      } else {
+        // Fallback: blob URL download
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }
       setShowSaveSuccess(true);
       setTimeout(() => setShowSaveSuccess(false), 2000);
     } catch (error) {
-      console.error('Save error:', error);
+      // User cancelled share sheet - not an error
+      if (error instanceof Error && error.name === 'AbortError') return;
+      logger.error('Save error:', error);
+      setErrorMessage('이미지 저장에 실패했습니다.');
+      setShowErrorToast(true);
     }
-  };
-
-  const handleSaveAll = async () => {
-    for (const result of results) {
-      const link = document.createElement('a');
-      link.href = result.resultImage;
-      link.download = `hairstyle-${result.styleName}-${Date.now()}.png`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      await new Promise(r => setTimeout(r, 500));
-    }
-    setShowSaveSuccess(true);
-    setTimeout(() => setShowSaveSuccess(false), 2000);
-  };
-
-  const handleShare = () => {
-    if (!displayImage) return;
-    setShowShareSheet(true);
-  };
-
-  const handleRefinementComplete = (newImage: string) => {
-    setResults(prev => prev.map((r, idx) =>
-      idx === currentIndex
-        ? { ...r, resultImage: newImage }
-        : r
-    ));
-    setShowRefinementPanel(false);
   };
 
   const handleSliderTouch = (e: React.TouchEvent | React.MouseEvent) => {
@@ -192,23 +182,20 @@ export default function Result() {
   };
 
   if (!displayImage || !userPhoto) {
-    if (results.length === 0 && !resultImage) {
-      navigate('/');
-      return null;
-    }
+    if (results.length === 0 && !resultImage) { navigate('/'); return null; }
     return (
-      <div className="min-h-screen bg-[var(--color-bg-primary)] flex items-center justify-center">
-        <div className="w-10 h-10 border-3 border-[var(--color-blue)]/30 border-t-[var(--color-blue)] rounded-full animate-spin" />
+      <div className="min-h-screen bg-white dark:bg-[#121212] flex items-center justify-center">
+        <div className="w-10 h-10 border-3 border-[#007AFF]/30 border-t-[#007AFF] rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg-primary)] flex flex-col safe-area-top safe-area-bottom">
+    <div className="h-[100dvh] bg-white dark:bg-[#121212] text-gray-900 dark:text-gray-100 flex flex-col overflow-hidden">
       {/* Save Success Toast */}
       {showSaveSuccess && (
         <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 animate-fade-in">
-          <div className="px-5 py-2.5 bg-[var(--color-green)] rounded-full text-white text-subheadline font-medium flex items-center gap-2">
+          <div className="px-5 py-2.5 bg-green-500 rounded-full text-white text-sm font-medium flex items-center gap-2">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
               <path d="M20 6L9 17l-5-5"/>
             </svg>
@@ -218,88 +205,46 @@ export default function Result() {
       )}
 
       {/* Header */}
-      <header className="relative flex items-center justify-between h-11 px-4 bg-[var(--color-bg-primary)] border-b border-[var(--color-separator)]">
-        <button
-          onClick={handleStartOver}
-          className="w-11 h-11 flex items-center justify-center -ml-2 active:opacity-60 transition-opacity"
-        >
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--color-blue)" strokeWidth="2.5" strokeLinecap="round">
+      <header className="flex-none px-4 py-2 flex items-center justify-between relative">
+        <button onClick={handleStartOver} className="p-2 -ml-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-[#007AFF]">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
             <path d="M15 18l-6-6 6-6"/>
           </svg>
         </button>
-        <h1 className="absolute left-1/2 -translate-x-1/2 text-headline text-[var(--color-label)]">
-          {results.length > 1 ? `${currentIndex + 1} / ${results.length}` : texts.result}
-        </h1>
-        <button
-          onClick={handleShare}
-          className="w-11 h-11 flex items-center justify-center -mr-2 active:opacity-60 transition-opacity text-[var(--color-blue)]"
-        >
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <h1 className="text-[17px] font-bold text-center flex-1 tracking-tight">{texts.result}</h1>
+        <button onClick={() => setShowShareSheet(true)} className="p-2 -mr-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-[#007AFF] opacity-0 pointer-events-none">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13"/>
           </svg>
         </button>
       </header>
 
-      {/* 멀티 결과 썸네일 */}
-      {results.length > 1 && (
-        <div className="px-4 py-3 bg-[var(--color-bg-secondary)]">
-          <div className="flex gap-2 overflow-x-auto scrollbar-hide">
-            {results.map((result, idx) => (
-              <button
-                key={result.styleId}
-                onClick={() => setCurrentIndex(idx)}
-                className={`flex-shrink-0 relative transition-all ${
-                  idx === currentIndex ? 'scale-105' : 'opacity-60'
-                }`}
-              >
-                <img
-                  src={result.resultImage}
-                  alt={result.styleName}
-                  className={`w-14 h-[72px] object-cover rounded-lg ${
-                    idx === currentIndex ? 'ring-2 ring-[var(--color-blue)]' : ''
-                  }`}
-                />
-                <span className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-[10px] text-center py-0.5 rounded-b-lg truncate px-1">
-                  {result.styleName}
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* View Mode Segmented Control */}
-      <div className="px-4 py-3">
-        <div className="flex bg-[var(--color-fill-tertiary)] rounded-[9px] p-[2px]">
-          {[
-            { id: 'result', label: texts.result },
-            { id: 'compare', label: texts.compare },
-            { id: 'slider', label: texts.slider }
-          ].map((mode) => (
-            <button
-              key={mode.id}
-              onClick={() => setViewMode(mode.id as typeof viewMode)}
-              className={`flex-1 py-2 rounded-[7px] text-subheadline font-medium transition-all ${
-                viewMode === mode.id
-                  ? 'bg-[var(--color-bg-primary)] text-[var(--color-label)] shadow-sm'
-                  : 'text-[var(--color-label-secondary)]'
-              }`}
-            >
-              {mode.label}
-            </button>
-          ))}
-        </div>
+      {/* Tab Navigation */}
+      <div className="flex-none flex items-center text-[15px] font-medium border-b border-gray-200 dark:border-gray-800">
+        {(['single', 'compare', 'slider'] as const).map((mode) => (
+          <button
+            key={mode}
+            onClick={() => setViewMode(mode)}
+            className={`flex-1 py-3 transition-colors ${
+              viewMode === mode
+                ? 'border-b-[2px] border-gray-900 dark:border-white text-gray-900 dark:text-white'
+                : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'
+            }`}
+          >
+            {mode === 'single' ? texts.single : mode === 'compare' ? texts.compare : texts.slider}
+          </button>
+        ))}
       </div>
 
       {/* Front/Back Toggle */}
-      <div className="px-4 pb-3">
-        <div className="flex gap-2">
+      <div className="flex-none px-4 py-3 bg-white dark:bg-black">
+        <div className="flex items-center p-1 bg-gray-100 dark:bg-gray-800 rounded-lg">
           <button
             onClick={() => setHairView('front')}
-            className={`flex-1 h-11 rounded-xl text-subheadline font-medium transition-all flex items-center justify-center gap-2 ${
+            className={`flex-1 py-1.5 rounded-[6px] text-[13px] font-semibold transition-all flex items-center justify-center gap-1.5 ${
               hairView === 'front'
-                ? 'bg-[var(--color-blue)] text-white'
-                : 'bg-[var(--color-fill-tertiary)] text-[var(--color-label)]'
+                ? 'bg-[#007AFF] text-white shadow-sm'
+                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
             }`}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -311,10 +256,10 @@ export default function Result() {
           <button
             onClick={handleGenerateBack}
             disabled={isGeneratingBack}
-            className={`flex-1 h-11 rounded-xl text-subheadline font-medium transition-all flex items-center justify-center gap-2 ${
+            className={`flex-1 py-1.5 rounded-[6px] text-[13px] font-medium transition-all flex items-center justify-center gap-1.5 ${
               hairView === 'back'
-                ? 'bg-[var(--color-blue)] text-white'
-                : 'bg-[var(--color-fill-tertiary)] text-[var(--color-label)]'
+                ? 'bg-[#007AFF] text-white shadow-sm'
+                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
             } ${isGeneratingBack ? 'opacity-50' : ''}`}
           >
             {isGeneratingBack ? (
@@ -327,9 +272,8 @@ export default function Result() {
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <circle cx="12" cy="8" r="5"/>
                   <path d="M20 21c0-4.4-3.6-8-8-8s-8 3.6-8 8"/>
-                  <path d="M12 3v2"/>
                 </svg>
-                {texts.backView} {(currentResult?.backViewImage || currentResult?.backImage) ? '' : texts.generate}
+                {texts.backView}
               </>
             )}
           </button>
@@ -337,35 +281,32 @@ export default function Result() {
       </div>
 
       {/* Main Content */}
-      <main className="flex-1 px-4 pb-4 overflow-hidden">
-        {viewMode === 'result' && (
-          <div className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-[var(--color-bg-secondary)]">
-            <img src={displayImage} alt="Result" className="w-full h-full object-cover" />
-            {hairView === 'back' && (
-              <div className="absolute top-3 right-3 bg-black/50 backdrop-blur-sm px-3 py-1.5 rounded-full text-caption1 text-white">
-                {texts.backViewLabel}
-              </div>
-            )}
+      <main className="flex-1 relative w-full overflow-hidden bg-gray-50 dark:bg-gray-900 flex flex-col">
+        {viewMode === 'single' && (
+          <div className="flex-1 w-full h-full flex items-center justify-center p-4">
+            <div className="relative w-full max-w-md aspect-[3/4] rounded-2xl overflow-hidden bg-gray-200 dark:bg-gray-800">
+              <img src={displayImage} alt="Result" className="w-full h-full object-cover" />
+            </div>
           </div>
         )}
 
         {viewMode === 'compare' && (
-          <div className="flex gap-3 h-full">
-            <div className="flex-1">
-              <div className="bg-[var(--color-fill-tertiary)] rounded-t-xl px-3 py-1.5">
-                <p className="text-caption1 text-[var(--color-label-secondary)] text-center">{texts.before}</p>
-              </div>
-              <div className="aspect-[3/4] rounded-b-xl overflow-hidden bg-[var(--color-bg-secondary)]">
-                <img src={userPhoto} alt="Before" className="w-full h-full object-cover" />
-              </div>
+          <div className="relative flex-1 w-full h-full flex items-stretch">
+            {/* Before Label */}
+            <div className="absolute top-0 left-0 w-1/2 h-8 z-20 flex items-center justify-center bg-gray-100/80 dark:bg-gray-800/80 backdrop-blur-sm">
+              <span className="text-xs font-semibold text-gray-500">{texts.before}</span>
             </div>
-            <div className="flex-1">
-              <div className="bg-[var(--color-blue)] rounded-t-xl px-3 py-1.5">
-                <p className="text-caption1 text-white text-center">{texts.after}</p>
-              </div>
-              <div className="aspect-[3/4] rounded-b-xl overflow-hidden bg-[var(--color-bg-secondary)] ring-2 ring-[var(--color-blue)]">
-                <img src={displayImage} alt="After" className="w-full h-full object-cover" />
-              </div>
+            {/* After Label */}
+            <div className="absolute top-0 right-0 w-1/2 h-8 z-20 flex items-center justify-center bg-blue-50/80 dark:bg-blue-900/50 backdrop-blur-sm">
+              <span className="text-xs font-semibold text-[#007AFF]">{texts.after}</span>
+            </div>
+            {/* Before Image */}
+            <div className="w-1/2 h-full relative overflow-hidden bg-gray-200 dark:bg-gray-800 border-r border-white/20">
+              <img src={userPhoto} alt="Before" className="w-full h-full object-cover" />
+            </div>
+            {/* After Image */}
+            <div className="w-1/2 h-full relative overflow-hidden bg-gray-300 dark:bg-gray-700">
+              <img src={displayImage} alt="After" className="w-full h-full object-cover" />
             </div>
           </div>
         )}
@@ -373,7 +314,7 @@ export default function Result() {
         {viewMode === 'slider' && (
           <div
             ref={sliderRef}
-            className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-[var(--color-bg-secondary)] cursor-ew-resize touch-none"
+            className="flex-1 w-full h-full relative cursor-ew-resize touch-none"
             onMouseDown={(e) => {
               handleSliderTouch(e);
               const handleMove = (ev: MouseEvent) => handleSliderTouch(ev as unknown as React.MouseEvent);
@@ -399,36 +340,33 @@ export default function Result() {
               style={{ left: `${sliderPosition}%`, transform: 'translateX(-50%)' }}
             >
               <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-label)" strokeWidth="2.5">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#333" strokeWidth="2.5">
                   <path d="M18 8l4 4-4 4M6 8l-4 4 4 4"/>
                 </svg>
               </div>
             </div>
-            <div className="absolute bottom-3 left-3 bg-black/50 backdrop-blur-sm px-3 py-1.5 rounded-full text-caption1 text-white">
+            <div className="absolute bottom-3 left-3 bg-black/50 backdrop-blur-sm px-3 py-1.5 rounded-full text-xs text-white font-medium">
               {texts.before}
             </div>
-            <div className="absolute bottom-3 right-3 bg-[var(--color-blue)] px-3 py-1.5 rounded-full text-caption1 text-white">
+            <div className="absolute bottom-3 right-3 bg-[#007AFF] px-3 py-1.5 rounded-full text-xs text-white font-medium">
               {texts.after}
             </div>
           </div>
         )}
+
+        {/* Style Name */}
+        {currentResult && (
+          <div className="flex-none bg-[#F9FAFB] dark:bg-[#1E1E1E] py-3 border-t border-gray-200 dark:border-gray-800 text-center">
+            <span className="text-base font-bold text-gray-900 dark:text-white tracking-tight">{currentResult.styleName}</span>
+          </div>
+        )}
       </main>
 
-      {/* Style Name */}
-      {currentResult && (
-        <div className="px-4 pb-3">
-          <div className="bg-[var(--color-bg-secondary)] rounded-xl p-4 text-center">
-            <p className="text-[var(--color-label)] font-semibold text-body">{currentResult.styleName}</p>
-          </div>
-        </div>
-      )}
-
-      {/* Action Buttons */}
-      <div className="px-4 pb-4 space-y-3 safe-area-bottom">
-        {/* 미세 조정 버튼 */}
+      {/* Footer Actions */}
+      <footer className="flex-none bg-white dark:bg-[#121212] px-5 pt-4 pb-8 flex flex-col gap-3 z-50 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
         <button
           onClick={() => setShowRefinementPanel(true)}
-          className="w-full h-[50px] rounded-xl bg-[var(--color-blue)] text-white font-semibold text-body flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
+          className="w-full h-[54px] rounded-2xl bg-[#007AFF] text-white font-bold text-[16px] shadow-lg shadow-[#007AFF]/25 hover:bg-[#0062cc] transition-all active:scale-[0.98] flex items-center justify-center gap-2"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M12 3v18M3 12h18"/>
@@ -436,39 +374,22 @@ export default function Result() {
           </svg>
           {texts.refine}
         </button>
-
-        {/* 저장 버튼들 */}
-        <div className="flex gap-3">
-          <button
-            onClick={handleSave}
-            className="flex-1 h-[50px] rounded-xl bg-[var(--color-fill-tertiary)] text-[var(--color-label)] font-medium text-body flex items-center justify-center gap-2 active:bg-[var(--color-fill-secondary)] transition-colors"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
-            </svg>
-            {texts.save}
-          </button>
-          {results.length > 1 && (
-            <button
-              onClick={handleSaveAll}
-              className="flex-1 h-[50px] rounded-xl bg-[var(--color-fill-tertiary)] text-[var(--color-label)] font-medium text-body flex items-center justify-center gap-2 active:bg-[var(--color-fill-secondary)] transition-colors"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
-              </svg>
-              {texts.saveAll}
-            </button>
-          )}
-        </div>
-
-        {/* 다시 시도 버튼 */}
+        <button
+          onClick={handleSave}
+          className="w-full h-[54px] rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white font-bold text-[16px] hover:bg-gray-50 dark:hover:bg-gray-700 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+          </svg>
+          {texts.save}
+        </button>
         <button
           onClick={handleStartOver}
-          className="w-full h-[50px] rounded-xl bg-[var(--color-label)] text-[var(--color-bg-primary)] font-semibold text-body active:opacity-80 transition-opacity"
+          className="w-full h-[48px] mt-1 rounded-2xl text-gray-500 dark:text-gray-400 font-medium text-[14px] hover:text-gray-900 dark:hover:text-white transition-colors flex items-center justify-center underline decoration-gray-300 underline-offset-4"
         >
           {texts.tryAnother}
         </button>
-      </div>
+      </footer>
 
       {/* Share Sheet */}
       {showShareSheet && displayImage && (
@@ -480,9 +401,7 @@ export default function Result() {
       )}
 
       {/* Rating Prompt */}
-      {showRatingPrompt && (
-        <RatingPrompt onClose={() => setShowRatingPrompt(false)} />
-      )}
+      {showRatingPrompt && <RatingPrompt onClose={() => setShowRatingPrompt(false)} />}
 
       {/* Refinement Panel */}
       {showRefinementPanel && currentResult && displayImage && userPhoto && (
@@ -490,11 +409,17 @@ export default function Result() {
           resultImage={displayImage}
           userPhoto={userPhoto}
           styleName={currentResult.styleName}
-          onRefinementComplete={handleRefinementComplete}
+          onRefinementComplete={(newImage) => {
+            setResults(prev => prev.map((r, idx) => idx === currentIndex ? { ...r, resultImage: newImage } : r));
+            setShowRefinementPanel(false);
+          }}
           onClose={() => setShowRefinementPanel(false)}
           language={language === 'ko' ? 'ko' : 'en'}
         />
       )}
+
+      {/* Error Toast */}
+      <Toast message={errorMessage} type="error" visible={showErrorToast} onClose={() => setShowErrorToast(false)} />
     </div>
   );
 }

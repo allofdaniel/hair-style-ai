@@ -1,30 +1,65 @@
-import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, OAuthProvider } from 'firebase/auth';
+﻿import { getApps, getApp, initializeApp, type FirebaseApp } from 'firebase/app';
+import { getAuth, GoogleAuthProvider, OAuthProvider, type Auth } from 'firebase/auth';
+import { logger } from '../services/logger';
 
-// Firebase configuration - 실제 배포 시 환경변수로 관리
+const trimEnv = (value: string | undefined): string => (value || '').trim();
+
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || '',
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || '',
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || '',
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || '',
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '',
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || '',
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || '',
+  apiKey: trimEnv(import.meta.env.VITE_FIREBASE_API_KEY),
+  authDomain: trimEnv(import.meta.env.VITE_FIREBASE_AUTH_DOMAIN),
+  projectId: trimEnv(import.meta.env.VITE_FIREBASE_PROJECT_ID),
+  storageBucket: trimEnv(import.meta.env.VITE_FIREBASE_STORAGE_BUCKET),
+  messagingSenderId: trimEnv(import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID),
+  appId: trimEnv(import.meta.env.VITE_FIREBASE_APP_ID),
+  measurementId: trimEnv(import.meta.env.VITE_FIREBASE_MEASUREMENT_ID),
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+const requiredKeys = [
+  'apiKey',
+  'authDomain',
+  'projectId',
+  'storageBucket',
+  'messagingSenderId',
+  'appId',
+] as const;
 
-// Initialize Firebase Authentication
-export const auth = getAuth(app);
+export const isFirebaseConfigReady = requiredKeys.every((key) => Boolean(firebaseConfig[key]));
 
-// Auth Providers
-export const googleProvider = new GoogleAuthProvider();
-googleProvider.addScope('profile');
-googleProvider.addScope('email');
+const getFirebaseApp = (): FirebaseApp | null => {
+  if (!isFirebaseConfigReady) {
+    if (!import.meta.env.PROD) {
+      logger.warn('[Firebase] Environment config is incomplete. Authentication is disabled.');
+    }
+    return null;
+  }
 
-export const appleProvider = new OAuthProvider('apple.com');
-appleProvider.addScope('email');
-appleProvider.addScope('name');
+  if (getApps().length > 0) {
+    return getApp();
+  }
+
+  try {
+    return initializeApp(firebaseConfig);
+  } catch (error) {
+    logger.error('[Firebase] Failed to initialize app:', error);
+    return null;
+  }
+};
+
+export const app: FirebaseApp | null = getFirebaseApp();
+
+export const auth: Auth | null = app ? getAuth(app) : null;
+
+export const googleProvider = auth ? new GoogleAuthProvider() : null;
+export const appleProvider = auth ? new OAuthProvider('apple.com') : null;
+
+if (googleProvider) {
+  googleProvider.addScope('profile');
+  googleProvider.addScope('email');
+}
+
+if (appleProvider) {
+  appleProvider.addScope('email');
+  appleProvider.addScope('name');
+}
 
 export default app;

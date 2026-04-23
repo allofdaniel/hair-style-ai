@@ -34,7 +34,9 @@ export const useI18n = create<I18nState>()(
       },
       t: (key) => {
         const { language } = get();
-        return translations[language]?.[key] || translations.en[key] || key;
+        const langTranslations = translations[language] as Record<string, string>;
+        const enTranslations = translations.en as Record<string, string>;
+        return langTranslations?.[key] || enTranslations[key] || key;
       },
       isRTL: () => RTL_LANGUAGES.includes(get().language),
       getDir: () => RTL_LANGUAGES.includes(get().language) ? 'rtl' : 'ltr',

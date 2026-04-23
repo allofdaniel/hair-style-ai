@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Hair Extract & Overlay Service
  *
  * 핵심 원칙: 원본 사진은 절대 재생성하지 않음!
@@ -12,6 +12,8 @@
 
 import type { HairStyle, HairSettings } from '../stores/useAppStore';
 
+import { logger } from './logger';
+import { resilientFetch } from './networkResilience';
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
 interface GenerateResult {
@@ -43,7 +45,7 @@ export async function applyHairStyleOverlay(params: {
   }
 
   try {
-    console.log('Step 1: Detecting face positions...');
+    logger.log('Step 1: Detecting face positions...');
 
     // 1. 두 이미지에서 얼굴 위치 감지
     const [userFace, refFace] = await Promise.all([
@@ -55,10 +57,10 @@ export async function applyHairStyleOverlay(params: {
       return { success: false, error: 'Could not detect face in your photo' };
     }
 
-    console.log('User face detected:', userFace.face);
-    console.log('Reference face detected:', refFace.face);
+    logger.log('User face detected:', userFace.face);
+    logger.log('Reference face detected:', refFace.face);
 
-    console.log('Step 2: Extracting hair from reference...');
+    logger.log('Step 2: Extracting hair from reference...');
 
     // 2. 레퍼런스에서 머리카락 추출
     const hairExtract = await extractHairFromReference(style.thumbnail);
@@ -66,8 +68,8 @@ export async function applyHairStyleOverlay(params: {
       return { success: false, error: 'Could not extract hair from reference' };
     }
 
-    console.log('Hair extracted successfully');
-    console.log('Step 3: Overlaying hair onto original...');
+    logger.log('Hair extracted successfully');
+    logger.log('Step 3: Overlaying hair onto original...');
 
     // 3. 원본 위에 머리카락 오버레이
     const result = await overlayHairOnPhoto(
@@ -77,7 +79,7 @@ export async function applyHairStyleOverlay(params: {
       refFace.face
     );
 
-    console.log('Overlay complete!');
+    logger.log('Overlay complete!');
 
     return {
       success: true,
@@ -85,7 +87,7 @@ export async function applyHairStyleOverlay(params: {
     };
 
   } catch (error) {
-    console.error('Hair overlay error:', error);
+    logger.error('Hair overlay error:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -108,7 +110,7 @@ async function extractHairFromReference(imageUrl: string): Promise<{ success: bo
     const maskResult = await createHairMaskFromImage(imageBase64);
     if (!maskResult.success || !maskResult.mask) {
       // 폴백: 상단 부분을 머리카락으로 간주
-      console.log('Using fallback hair extraction');
+      logger.log('Using fallback hair extraction');
       return await extractHairFallback(imageBase64);
     }
 
@@ -118,7 +120,7 @@ async function extractHairFromReference(imageUrl: string): Promise<{ success: bo
     return { success: true, hairImage: hairOnly };
 
   } catch (error) {
-    console.error('Hair extraction error:', error);
+    logger.error('Hair extraction error:', error);
     return { success: false, error: 'Failed to extract hair' };
   }
 }
@@ -141,7 +143,7 @@ async function loadImageAsBase64(url: string): Promise<string | null> {
     };
 
     img.onerror = () => {
-      console.error('Failed to load image from URL:', url);
+      logger.error('Failed to load image from URL:', url);
       resolve(null);
     };
 
@@ -175,11 +177,11 @@ Return ONLY JSON:
 Values are normalized 0-1.`;
 
   try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+    const response = await resilientFetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent`,
       {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': GEMINI_API_KEY },
         body: JSON.stringify({
           contents: [{
             role: 'user',
@@ -214,7 +216,7 @@ Values are normalized 0-1.`;
     return { success: false };
 
   } catch (error) {
-    console.error('Mask creation error:', error);
+    logger.error('Mask creation error:', error);
     return { success: false };
   }
 }
@@ -382,11 +384,11 @@ async function detectFacePosition(imageBase64: string): Promise<{ success: boole
 }`;
 
   try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+    const response = await resilientFetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent`,
       {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': GEMINI_API_KEY },
         body: JSON.stringify({
           contents: [{
             role: 'user',
@@ -418,7 +420,7 @@ async function detectFacePosition(imageBase64: string): Promise<{ success: boole
     return { success: true, face: { x: 0.5, y: 0.4, width: 0.4, height: 0.5, foreheadY: 0.2 } };
 
   } catch (error) {
-    console.error('Face detection error:', error);
+    logger.error('Face detection error:', error);
     return { success: true, face: { x: 0.5, y: 0.4, width: 0.4, height: 0.5, foreheadY: 0.2 } };
   }
 }
@@ -503,7 +505,7 @@ export async function applyReferenceHairOverlay(params: {
   const { userPhoto, referencePhoto } = params;
 
   try {
-    console.log('Step 1: Detecting faces...');
+    logger.log('Step 1: Detecting faces...');
 
     const [userFace, refFace] = await Promise.all([
       detectFacePosition(userPhoto),
@@ -514,7 +516,7 @@ export async function applyReferenceHairOverlay(params: {
       return { success: false, error: 'Could not detect face in your photo' };
     }
 
-    console.log('Step 2: Extracting hair from reference...');
+    logger.log('Step 2: Extracting hair from reference...');
 
     // 레퍼런스에서 머리카락 추출
     const maskResult = await createHairMaskFromImage(referencePhoto);
@@ -530,7 +532,7 @@ export async function applyReferenceHairOverlay(params: {
       hairImage = fallback.hairImage;
     }
 
-    console.log('Step 3: Overlaying...');
+    logger.log('Step 3: Overlaying...');
 
     const result = await overlayHairOnPhoto(
       userPhoto,
@@ -542,7 +544,9 @@ export async function applyReferenceHairOverlay(params: {
     return { success: true, resultImage: result };
 
   } catch (error) {
-    console.error('Reference overlay error:', error);
+    logger.error('Reference overlay error:', error);
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 }
+
+

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * OpenAI GPT-Image-1.5 Service
  *
  * 최신 OpenAI 이미지 생성/편집 API
@@ -9,6 +9,9 @@
 
 import type { HairStyle, HairSettings, HairTexture, CustomHairSettings } from '../stores/useAppStore';
 import { hairColors, hairTextures } from '../data/hairStyles';
+
+import { logger } from './logger';
+import { resilientFetch } from './networkResilience';
 
 const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 const OPENAI_EDIT_URL = 'https://api.openai.com/v1/images/edits';
@@ -62,6 +65,46 @@ const cleanHairStylePrompt = (prompt: string): string => {
   }
 
   return '';
+};
+
+const readBlobAsDataUrl = (blob: Blob): Promise<string> => {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result as string);
+    reader.onerror = () => resolve('');
+    reader.readAsDataURL(blob);
+  });
+};
+
+const toOpenAIErrorMessage = async (response: Response): Promise<string> => {
+  try {
+    const errorData = await response.json();
+    return errorData?.error?.message || `API Error: ${response.status}`;
+  } catch {
+    return `API Error: ${response.status}`;
+  }
+};
+
+const extractOpenAIImageDataUrl = async (imageData: {
+  b64_json?: string;
+  url?: string;
+}): Promise<string | null> => {
+  if (imageData.b64_json) {
+    return `data:image/png;base64,${imageData.b64_json}`;
+  }
+
+  if (!imageData.url) {
+    return null;
+  }
+
+  const imgResponse = await resilientFetch(imageData.url, { method: 'GET' });
+  if (!imgResponse.ok) {
+    logger.warn('Failed to fetch generated OpenAI image URL:', imgResponse.status);
+    return null;
+  }
+
+  const imgBlob = await imgResponse.blob();
+  return readBlobAsDataUrl(imgBlob);
 };
 
 // Build the AI prompt based on selected options
@@ -125,7 +168,7 @@ const fetchReferenceImageAsBase64 = async (thumbnailUrl: string): Promise<string
       ? `${window.location.origin}${thumbnailUrl}`
       : thumbnailUrl;
 
-    const response = await fetch(fullUrl);
+    const response = await resilientFetch(fullUrl, { method: 'GET' });
     if (!response.ok) return null;
 
     const blob = await response.blob();
@@ -136,7 +179,7 @@ const fetchReferenceImageAsBase64 = async (thumbnailUrl: string): Promise<string
       reader.readAsDataURL(blob);
     });
   } catch (error) {
-    console.error('Failed to fetch reference image:', error);
+    logger.error('Failed to fetch reference image:', error);
     return null;
   }
 };
@@ -144,7 +187,7 @@ const fetchReferenceImageAsBase64 = async (thumbnailUrl: string): Promise<string
 // Analyze reference image using GPT-4o Vision to get detailed hairstyle description
 const analyzeReferenceImage = async (referenceBase64: string, styleName: string): Promise<string | null> => {
   try {
-    const response = await fetch(OPENAI_CHAT_URL, {
+    const response = await resilientFetch(OPENAI_CHAT_URL, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${OPENAI_API_KEY}`,
@@ -185,14 +228,14 @@ Respond in 2-3 sentences, focusing on the most distinctive and important feature
     });
 
     if (!response.ok) {
-      console.error('GPT-4o Vision analysis failed:', response.status);
+      logger.error('GPT-4o Vision analysis failed:', response.status);
       return null;
     }
 
     const data = await response.json();
     return data.choices?.[0]?.message?.content || null;
   } catch (error) {
-    console.error('Error analyzing reference image:', error);
+    logger.error('Error analyzing reference image:', error);
     return null;
   }
 };
@@ -231,7 +274,7 @@ export const generateHairStyle = async (
     : '';
 
   if (colorPrompt) {
-    console.log('Color prompt will be added:', colorPrompt);
+    logger.log('Color prompt will be added:', colorPrompt);
   }
 
   try {
@@ -241,17 +284,17 @@ export const generateHairStyle = async (
 
     if (preAnalyzedPrompt && preAnalyzedPrompt.length > 50) {
       // Use the pre-analyzed prompt directly (no API call needed)
-      console.log('Using pre-analyzed prompt:', preAnalyzedPrompt.substring(0, 100) + '...');
+      logger.log('Using pre-analyzed prompt:', preAnalyzedPrompt.substring(0, 100) + '...');
       stylePrompt = preAnalyzedPrompt;
     } else if (style.thumbnail) {
       // Fallback: Analyze reference image in real-time (costs API call)
-      console.log('No pre-analyzed prompt, fetching reference image:', style.thumbnail);
+      logger.log('No pre-analyzed prompt, fetching reference image:', style.thumbnail);
       const referenceBase64 = await fetchReferenceImageAsBase64(style.thumbnail);
       if (referenceBase64) {
-        console.log('Analyzing reference image with GPT-4o Vision...');
+        logger.log('Analyzing reference image with GPT-4o Vision...');
         const referenceAnalysis = await analyzeReferenceImage(referenceBase64, style.nameKo);
         if (referenceAnalysis) {
-          console.log('Reference analysis:', referenceAnalysis);
+          logger.log('Reference analysis:', referenceAnalysis);
           stylePrompt = referenceAnalysis;
         }
       }
@@ -265,8 +308,8 @@ export const generateHairStyle = async (
       mimeType = 'image/webp';
     }
 
-    console.log('Calling OpenAI GPT-Image-1.5 API...');
-    console.log('Final style prompt:', stylePrompt.substring(0, 200) + '...');
+    logger.log('Calling OpenAI GPT-Image-1.5 API...');
+    logger.log('Final style prompt:', stylePrompt.substring(0, 200) + '...');
 
     // PIXEL-PERFECT face preservation prompt - ZERO face modifications allowed
     // This is an inpainting task where ONLY the hair region should change
@@ -332,7 +375,7 @@ Think of this as: mask the hair area, edit ONLY that masked region, paste the or
     formData.append('n', '1');
     formData.append('size', '1024x1024');
 
-    const response = await fetch(OPENAI_EDIT_URL, {
+    const response = await resilientFetch(OPENAI_EDIT_URL, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${OPENAI_API_KEY}`,
@@ -341,8 +384,8 @@ Think of this as: mask the hair area, edit ONLY that masked region, paste the or
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error('OpenAI API error:', response.status, errorData);
+      const errorMessage = await toOpenAIErrorMessage(response);
+      logger.error('OpenAI API error:', response.status, errorMessage);
 
       if (response.status === 400) {
         return { success: false, error: 'Invalid image format. Please try a different photo.' };
@@ -354,29 +397,18 @@ Think of this as: mask the hair area, edit ONLY that masked region, paste the or
         return { success: false, error: 'Rate limit exceeded. Please wait and try again.' };
       }
 
-      return { success: false, error: errorData.error?.message || `API Error: ${response.status}` };
+      return { success: false, error: errorMessage };
     }
 
     const data = await response.json();
-    console.log('OpenAI response received');
+    logger.log('OpenAI response received');
 
     // Extract the generated image
     if (data.data && data.data.length > 0) {
       const imageData = data.data[0];
 
-      let resultImage: string;
-      if (imageData.b64_json) {
-        resultImage = `data:image/png;base64,${imageData.b64_json}`;
-      } else if (imageData.url) {
-        // Fetch the image from URL and convert to base64
-        const imgResponse = await fetch(imageData.url);
-        const imgBlob = await imgResponse.blob();
-        resultImage = await new Promise((resolve) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result as string);
-          reader.readAsDataURL(imgBlob);
-        });
-      } else {
+      let resultImage = await extractOpenAIImageDataUrl(imageData);
+      if (!resultImage) {
         return { success: false, error: 'No image data in response' };
       }
 
@@ -392,7 +424,7 @@ Think of this as: mask the hair area, edit ONLY that masked region, paste the or
     };
 
   } catch (error) {
-    console.error('Error generating hair style:', error);
+    logger.error('Error generating hair style:', error);
 
     if (error instanceof TypeError && error.message.includes('fetch')) {
       return { success: false, error: 'Network error. Please check your internet connection.' };
@@ -426,7 +458,7 @@ export const generateFromReference = async (
   const colorPrompt = colorOption && colorOption.id !== 'natural' ? `Apply hair color: ${colorOption.prompt}.` : '';
 
   try {
-    console.log('Generating from reference with OpenAI...');
+    logger.log('Generating from reference with OpenAI...');
 
     // For reference-based generation, we need to describe the reference hairstyle
     // OpenAI doesn't support multiple input images in edit, so we use generation with detailed prompt
@@ -449,7 +481,7 @@ This is a virtual hairstyle try-on - same person, different hair only.`;
     formData.append('n', '1');
     formData.append('size', '1024x1024');
 
-    const response = await fetch(OPENAI_EDIT_URL, {
+    const response = await resilientFetch(OPENAI_EDIT_URL, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${OPENAI_API_KEY}`,
@@ -458,9 +490,9 @@ This is a virtual hairstyle try-on - same person, different hair only.`;
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error('OpenAI reference generation error:', response.status, errorData);
-      return { success: false, error: errorData.error?.message || `API Error: ${response.status}` };
+      const errorMessage = await toOpenAIErrorMessage(response);
+      logger.error('OpenAI reference generation error:', response.status, errorMessage);
+      return { success: false, error: errorMessage };
     }
 
     const data = await response.json();
@@ -468,18 +500,8 @@ This is a virtual hairstyle try-on - same person, different hair only.`;
     if (data.data && data.data.length > 0) {
       const imageData = data.data[0];
 
-      let resultImage: string;
-      if (imageData.b64_json) {
-        resultImage = `data:image/png;base64,${imageData.b64_json}`;
-      } else if (imageData.url) {
-        const imgResponse = await fetch(imageData.url);
-        const imgBlob = await imgResponse.blob();
-        resultImage = await new Promise((resolve) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result as string);
-          reader.readAsDataURL(imgBlob);
-        });
-      } else {
+      let resultImage = await extractOpenAIImageDataUrl(imageData);
+      if (!resultImage) {
         return { success: false, error: 'No image data in response' };
       }
 
@@ -492,7 +514,7 @@ This is a virtual hairstyle try-on - same person, different hair only.`;
     return { success: false, error: 'No image generated. Please try again.' };
 
   } catch (error) {
-    console.error('Error generating from reference:', error);
+    logger.error('Error generating from reference:', error);
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 };
@@ -523,9 +545,9 @@ export const generateBackView = async (
     : '';
 
   try {
-    console.log('Generating back view with OpenAI...');
+    logger.log('Generating back view with OpenAI...');
     if (colorPrompt) {
-      console.log('Back view color prompt:', colorPrompt);
+      logger.log('Back view color prompt:', colorPrompt);
     }
 
     // Generate back view based on the front view result
@@ -563,7 +585,7 @@ This should look like a "back view" photo of the same person with this hairstyle
     formData.append('n', '1');
     formData.append('size', '1024x1024');
 
-    const response = await fetch(OPENAI_EDIT_URL, {
+    const response = await resilientFetch(OPENAI_EDIT_URL, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${OPENAI_API_KEY}`,
@@ -572,9 +594,9 @@ This should look like a "back view" photo of the same person with this hairstyle
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error('OpenAI back view error:', response.status, errorData);
-      return { success: false, error: errorData.error?.message || `API Error: ${response.status}` };
+      const errorMessage = await toOpenAIErrorMessage(response);
+      logger.error('OpenAI back view error:', response.status, errorMessage);
+      return { success: false, error: errorMessage };
     }
 
     const data = await response.json();
@@ -582,18 +604,8 @@ This should look like a "back view" photo of the same person with this hairstyle
     if (data.data && data.data.length > 0) {
       const imageData = data.data[0];
 
-      let resultImage: string;
-      if (imageData.b64_json) {
-        resultImage = `data:image/png;base64,${imageData.b64_json}`;
-      } else if (imageData.url) {
-        const imgResponse = await fetch(imageData.url);
-        const imgBlob = await imgResponse.blob();
-        resultImage = await new Promise((resolve) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result as string);
-          reader.readAsDataURL(imgBlob);
-        });
-      } else {
+      let resultImage = await extractOpenAIImageDataUrl(imageData);
+      if (!resultImage) {
         return { success: false, error: 'No image data in response' };
       }
 
@@ -606,7 +618,7 @@ This should look like a "back view" photo of the same person with this hairstyle
     return { success: false, error: 'No back view generated. Please try again.' };
 
   } catch (error) {
-    console.error('Error generating back view:', error);
+    logger.error('Error generating back view:', error);
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 };
@@ -697,8 +709,8 @@ export const generateCustomHairStyle = async (
   const customPrompt = buildCustomPrompt(customSettings);
 
   try {
-    console.log('Generating custom hairstyle with OpenAI...');
-    console.log('Custom settings prompt:', customPrompt);
+    logger.log('Generating custom hairstyle with OpenAI...');
+    logger.log('Custom settings prompt:', customPrompt);
 
     const editPrompt = `TASK: Apply this EXACT custom haircut specification to this person's photo:
 
@@ -724,7 +736,7 @@ Apply these haircut specifications as if a professional barber/stylist just fini
     formData.append('n', '1');
     formData.append('size', '1024x1024');
 
-    const response = await fetch(OPENAI_EDIT_URL, {
+    const response = await resilientFetch(OPENAI_EDIT_URL, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${OPENAI_API_KEY}`,
@@ -733,9 +745,9 @@ Apply these haircut specifications as if a professional barber/stylist just fini
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error('OpenAI custom generation error:', response.status, errorData);
-      return { success: false, error: errorData.error?.message || `API Error: ${response.status}` };
+      const errorMessage = await toOpenAIErrorMessage(response);
+      logger.error('OpenAI custom generation error:', response.status, errorMessage);
+      return { success: false, error: errorMessage };
     }
 
     const data = await response.json();
@@ -743,18 +755,8 @@ Apply these haircut specifications as if a professional barber/stylist just fini
     if (data.data && data.data.length > 0) {
       const imageData = data.data[0];
 
-      let resultImage: string;
-      if (imageData.b64_json) {
-        resultImage = `data:image/png;base64,${imageData.b64_json}`;
-      } else if (imageData.url) {
-        const imgResponse = await fetch(imageData.url);
-        const imgBlob = await imgResponse.blob();
-        resultImage = await new Promise((resolve) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result as string);
-          reader.readAsDataURL(imgBlob);
-        });
-      } else {
+      let resultImage = await extractOpenAIImageDataUrl(imageData);
+      if (!resultImage) {
         return { success: false, error: 'No image data in response' };
       }
 
@@ -767,7 +769,8 @@ Apply these haircut specifications as if a professional barber/stylist just fini
     return { success: false, error: 'No image generated. Please try again.' };
 
   } catch (error) {
-    console.error('Error generating custom hairstyle:', error);
+    logger.error('Error generating custom hairstyle:', error);
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 };
+

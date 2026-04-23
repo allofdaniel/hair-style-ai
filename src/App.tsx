@@ -1,31 +1,13 @@
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
-import { lazy, Suspense, useEffect, useState } from 'react';
+import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import { lazy, Suspense, useEffect, useCallback } from 'react';
+import { App as CapacitorApp } from '@capacitor/app';
 import NetworkStatus from './components/NetworkStatus';
 import SkipLink from './components/SkipLink';
-import CookieConsent from './components/CookieConsent';
-import OnboardingTutorial, { hasCompletedOnboarding } from './components/OnboardingTutorial';
-import ProcessingIndicator from './components/ProcessingIndicator';
 import { trackPageView } from './services/analytics';
 import { initPageSEO } from './services/seo';
 import { useI18n } from './i18n/useI18n';
-// import { admobService } from './services/admob'; // Disabled for initial release
 import { initializeRevenueCat } from './services/revenuecat';
 
-// 온보딩 상태 관리 컴포넌트
-function OnboardingManager() {
-  const [showOnboarding, setShowOnboarding] = useState(false);
-
-  useEffect(() => {
-    // 첫 방문 사용자에게 온보딩 표시
-    if (!hasCompletedOnboarding()) {
-      setShowOnboarding(true);
-    }
-  }, []);
-
-  if (!showOnboarding) return null;
-
-  return <OnboardingTutorial onComplete={() => setShowOnboarding(false)} />;
-}
 
 // iOS 스타일 로딩 컴포넌트
 const LoadingSpinner = () => (
@@ -54,28 +36,79 @@ const LoadingSpinner = () => (
 );
 
 
-// 지연 로딩 적용
+// 지연 로딩 적용 - 핵심 기능만
 const MainMenu = lazy(() => import('./pages/MainMenu'));
-const Camera = lazy(() => import('./pages/Camera'));
 const Processing = lazy(() => import('./pages/Processing'));
 const ProcessingCustom = lazy(() => import('./pages/ProcessingCustom'));
 const CustomStyle = lazy(() => import('./pages/CustomStyle'));
 const Result = lazy(() => import('./pages/Result'));
 const Settings = lazy(() => import('./pages/Settings'));
 const History = lazy(() => import('./pages/History'));
-const FaceAnalysis = lazy(() => import('./pages/FaceAnalysis'));
-const WeightSimulation = lazy(() => import('./pages/WeightSimulation'));
-const FitnessSimulation = lazy(() => import('./pages/FitnessSimulation'));
-const HairColorSimulation = lazy(() => import('./pages/HairColorSimulation'));
-const HairVolumeSimulation = lazy(() => import('./pages/HairVolumeSimulation'));
-const SkinTreatmentSimulation = lazy(() => import('./pages/SkinTreatmentSimulation'));
-const AgingSimulation = lazy(() => import('./pages/AgingSimulation'));
-const MakeupSimulation = lazy(() => import('./pages/MakeupSimulation'));
+const GrowthSimulation = lazy(() => import('./pages/GrowthSimulation'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const Privacy = lazy(() => import('./pages/Privacy'));
 const Terms = lazy(() => import('./pages/Terms'));
-const Admin = lazy(() => import('./pages/Admin'));
-const Auth = lazy(() => import('./pages/Auth'));
+
+// 앱 상태 변경 핸들러 (백그라운드 -> 포그라운드)
+function AppStateHandler() {
+  useEffect(() => {
+    const stateListener = CapacitorApp.addListener('appStateChange', ({ isActive }) => {
+      if (isActive) {
+        // 앱이 포그라운드로 돌아올 때 WebView 강제 repaint
+        document.body.style.display = 'none';
+        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+        document.body.offsetHeight; // Force reflow
+        document.body.style.display = '';
+
+        // 비디오 요소들 재시작 시도
+        const videos = document.querySelectorAll('video');
+        videos.forEach(video => {
+          if (video.srcObject) {
+            video.play().catch(() => {});
+          }
+        });
+      }
+    });
+
+    return () => {
+      stateListener.then((listener: { remove: () => void }) => listener.remove());
+    };
+  }, []);
+
+  return null;
+}
+
+// Android 뒤로 버튼 핸들러
+function BackButtonHandler() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleBackButton = useCallback(() => {
+    // 메인 페이지에서 뒤로가기 시 앱 종료
+    if (location.pathname === '/') {
+      CapacitorApp.exitApp();
+    } else {
+      // 다른 페이지에서는 이전 페이지로 이동
+      navigate(-1);
+    }
+  }, [location.pathname, navigate]);
+
+  useEffect(() => {
+    const backButtonListener = CapacitorApp.addListener('backButton', ({ canGoBack }: { canGoBack: boolean }) => {
+      if (!canGoBack) {
+        CapacitorApp.exitApp();
+      } else {
+        handleBackButton();
+      }
+    });
+
+    return () => {
+      backButtonListener.then((listener: { remove: () => void }) => listener.remove());
+    };
+  }, [handleBackButton]);
+
+  return null;
+}
 
 // 페이지 추적 및 SEO 컴포넌트
 function PageTracker() {
@@ -103,9 +136,11 @@ function PageTracker() {
 }
 
 function App() {
-  // RevenueCat 초기화 (AdMob disabled for initial release)
   useEffect(() => {
-    // admobService.initialize(); // Disabled - no AdMob account yet
+    // 이전 버전의 백그라운드 큐 데이터 정리
+    localStorage.removeItem('hair-processing-queue');
+    localStorage.removeItem('background-tasks');
+
     initializeRevenueCat();
   }, []);
 
@@ -120,6 +155,12 @@ function App() {
       {/* 페이지 추적 */}
       <PageTracker />
 
+      {/* Android 뒤로 버튼 처리 */}
+      <BackButtonHandler />
+
+      {/* 앱 상태 변경 처리 (백그라운드 복귀 시) */}
+      <AppStateHandler />
+
       {/* 메인 컨텐츠 */}
       <main id="main-content" tabIndex={-1}>
         <Suspense fallback={<LoadingSpinner />}>
@@ -128,21 +169,13 @@ function App() {
             <Route path="/" element={<MainMenu />} />
 
             {/* 헤어스타일 시뮬레이션 */}
-            <Route path="/camera" element={<Camera />} />
             <Route path="/processing" element={<Processing />} />
             <Route path="/processing-custom" element={<ProcessingCustom />} />
             <Route path="/custom" element={<CustomStyle />} />
             <Route path="/result" element={<Result />} />
 
-            {/* 추가 기능 (햄버거 메뉴에서 접근) */}
-            <Route path="/analysis" element={<FaceAnalysis />} />
-            <Route path="/weight" element={<WeightSimulation />} />
-            <Route path="/fitness" element={<FitnessSimulation />} />
-            <Route path="/hair-color" element={<HairColorSimulation />} />
-            <Route path="/hair-volume" element={<HairVolumeSimulation />} />
-            <Route path="/skin-treatment" element={<SkinTreatmentSimulation />} />
-            <Route path="/aging" element={<AgingSimulation />} />
-            <Route path="/makeup" element={<MakeupSimulation />} />
+            {/* 머리 성장 시뮬레이션 */}
+            <Route path="/growth" element={<GrowthSimulation />} />
 
             {/* 설정 및 기록 */}
             <Route path="/settings" element={<Settings />} />
@@ -150,26 +183,12 @@ function App() {
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
 
-            {/* 관리자 페이지 */}
-            <Route path="/admin" element={<Admin />} />
-
-            {/* 인증 페이지 */}
-            <Route path="/auth" element={<Auth />} />
-
             {/* 404 페이지 */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
       </main>
 
-      {/* 온보딩 튜토리얼 (첫 방문 사용자) */}
-      <OnboardingManager />
-
-      {/* 백그라운드 AI 생성 인디케이터 */}
-      <ProcessingIndicator />
-
-      {/* GDPR/CCPA 쿠키 동의 배너 */}
-      <CookieConsent />
     </BrowserRouter>
   );
 }

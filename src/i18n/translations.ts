@@ -19,7 +19,7 @@ export const languages: { code: Language; name: string; nativeName: string; rtl?
 export const translations = {
   ko: {
     // Common
-    app_name: 'LookSim',
+    app_name: 'BeforeCut',
     app_desc: 'AI 헤어 시뮬레이션',
     close: '닫기',
     cancel: '취소',
@@ -32,6 +32,7 @@ export const translations = {
     // MainMenu
     menu: '메뉴',
     album: '앨범',
+    gallery: '갤러리',
     switch_camera: '전환',
     back_to_camera: '카메라로',
     male: '남성',
@@ -42,6 +43,7 @@ export const translations = {
     selected_count: '개 선택',
     dye: '염색',
     reference: '참고',
+    search_style: '스타일 검색',
 
     // Categories
     cat_all: '전체',
@@ -63,6 +65,26 @@ export const translations = {
     // Color Picker
     hair_color: '염색 색상',
     no_color: '없음',
+    brightness: '밝기',
+    saturation: '채도',
+
+    // Length Simulation
+    growth: '길이',
+    growth_simulation: '머리 길이 시뮬레이션',
+    length_simulation: '머리 길이 시뮬레이션',
+    growth_period: '성장 기간',
+    weeks: '주',
+    months: '개월',
+    expected_growth: '예상 성장량',
+    simulate_growth: '길이 시뮬레이션 시작',
+    simulate_length: '길이 시뮬레이션 시작',
+
+    // Settings Sections
+    app_settings: '앱 설정',
+    user_content: '사용자 콘텐츠',
+    support: '지원',
+    token_reward: '5토큰 보상',
+    delete_history: '기록 삭제',
 
     // Reference
     reference_images: '참고 이미지',
@@ -72,14 +94,27 @@ export const translations = {
     // History
     no_history: '아직 기록이 없어요',
     no_history_desc: '첫 번째 스타일을 시도해보세요',
-    history_count: '개의 기록',
+    history_count: '개',
     selected_items: '개 선택됨',
+    total: '총',
+    newest: '최신순',
+    oldest: '오래된순',
 
     // Processing
     generating: '생성 중',
     preparing: '준비 중...',
     please_wait: '잠시만 기다려주세요',
     generation_failed: '스타일 생성에 실패했습니다.',
+    retry: '다시 시도',
+    unsupported_file_format: '지원하지 않는 파일 형식입니다. (JPG, PNG, WebP만 가능)',
+    file_too_large: '파일 크기는 10MB 이하여야 합니다.',
+    image_too_large: '이미지 해상도가 너무 큽니다. (최대 4096px)',
+    invalid_image: '유효하지 않은 이미지 파일입니다.',
+    photo_load_failed: '사진을 불러오는데 실패했습니다.',
+    camera_permission_denied: '카메라 접근 권한이 거부되었습니다. 설정에서 카메라 권한을 허용해주세요.',
+    camera_not_found: '카메라를 찾을 수 없습니다.',
+    camera_error: '카메라를 시작할 수 없습니다.',
+    reference_load_failed: '레퍼런스 이미지를 불러오는데 실패했습니다.',
 
     // Settings
     language: '언어',
@@ -88,6 +123,74 @@ export const translations = {
     privacy: '개인정보 처리방침',
     terms: '이용약관',
     version: '버전',
+
+    // Settings - My Photo
+    my_photo: '내 사진',
+    register_photo: '사진 등록',
+    for_custom_style: '커스텀 스타일용',
+    custom_style: '커스텀 스타일',
+    manage_photo: '내 사진 관리',
+    register_photo_title: '내 사진 등록',
+    photo_registered_desc: '등록된 사진은 커스텀 스타일 생성 시 사용됩니다.',
+    photo_register_desc: '얼굴이 잘 보이는 정면 사진을 등록해주세요.',
+    select_another_photo: '다른 사진 선택',
+    delete_photo: '사진 삭제',
+
+    // Settings - Hair Profile
+    my_hair_features: '내 머리 특징',
+    hair_features_settings: '머리 특징 설정',
+    hair_texture: '모질',
+    hair_density: '머리숱',
+    current_length: '현재 길이',
+    texture_straight: '직모',
+    texture_wavy: '웨이브',
+    texture_curly: '곱슬',
+    texture_coily: '강한 곱슬',
+    density_sparse: '숱이 적음',
+    density_normal: '보통',
+    density_dense: '숱이 많음',
+
+    // Settings - History
+    my_conversion_history: '내 변환 기록',
+    delete_history_confirm: '기록을 삭제하시겠습니까?',
+    delete_history_warning: '모든 변환 기록이 영구적으로 삭제됩니다.',
+
+    // Settings - Referral
+    friend_referral: '친구 추천',
+    invite_friends: '친구 초대하기',
+    invite_reward_desc: '친구가 가입하면 서로 5토큰',
+    my_referral_code: '내 추천 코드',
+    copy: '복사',
+    copied: '복사됨',
+    invited_friends: '초대한 친구',
+    earned_tokens: '획득 토큰',
+    referral_code_input: '추천 코드 입력',
+    apply: '적용',
+    share_with_friends: '친구에게 공유하기',
+    enter_referral_code: '추천 코드를 입력해주세요.',
+    referral_applied: '추천 코드가 적용되었습니다!',
+    referral_invalid: '유효하지 않거나 이미 사용된 코드입니다.',
+    share_invite_text: 'BeforeCut에서 다양한 헤어스타일을 체험해보세요! 추천코드:',
+
+    // Settings - Terms
+    terms_section: '약관',
+
+    // AI Processing Tips
+    ai_tip_analyzing: 'AI가 당신의 얼굴 특징을 분석하고 있어요',
+    ai_tip_applying: '선택한 헤어스타일을 자연스럽게 적용 중이에요',
+    ai_tip_quality: '고품질 결과를 위해 세부사항을 조정하고 있어요',
+    ai_tip_almost: '거의 완성됐어요! 조금만 더 기다려주세요',
+    ai_tip_finalizing: '최종 이미지를 완성하고 있어요',
+
+    // Error Messages
+    consent_required: '서비스 이용을 위해서는 약관 동의가 필요합니다.',
+    back_view_failed: '뒷머리 생성에 실패했습니다. 다시 시도해주세요.',
+    error_occurred: '오류가 발생했습니다.',
+    please_register_photo: '먼저 내 사진을 등록해주세요!',
+    style_generation_failed: '스타일 생성에 실패했습니다. 다시 시도해주세요.',
+
+    // Queue
+    generating_count: '개 생성 중',
 
     // Regions
     region_eastasia: '동아시아',
@@ -182,7 +285,7 @@ export const translations = {
     select_makeup_preview: '메이크업을 선택하면 미리보기가 표시됩니다',
 
     // PWA 설치 프롬프트
-    install_app: 'LookSim 앱 설치',
+    install_app: 'BeforeCut 앱 설치',
     install_app_desc: '홈 화면에 추가하고 더 빠르게 사용하세요',
     later: '나중에',
     install: '설치하기',
@@ -219,7 +322,7 @@ export const translations = {
 
   en: {
     // Common
-    app_name: 'LookSim',
+    app_name: 'BeforeCut',
     app_desc: 'AI Hair Simulation',
     close: 'Close',
     cancel: 'Cancel',
@@ -232,6 +335,7 @@ export const translations = {
     // MainMenu
     menu: 'Menu',
     album: 'Album',
+    gallery: 'Gallery',
     switch_camera: 'Flip',
     back_to_camera: 'Camera',
     male: 'Male',
@@ -242,6 +346,7 @@ export const translations = {
     selected_count: ' selected',
     dye: 'Color',
     reference: 'Ref',
+    search_style: 'Search styles',
 
     // Categories
     cat_all: 'All',
@@ -263,6 +368,26 @@ export const translations = {
     // Color Picker
     hair_color: 'Hair Color',
     no_color: 'None',
+    brightness: 'Brightness',
+    saturation: 'Saturation',
+
+    // Length Simulation
+    growth: 'Length',
+    growth_simulation: 'Hair Length Simulation',
+    length_simulation: 'Hair Length Simulation',
+    growth_period: 'Growth Period',
+    weeks: ' weeks',
+    months: ' months',
+    expected_growth: 'Expected Growth',
+    simulate_growth: 'Start Length Simulation',
+    simulate_length: 'Start Length Simulation',
+
+    // Settings Sections
+    app_settings: 'App Settings',
+    user_content: 'User Content',
+    support: 'Support',
+    token_reward: '5 Token Reward',
+    delete_history: 'Delete History',
 
     // Reference
     reference_images: 'Reference Images',
@@ -274,12 +399,25 @@ export const translations = {
     no_history_desc: 'Try your first style',
     history_count: ' items',
     selected_items: ' selected',
+    total: 'Total',
+    newest: 'Newest',
+    oldest: 'Oldest',
 
     // Processing
     generating: 'Generating',
     preparing: 'Preparing...',
     please_wait: 'Please wait',
     generation_failed: 'Failed to generate style.',
+    retry: 'Retry',
+    unsupported_file_format: 'Unsupported file format. (JPG, PNG, WebP only)',
+    file_too_large: 'File size must be 10MB or less.',
+    image_too_large: 'Image resolution is too large. (Max 4096px)',
+    invalid_image: 'Invalid image file.',
+    photo_load_failed: 'Failed to load photo.',
+    camera_permission_denied: 'Camera access denied. Please enable camera permission in settings.',
+    camera_not_found: 'Camera not found.',
+    camera_error: 'Unable to start camera.',
+    reference_load_failed: 'Failed to load reference image.',
 
     // Settings
     language: 'Language',
@@ -288,6 +426,74 @@ export const translations = {
     privacy: 'Privacy Policy',
     terms: 'Terms of Service',
     version: 'Version',
+
+    // Settings - My Photo
+    my_photo: 'My Photo',
+    register_photo: 'Add Photo',
+    for_custom_style: 'For custom styles',
+    custom_style: 'Custom Style',
+    manage_photo: 'Manage Photo',
+    register_photo_title: 'Add My Photo',
+    photo_registered_desc: 'This photo will be used for custom style generation.',
+    photo_register_desc: 'Please add a front-facing photo with your face clearly visible.',
+    select_another_photo: 'Choose Another',
+    delete_photo: 'Delete Photo',
+
+    // Settings - Hair Profile
+    my_hair_features: 'My Hair',
+    hair_features_settings: 'Hair Settings',
+    hair_texture: 'Texture',
+    hair_density: 'Density',
+    current_length: 'Current Length',
+    texture_straight: 'Straight',
+    texture_wavy: 'Wavy',
+    texture_curly: 'Curly',
+    texture_coily: 'Coily',
+    density_sparse: 'Thin',
+    density_normal: 'Normal',
+    density_dense: 'Thick',
+
+    // Settings - History
+    my_conversion_history: 'My Results',
+    delete_history_confirm: 'Delete history?',
+    delete_history_warning: 'All results will be permanently deleted.',
+
+    // Settings - Referral
+    friend_referral: 'Referral',
+    invite_friends: 'Invite Friends',
+    invite_reward_desc: 'Both get 5 tokens when friend joins',
+    my_referral_code: 'My Code',
+    copy: 'Copy',
+    copied: 'Copied',
+    invited_friends: 'Invited',
+    earned_tokens: 'Earned',
+    referral_code_input: 'Enter Code',
+    apply: 'Apply',
+    share_with_friends: 'Share with Friends',
+    enter_referral_code: 'Please enter a referral code.',
+    referral_applied: 'Code applied successfully!',
+    referral_invalid: 'Invalid or already used code.',
+    share_invite_text: 'Try different hairstyles on BeforeCut! Referral code:',
+
+    // Settings - Terms
+    terms_section: 'Legal',
+
+    // AI Processing Tips
+    ai_tip_analyzing: 'AI is analyzing your facial features',
+    ai_tip_applying: 'Applying the selected hairstyle naturally',
+    ai_tip_quality: 'Adjusting details for high quality',
+    ai_tip_almost: 'Almost done! Just a moment',
+    ai_tip_finalizing: 'Finalizing your image',
+
+    // Error Messages
+    consent_required: 'You must agree to the terms to use this service.',
+    back_view_failed: 'Failed to generate back view. Please try again.',
+    error_occurred: 'An error occurred.',
+    please_register_photo: 'Please add your photo first!',
+    style_generation_failed: 'Style generation failed. Please try again.',
+
+    // Queue
+    generating_count: ' generating',
 
     // Regions
     region_eastasia: 'East Asia',
@@ -382,7 +588,7 @@ export const translations = {
     select_makeup_preview: 'Select a style to preview',
 
     // PWA Install Prompt
-    install_app: 'Install LookSim',
+    install_app: 'Install BeforeCut',
     install_app_desc: 'Add to home screen for faster access',
     later: 'Later',
     install: 'Install',
@@ -419,7 +625,7 @@ export const translations = {
 
   zh: {
     // Common
-    app_name: 'LookSim',
+    app_name: 'BeforeCut',
     app_desc: 'AI发型模拟',
     close: '关闭',
     cancel: '取消',
@@ -432,6 +638,7 @@ export const translations = {
     // MainMenu
     menu: '菜单',
     album: '相册',
+    gallery: '图库',
     switch_camera: '切换',
     back_to_camera: '返回相机',
     male: '男性',
@@ -442,6 +649,7 @@ export const translations = {
     selected_count: '个已选',
     dye: '染发',
     reference: '参考',
+    search_style: '搜索发型',
 
     // Categories
     cat_all: '全部',
@@ -582,7 +790,7 @@ export const translations = {
     select_makeup_preview: '选择风格后显示预览',
 
     // PWA安装提示
-    install_app: '安装LookSim',
+    install_app: '安装BeforeCut',
     install_app_desc: '添加到主屏幕以便快速访问',
     later: '稍后',
     install: '安装',
@@ -619,7 +827,7 @@ export const translations = {
 
   ja: {
     // Common
-    app_name: 'LookSim',
+    app_name: 'BeforeCut',
     app_desc: 'AIヘアシミュレーション',
     close: '閉じる',
     cancel: 'キャンセル',
@@ -642,6 +850,7 @@ export const translations = {
     selected_count: '件選択',
     dye: 'カラー',
     reference: '参考',
+    search_style: 'スタイル検索',
 
     // Categories
     cat_all: 'すべて',
@@ -782,7 +991,7 @@ export const translations = {
     select_makeup_preview: 'スタイルを選択するとプレビューが表示されます',
 
     // PWAインストールプロンプト
-    install_app: 'LookSimをインストール',
+    install_app: 'BeforeCutをインストール',
     install_app_desc: 'ホーム画面に追加してすぐにアクセス',
     later: '後で',
     install: 'インストール',
@@ -819,7 +1028,7 @@ export const translations = {
 
   // Spanish (Español) - Latin America, Spain
   es: {
-    app_name: 'LookSim',
+    app_name: 'BeforeCut',
     app_desc: 'Simulación de Cabello con IA',
     close: 'Cerrar',
     cancel: 'Cancelar',
@@ -840,6 +1049,7 @@ export const translations = {
     selected_count: ' seleccionados',
     dye: 'Color',
     reference: 'Ref',
+    search_style: 'Buscar estilos',
     cat_all: 'Todo',
     cat_perm: 'Permanente',
     cat_cut: 'Corte',
@@ -950,7 +1160,7 @@ export const translations = {
     makeup_simulation_desc: 'Prueba diferentes estilos de maquillaje',
     select_makeup: 'Selecciona un estilo de maquillaje',
     select_makeup_preview: 'Selecciona un estilo para previsualizar',
-    install_app: 'Instalar LookSim',
+    install_app: 'Instalar BeforeCut',
     install_app_desc: 'Añadir a pantalla de inicio para acceso rápido',
     later: 'Después',
     install: 'Instalar',
@@ -987,7 +1197,7 @@ export const translations = {
 
   // Portuguese (Português) - Brazil, Portugal
   pt: {
-    app_name: 'LookSim',
+    app_name: 'BeforeCut',
     app_desc: 'Simulação de Cabelo com IA',
     close: 'Fechar',
     cancel: 'Cancelar',
@@ -1008,6 +1218,7 @@ export const translations = {
     selected_count: ' selecionados',
     dye: 'Cor',
     reference: 'Ref',
+    search_style: 'Buscar estilos',
     cat_all: 'Tudo',
     cat_perm: 'Permanente',
     cat_cut: 'Corte',
@@ -1118,7 +1329,7 @@ export const translations = {
     makeup_simulation_desc: 'Experimente diferentes estilos de maquiagem',
     select_makeup: 'Selecione um estilo de maquiagem',
     select_makeup_preview: 'Selecione um estilo para visualizar',
-    install_app: 'Instalar LookSim',
+    install_app: 'Instalar BeforeCut',
     install_app_desc: 'Adicionar à tela inicial para acesso rápido',
     later: 'Depois',
     install: 'Instalar',
@@ -1155,7 +1366,7 @@ export const translations = {
 
   // French (Français) - France, Africa, Canada
   fr: {
-    app_name: 'LookSim',
+    app_name: 'BeforeCut',
     app_desc: 'Simulation Capillaire IA',
     close: 'Fermer',
     cancel: 'Annuler',
@@ -1176,6 +1387,7 @@ export const translations = {
     selected_count: ' sélectionnés',
     dye: 'Couleur',
     reference: 'Réf',
+    search_style: 'Rechercher styles',
     cat_all: 'Tout',
     cat_perm: 'Permanente',
     cat_cut: 'Coupe',
@@ -1286,7 +1498,7 @@ export const translations = {
     makeup_simulation_desc: 'Essayez différents styles de maquillage',
     select_makeup: 'Sélectionnez un style de maquillage',
     select_makeup_preview: 'Sélectionnez un style pour aperçu',
-    install_app: 'Installer LookSim',
+    install_app: 'Installer BeforeCut',
     install_app_desc: 'Ajouter à l\'écran d\'accueil pour un accès rapide',
     later: 'Plus tard',
     install: 'Installer',
@@ -1323,7 +1535,7 @@ export const translations = {
 
   // German (Deutsch) - Germany, Austria, Switzerland
   de: {
-    app_name: 'LookSim',
+    app_name: 'BeforeCut',
     app_desc: 'KI-Haarsimulation',
     close: 'Schließen',
     cancel: 'Abbrechen',
@@ -1344,6 +1556,7 @@ export const translations = {
     selected_count: ' ausgewählt',
     dye: 'Farbe',
     reference: 'Ref',
+    search_style: 'Stile suchen',
     cat_all: 'Alle',
     cat_perm: 'Dauerwelle',
     cat_cut: 'Schnitt',
@@ -1454,7 +1667,7 @@ export const translations = {
     makeup_simulation_desc: 'Probieren Sie verschiedene Make-up-Stile',
     select_makeup: 'Make-up-Stil auswählen',
     select_makeup_preview: 'Stil für Vorschau auswählen',
-    install_app: 'LookSim installieren',
+    install_app: 'BeforeCut installieren',
     install_app_desc: 'Zum Startbildschirm für schnellen Zugriff hinzufügen',
     later: 'Später',
     install: 'Installieren',
@@ -1491,7 +1704,7 @@ export const translations = {
 
   // Thai (ไทย) - Thailand
   th: {
-    app_name: 'LookSim',
+    app_name: 'BeforeCut',
     app_desc: 'จำลองทรงผมด้วย AI',
     close: 'ปิด',
     cancel: 'ยกเลิก',
@@ -1512,6 +1725,7 @@ export const translations = {
     selected_count: ' ที่เลือก',
     dye: 'ย้อม',
     reference: 'อ้างอิง',
+    search_style: 'ค้นหาสไตล์',
     cat_all: 'ทั้งหมด',
     cat_perm: 'ดัด',
     cat_cut: 'ตัด',
@@ -1622,7 +1836,7 @@ export const translations = {
     makeup_simulation_desc: 'ลองสไตล์เมคอัพต่างๆ',
     select_makeup: 'เลือกสไตล์เมคอัพ',
     select_makeup_preview: 'เลือกสไตล์เพื่อดูตัวอย่าง',
-    install_app: 'ติดตั้ง LookSim',
+    install_app: 'ติดตั้ง BeforeCut',
     install_app_desc: 'เพิ่มไปยังหน้าจอหลักเพื่อเข้าถึงเร็วขึ้น',
     later: 'ภายหลัง',
     install: 'ติดตั้ง',
@@ -1659,7 +1873,7 @@ export const translations = {
 
   // Vietnamese (Tiếng Việt) - Vietnam
   vi: {
-    app_name: 'LookSim',
+    app_name: 'BeforeCut',
     app_desc: 'Mô phỏng Tóc AI',
     close: 'Đóng',
     cancel: 'Hủy',
@@ -1680,6 +1894,7 @@ export const translations = {
     selected_count: ' đã chọn',
     dye: 'Nhuộm',
     reference: 'Tham khảo',
+    search_style: 'Tìm kiểu tóc',
     cat_all: 'Tất cả',
     cat_perm: 'Uốn',
     cat_cut: 'Cắt',
@@ -1790,7 +2005,7 @@ export const translations = {
     makeup_simulation_desc: 'Thử các kiểu trang điểm khác nhau',
     select_makeup: 'Chọn kiểu trang điểm',
     select_makeup_preview: 'Chọn kiểu để xem trước',
-    install_app: 'Cài đặt LookSim',
+    install_app: 'Cài đặt BeforeCut',
     install_app_desc: 'Thêm vào màn hình chính để truy cập nhanh',
     later: 'Để sau',
     install: 'Cài đặt',
@@ -1827,7 +2042,7 @@ export const translations = {
 
   // Indonesian (Bahasa Indonesia) - Indonesia
   id: {
-    app_name: 'LookSim',
+    app_name: 'BeforeCut',
     app_desc: 'Simulasi Rambut AI',
     close: 'Tutup',
     cancel: 'Batal',
@@ -1848,6 +2063,7 @@ export const translations = {
     selected_count: ' dipilih',
     dye: 'Warna',
     reference: 'Ref',
+    search_style: 'Cari gaya',
     cat_all: 'Semua',
     cat_perm: 'Perm',
     cat_cut: 'Potong',
@@ -1958,7 +2174,7 @@ export const translations = {
     makeup_simulation_desc: 'Coba berbagai gaya makeup',
     select_makeup: 'Pilih gaya makeup',
     select_makeup_preview: 'Pilih gaya untuk pratinjau',
-    install_app: 'Pasang LookSim',
+    install_app: 'Pasang BeforeCut',
     install_app_desc: 'Tambahkan ke layar utama untuk akses cepat',
     later: 'Nanti',
     install: 'Pasang',
@@ -1995,7 +2211,7 @@ export const translations = {
 
   // Hindi (हिन्दी) - India
   hi: {
-    app_name: 'LookSim',
+    app_name: 'BeforeCut',
     app_desc: 'AI हेयर सिमुलेशन',
     close: 'बंद करें',
     cancel: 'रद्द करें',
@@ -2016,6 +2232,7 @@ export const translations = {
     selected_count: ' चुने गए',
     dye: 'रंग',
     reference: 'संदर्भ',
+    search_style: 'स्टाइल खोजें',
     cat_all: 'सभी',
     cat_perm: 'पर्म',
     cat_cut: 'कट',
@@ -2126,7 +2343,7 @@ export const translations = {
     makeup_simulation_desc: 'विभिन्न मेकअप स्टाइल आज़माएं',
     select_makeup: 'मेकअप स्टाइल चुनें',
     select_makeup_preview: 'प्रीव्यू के लिए स्टाइल चुनें',
-    install_app: 'LookSim इंस्टॉल करें',
+    install_app: 'BeforeCut इंस्टॉल करें',
     install_app_desc: 'त्वरित पहुंच के लिए होम स्क्रीन पर जोड़ें',
     later: 'बाद में',
     install: 'इंस्टॉल करें',
@@ -2163,7 +2380,7 @@ export const translations = {
 
   // Arabic (العربية) - Middle East, North Africa (RTL)
   ar: {
-    app_name: 'LookSim',
+    app_name: 'BeforeCut',
     app_desc: 'محاكاة الشعر بالذكاء الاصطناعي',
     close: 'إغلاق',
     cancel: 'إلغاء',
@@ -2184,6 +2401,7 @@ export const translations = {
     selected_count: ' محدد',
     dye: 'صبغة',
     reference: 'مرجع',
+    search_style: 'بحث الأنماط',
     cat_all: 'الكل',
     cat_perm: 'تجعيد',
     cat_cut: 'قص',
@@ -2294,7 +2512,7 @@ export const translations = {
     makeup_simulation_desc: 'جرب أنماط مكياج مختلفة',
     select_makeup: 'اختر نمط المكياج',
     select_makeup_preview: 'اختر نمطًا للمعاينة',
-    install_app: 'تثبيت LookSim',
+    install_app: 'تثبيت BeforeCut',
     install_app_desc: 'أضف إلى الشاشة الرئيسية للوصول السريع',
     later: 'لاحقًا',
     install: 'تثبيت',

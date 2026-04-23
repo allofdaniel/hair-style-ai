@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+﻿import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import {
   signInWithPopup,
@@ -7,9 +7,16 @@ import {
   signOut,
   sendPasswordResetEmail,
   onAuthStateChanged,
+  type User,
+  type UserCredential,
+  type Auth,
 } from 'firebase/auth';
-import type { User, UserCredential } from 'firebase/auth';
-import { auth, googleProvider, appleProvider } from '../config/firebase';
+import { auth, googleProvider, appleProvider, isFirebaseConfigReady } from '../config/firebase';
+
+interface AuthErrorState {
+  code?: string;
+  message: string;
+}
 
 export interface AuthUser {
   uid: string;
@@ -25,7 +32,6 @@ interface AuthState {
   isAuthenticated: boolean;
   error: string | null;
 
-  // Actions
   signInWithGoogle: () => Promise<void>;
   signInWithApple: () => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
@@ -35,6 +41,8 @@ interface AuthState {
   clearError: () => void;
   initializeAuth: () => () => void;
 }
+
+const MISSING_AUTH_CONFIG_ERROR = 'Firebase ?몄쬆 ?ㅼ젙??鍮꾩뼱 ?덉뼱 濡쒓렇??湲곕뒫???ъ슜?????놁뒿?덈떎.';
 
 const mapFirebaseUser = (user: User, provider: AuthUser['provider']): AuthUser => ({
   uid: user.uid,
@@ -52,6 +60,30 @@ const getProviderFromUser = (user: User): AuthUser['provider'] => {
   return null;
 };
 
+const formatAuthError = (error: unknown): string => {
+  if (error instanceof Error) {
+    const typedError = error as AuthErrorState;
+    const code = typedError.code;
+
+    if (code === 'auth/configuration-not-found') {
+      return 'Firebase ?몄쬆 ?ㅼ젙???섎せ?섏뿀?듬땲??';
+    }
+    if (code === 'auth/popup-closed-by-user') {
+      return '濡쒓렇??李쎌씠 ?ロ삍?듬땲??';
+    }
+    return error.message;
+  }
+
+  return '?????녿뒗 ?몄쬆 ?ㅻ쪟媛 諛쒖깮?덉뒿?덈떎.';
+};
+
+const getAuthClient = (): Auth => {
+  if (!isFirebaseConfigReady || !auth) {
+    throw new Error(MISSING_AUTH_CONFIG_ERROR);
+  }
+  return auth;
+};
+
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, _get) => ({
@@ -61,26 +93,38 @@ export const useAuthStore = create<AuthState>()(
       error: null,
 
       signInWithGoogle: async () => {
+        if (!googleProvider) {
+          const error = new Error(MISSING_AUTH_CONFIG_ERROR);
+          set({ error: error.message, isLoading: false });
+          throw error;
+        }
+
         set({ isLoading: true, error: null });
         try {
-          const result: UserCredential = await signInWithPopup(auth, googleProvider);
+          const result: UserCredential = await signInWithPopup(getAuthClient(), googleProvider);
           const authUser = mapFirebaseUser(result.user, 'google');
           set({ user: authUser, isAuthenticated: true, isLoading: false });
         } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : 'Google sign in failed';
+          const errorMessage = formatAuthError(error);
           set({ error: errorMessage, isLoading: false });
           throw error;
         }
       },
 
       signInWithApple: async () => {
+        if (!appleProvider) {
+          const error = new Error(MISSING_AUTH_CONFIG_ERROR);
+          set({ error: error.message, isLoading: false });
+          throw error;
+        }
+
         set({ isLoading: true, error: null });
         try {
-          const result: UserCredential = await signInWithPopup(auth, appleProvider);
+          const result: UserCredential = await signInWithPopup(getAuthClient(), appleProvider);
           const authUser = mapFirebaseUser(result.user, 'apple');
           set({ user: authUser, isAuthenticated: true, isLoading: false });
         } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : 'Apple sign in failed';
+          const errorMessage = formatAuthError(error);
           set({ error: errorMessage, isLoading: false });
           throw error;
         }
@@ -89,11 +133,15 @@ export const useAuthStore = create<AuthState>()(
       signInWithEmail: async (email: string, password: string) => {
         set({ isLoading: true, error: null });
         try {
-          const result: UserCredential = await signInWithEmailAndPassword(auth, email, password);
+          const result: UserCredential = await signInWithEmailAndPassword(
+            getAuthClient(),
+            email,
+            password
+          );
           const authUser = mapFirebaseUser(result.user, 'email');
           set({ user: authUser, isAuthenticated: true, isLoading: false });
         } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : 'Email sign in failed';
+          const errorMessage = formatAuthError(error);
           set({ error: errorMessage, isLoading: false });
           throw error;
         }
@@ -102,11 +150,15 @@ export const useAuthStore = create<AuthState>()(
       signUpWithEmail: async (email: string, password: string) => {
         set({ isLoading: true, error: null });
         try {
-          const result: UserCredential = await createUserWithEmailAndPassword(auth, email, password);
+          const result: UserCredential = await createUserWithEmailAndPassword(
+            getAuthClient(),
+            email,
+            password
+          );
           const authUser = mapFirebaseUser(result.user, 'email');
           set({ user: authUser, isAuthenticated: true, isLoading: false });
         } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : 'Sign up failed';
+          const errorMessage = formatAuthError(error);
           set({ error: errorMessage, isLoading: false });
           throw error;
         }
@@ -115,10 +167,10 @@ export const useAuthStore = create<AuthState>()(
       logout: async () => {
         set({ isLoading: true, error: null });
         try {
-          await signOut(auth);
+          await signOut(getAuthClient());
           set({ user: null, isAuthenticated: false, isLoading: false });
         } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : 'Logout failed';
+          const errorMessage = formatAuthError(error);
           set({ error: errorMessage, isLoading: false });
           throw error;
         }
@@ -127,10 +179,10 @@ export const useAuthStore = create<AuthState>()(
       resetPassword: async (email: string) => {
         set({ isLoading: true, error: null });
         try {
-          await sendPasswordResetEmail(auth, email);
+          await sendPasswordResetEmail(getAuthClient(), email);
           set({ isLoading: false });
         } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : 'Password reset failed';
+          const errorMessage = formatAuthError(error);
           set({ error: errorMessage, isLoading: false });
           throw error;
         }
@@ -139,6 +191,11 @@ export const useAuthStore = create<AuthState>()(
       clearError: () => set({ error: null }),
 
       initializeAuth: () => {
+        if (!isFirebaseConfigReady || !auth) {
+          set({ user: null, isAuthenticated: false, isLoading: false });
+          return () => {};
+        }
+
         const unsubscribe = onAuthStateChanged(auth, (user) => {
           if (user) {
             const provider = getProviderFromUser(user);
@@ -148,6 +205,7 @@ export const useAuthStore = create<AuthState>()(
             set({ user: null, isAuthenticated: false, isLoading: false });
           }
         });
+
         return unsubscribe;
       },
     }),

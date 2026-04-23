@@ -1,20 +1,71 @@
+import { logger } from './logger';
 /**
- * 네트워크 복원력 서비스
- * - 자동 재시도 (지수 백오프)
- * - 요청 큐잉 (오프라인 시)
- * - 연결 상태 감지
- * - 신흥 시장 저속 네트워크 최적화
+ * Network resilience utilities.
+ *
+ * - Retry control for unstable transport
+ * - Offline queueing for later replay
+ * - Basic connection quality tracking
+ * - Simple network preload helpers
  */
 
-// 재시도 설정
+const isDebug = import.meta.env.DEV || import.meta.env.MODE === 'test';
+
+const debugLog = (...args: unknown[]): void => {
+  if (isDebug) {
+    logger.log(...args);
+  }
+};
+
+const sanitizeLogUrl = (url: string): string => {
+  try {
+    const parsed = new URL(url);
+    return `${parsed.origin}${parsed.pathname}`;
+  } catch {
+    return url.split('?')[0];
+  }
+};
+
+const sanitizeHeaders = (headers?: HeadersInit): Record<string, string> | undefined => {
+  if (!headers) return undefined;
+
+  const entries: Array<[string, string]> = [];
+
+  if (headers instanceof Headers) {
+    headers.forEach((value, key) => {
+      entries.push([key, value]);
+    });
+  } else if (Array.isArray(headers)) {
+    headers.forEach(([key, value]) => {
+      entries.push([key, String(value)]);
+    });
+  } else {
+    Object.entries(headers).forEach(([key, value]) => {
+      entries.push([key, String(value)]);
+    });
+  }
+
+  const redacted: Record<string, string> = {};
+  const sensitiveHeaderNames = new Set(['authorization', 'cookie', 'set-cookie', 'x-api-key', 'api-key']);
+
+  for (const [key, value] of entries) {
+    const lower = key.toLowerCase();
+    if (sensitiveHeaderNames.has(lower)) {
+      continue;
+    }
+    redacted[key] = value.slice(0, 80);
+  }
+
+  if (Object.keys(redacted).length === 0) return undefined;
+  return redacted;
+};
+
 interface RetryConfig {
   maxRetries: number;
-  baseDelay: number;      // 기본 지연 (ms)
-  maxDelay: number;       // 최대 지연 (ms)
+  baseDelay: number;
+  maxDelay: number;
   retryableStatuses: number[];
 }
 
-// 기본 재시도 설정
 const DEFAULT_RETRY_CONFIG: RetryConfig = {
   maxRetries: 3,
   baseDelay: 1000,
@@ -22,7 +73,6 @@ const DEFAULT_RETRY_CONFIG: RetryConfig = {
   retryableStatuses: [408, 429, 500, 502, 503, 504],
 };
 
-// 요청 큐 아이템
 interface QueuedRequest {
   id: string;
   url: string;
@@ -33,32 +83,6 @@ interface QueuedRequest {
   reject: (reason: Error) => void;
 }
 
-// 요청 큐
-let requestQueue: QueuedRequest[] = [];
-let isProcessingQueue = false;
-
-// 연결 상태
-let isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
-let connectionQuality: 'good' | 'slow' | 'offline' = 'good';
-
-/**
- * 연결 상태 초기화
- */
-export const initNetworkMonitoring = (): void => {
-  if (typeof window === 'undefined') return;
-
-  // 온라인/오프라인 이벤트 리스너
-  window.addEventListener('online', handleOnline);
-  window.addEventListener('offline', handleOffline);
-
-  // Network Information API (지원되는 경우)
-  const connection = (navigator as Navigator & { connection?: NetworkInformation }).connection;
-  if (connection) {
-    connection.addEventListener('change', updateConnectionQuality);
-    updateConnectionQuality();
-  }
-};
-
 interface NetworkInformation extends EventTarget {
   effectiveType: 'slow-2g' | '2g' | '3g' | '4g';
   downlink: number;
@@ -66,97 +90,108 @@ interface NetworkInformation extends EventTarget {
   saveData: boolean;
 }
 
-/**
- * 연결 품질 업데이트
- */
+const QUEUE_STORAGE_KEY = 'looksim-request-queue';
+const MAX_QUEUED_AGE_MS = 30 * 60 * 1000;
+const MAX_QUEUED_RETRIES = 3;
+
+let requestQueue: QueuedRequest[] = [];
+let isProcessingQueue = false;
+let isMonitoringInitialized = false;
+let isNetworkQueueRestored = false;
+
+let isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
+let connectionQuality: 'good' | 'slow' | 'offline' = 'good';
+
+const getPersistedBody = (body: RequestInit['body']): string | null => {
+  if (typeof body !== 'string') return null;
+  const normalized = body.toLowerCase();
+  if (body.length > 1024) return null;
+  if (normalized.includes('data:image') || normalized.includes('base64') || normalized.includes('image')) return null;
+  return body;
+};
+
+const delay = (ms: number): Promise<void> => new Promise(resolve => setTimeout(resolve, ms));
+
+export const initNetworkMonitoring = (): void => {
+  if (typeof window === 'undefined' || isMonitoringInitialized) return;
+
+  isMonitoringInitialized = true;
+  window.addEventListener('online', handleOnline);
+  window.addEventListener('offline', handleOffline);
+
+  const connection = (navigator as Navigator & { connection?: NetworkInformation }).connection;
+  if (connection) {
+    connection.addEventListener('change', updateConnectionQuality);
+    updateConnectionQuality();
+  } else {
+    updateConnectionQuality();
+  }
+
+  restoreQueueFromStorage();
+  if (requestQueue.length > 0) {
+    processQueue();
+  }
+};
+
 const updateConnectionQuality = (): void => {
   const connection = (navigator as Navigator & { connection?: NetworkInformation }).connection;
-  if (!connection) return;
+  if (!connection) {
+    connectionQuality = navigator.onLine ? 'good' : 'offline';
+    return;
+  }
 
   if (!navigator.onLine) {
     connectionQuality = 'offline';
-  } else if (connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g' || connection.rtt > 500) {
+  } else if (
+    connection.effectiveType === 'slow-2g'
+    || connection.effectiveType === '2g'
+    || connection.rtt > 500
+  ) {
     connectionQuality = 'slow';
   } else {
     connectionQuality = 'good';
   }
 
-  // 연결 품질 변경 이벤트
   window.dispatchEvent(new CustomEvent('connection-quality-changed', {
     detail: { quality: connectionQuality }
   }));
 };
 
-/**
- * 온라인 복구 핸들러
- */
 const handleOnline = (): void => {
   isOnline = true;
   updateConnectionQuality();
-
-  // 큐에 쌓인 요청 처리
   processQueue();
-
-  console.log('[Network] Connection restored, processing queued requests');
+  debugLog('[Network] Connection restored, processing queued requests');
 };
 
-/**
- * 오프라인 핸들러
- */
 const handleOffline = (): void => {
   isOnline = false;
   connectionQuality = 'offline';
-
   window.dispatchEvent(new CustomEvent('connection-quality-changed', {
     detail: { quality: 'offline' }
   }));
-
-  console.log('[Network] Connection lost');
+  debugLog('[Network] Connection lost');
 };
 
-/**
- * 지수 백오프 계산
- */
 const calculateBackoff = (retryCount: number, config: RetryConfig): number => {
-  // 지수 백오프 + 지터
-  const delay = Math.min(
+  return Math.min(
     config.baseDelay * Math.pow(2, retryCount) + Math.random() * 1000,
     config.maxDelay
   );
-  return delay;
 };
 
-/**
- * 재시도 가능한 에러인지 확인
- */
 const isRetryableError = (error: Error | Response, config: RetryConfig): boolean => {
-  // 네트워크 에러
-  if (error instanceof TypeError && error.message.includes('fetch')) {
-    return true;
-  }
-
-  // HTTP 응답
   if (error instanceof Response) {
     return config.retryableStatuses.includes(error.status);
   }
 
-  // AbortError는 재시도하지 않음
-  if (error instanceof Error && error.name === 'AbortError') {
-    return false;
-  }
+  if (error instanceof TypeError && error.message.includes('fetch')) return true;
+
+  if (error instanceof Error && error.name === 'AbortError') return false;
 
   return false;
 };
 
-/**
- * 지연 함수
- */
-const delay = (ms: number): Promise<void> =>
-  new Promise(resolve => setTimeout(resolve, ms));
-
-/**
- * 복원력 있는 fetch 함수
- */
 export const resilientFetch = async (
   url: string,
   options: RequestInit = {},
@@ -164,7 +199,6 @@ export const resilientFetch = async (
 ): Promise<Response> => {
   const fullConfig: RetryConfig = { ...DEFAULT_RETRY_CONFIG, ...config };
 
-  // 오프라인인 경우 큐에 추가
   if (!isOnline) {
     return queueRequest(url, options);
   }
@@ -172,59 +206,55 @@ export const resilientFetch = async (
   let lastError: Error | null = null;
 
   for (let attempt = 0; attempt <= fullConfig.maxRetries; attempt++) {
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+    const timeout = connectionQuality === 'slow' ? 60000 : 30000;
+    const controller = new AbortController();
+
     try {
-      // 타임아웃 설정 (느린 네트워크 대응)
-      const timeout = connectionQuality === 'slow' ? 60000 : 30000;
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), timeout);
+      timeoutId = setTimeout(() => controller.abort(), timeout);
 
       const response = await fetch(url, {
         ...options,
-        signal: controller.signal,
+        signal: options.signal ? options.signal : controller.signal,
       });
 
-      clearTimeout(timeoutId);
-
-      // 성공 또는 재시도 불가능한 응답
-      if (response.ok || !isRetryableError(response, fullConfig)) {
+      if (!isRetryableError(response, fullConfig)) {
         return response;
       }
 
-      // 재시도 가능한 에러
       lastError = new Error(`HTTP ${response.status}`);
 
+      if (attempt < fullConfig.maxRetries) {
+        const backoffTime = calculateBackoff(attempt, fullConfig);
+        debugLog(`[Network] Retry ${attempt + 1}/${fullConfig.maxRetries} in ${backoffTime}ms`);
+        await delay(backoffTime);
+      }
     } catch (error) {
       lastError = error as Error;
 
-      // 오프라인이 된 경우 큐에 추가
-      if (!navigator.onLine) {
-        return queueRequest(url, options);
-      }
-
-      // 재시도 불가능한 에러
-      if (!isRetryableError(error as Error, fullConfig)) {
+      if (!isOnline || !isRetryableError(error as Error, fullConfig)) {
         throw error;
       }
-    }
 
-    // 마지막 시도가 아니면 백오프 후 재시도
-    if (attempt < fullConfig.maxRetries) {
-      const backoffTime = calculateBackoff(attempt, fullConfig);
-      console.log(`[Network] Retry ${attempt + 1}/${fullConfig.maxRetries} in ${backoffTime}ms`);
-      await delay(backoffTime);
+      if (attempt < fullConfig.maxRetries) {
+        const backoffTime = calculateBackoff(attempt, fullConfig);
+        debugLog(`[Network] Retry ${attempt + 1}/${fullConfig.maxRetries} in ${backoffTime}ms`);
+        await delay(backoffTime);
+      }
+    } finally {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
     }
   }
 
   throw lastError || new Error('Maximum retries exceeded');
 };
 
-/**
- * 요청 큐에 추가
- */
 const queueRequest = (url: string, options: RequestInit): Promise<Response> => {
   return new Promise((resolve, reject) => {
     const request: QueuedRequest = {
-      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`,
       url,
       options,
       timestamp: Date.now(),
@@ -234,17 +264,11 @@ const queueRequest = (url: string, options: RequestInit): Promise<Response> => {
     };
 
     requestQueue.push(request);
-
-    // LocalStorage에 백업 (앱 재시작 대비)
     saveQueueToStorage();
-
-    console.log(`[Network] Request queued: ${url}`);
+    debugLog(`[Network] Request queued: ${sanitizeLogUrl(url)}`);
   });
 };
 
-/**
- * 큐 처리
- */
 const processQueue = async (): Promise<void> => {
   if (isProcessingQueue || requestQueue.length === 0 || !isOnline) {
     return;
@@ -252,62 +276,163 @@ const processQueue = async (): Promise<void> => {
 
   isProcessingQueue = true;
 
-  while (requestQueue.length > 0 && isOnline) {
-    const request = requestQueue[0];
+  try {
+    while (requestQueue.length > 0 && isOnline) {
+      const request = requestQueue[0];
 
-    // 오래된 요청 삭제 (30분)
-    if (Date.now() - request.timestamp > 30 * 60 * 1000) {
-      requestQueue.shift();
-      request.reject(new Error('Request expired'));
-      continue;
-    }
-
-    try {
-      const response = await fetch(request.url, request.options);
-      requestQueue.shift();
-      request.resolve(response);
-    } catch (error) {
-      request.retryCount++;
-
-      if (request.retryCount >= 3) {
+      if (Date.now() - request.timestamp > MAX_QUEUED_AGE_MS) {
         requestQueue.shift();
-        request.reject(error as Error);
-      } else {
-        // 백오프 후 재시도
+        request.reject(new Error('Request expired'));
+        saveQueueToStorage();
+        continue;
+      }
+
+      try {
+        const response = await fetch(request.url, request.options);
+
+        if (response.ok) {
+          requestQueue.shift();
+          request.resolve(response);
+          saveQueueToStorage();
+          continue;
+        }
+
+        const retryable = isRetryableError(response, DEFAULT_RETRY_CONFIG);
+        request.retryCount += 1;
+
+        if (!retryable || request.retryCount >= MAX_QUEUED_RETRIES) {
+          requestQueue.shift();
+          request.reject(new Error(`HTTP ${response.status}`));
+          saveQueueToStorage();
+          continue;
+        }
+
+        debugLog(
+          `[Network] Retrying queued request ${request.id} after failure (attempt ${request.retryCount})`
+        );
+        await delay(calculateBackoff(request.retryCount, DEFAULT_RETRY_CONFIG));
+      } catch (error) {
+        request.retryCount += 1;
+        if (!isOnline || request.retryCount >= MAX_QUEUED_RETRIES) {
+          requestQueue.shift();
+          request.reject(error as Error);
+          saveQueueToStorage();
+          continue;
+        }
+
+        debugLog(
+          `[Network] Retrying queued request ${request.id} after failure (attempt ${request.retryCount})`
+        );
         await delay(calculateBackoff(request.retryCount, DEFAULT_RETRY_CONFIG));
       }
     }
-
-    saveQueueToStorage();
+  } finally {
+    isProcessingQueue = false;
   }
-
-  isProcessingQueue = false;
 };
 
-/**
- * 큐를 LocalStorage에 저장
- */
+const restoreQueueFromStorage = (): void => {
+  if (typeof localStorage === 'undefined' || isNetworkQueueRestored) return;
+
+  isNetworkQueueRestored = true;
+
+  try {
+    const raw = localStorage.getItem(QUEUE_STORAGE_KEY);
+    if (!raw) return;
+
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return;
+
+    requestQueue = parsed
+      .map((item): QueuedRequest | null => {
+        if (!item || typeof item !== 'object') return null;
+
+        const candidate = item as {
+          id?: unknown;
+          url?: unknown;
+          options?: {
+            method?: unknown;
+            headers?: Record<string, string>;
+            body?: string | null;
+          };
+          retryCount?: unknown;
+          timestamp?: unknown;
+        };
+
+        if (typeof candidate.id !== 'string' || typeof candidate.url !== 'string') return null;
+
+        const timestamp =
+          typeof candidate.timestamp === 'number' && Number.isFinite(candidate.timestamp)
+            ? candidate.timestamp
+            : Date.now();
+
+        return {
+          id: candidate.id,
+          url: candidate.url,
+          options: {
+            method: typeof candidate.options?.method === 'string' ? candidate.options.method : 'GET',
+            headers:
+              candidate.options && typeof candidate.options.headers === 'object'
+                ? candidate.options.headers
+                : undefined,
+            body:
+              candidate.options && typeof candidate.options.body === 'string'
+                ? candidate.options.body
+                : undefined,
+          },
+          retryCount:
+            typeof candidate.retryCount === 'number' && Number.isFinite(candidate.retryCount)
+              ? candidate.retryCount
+              : 0,
+          timestamp,
+          resolve: () => {},
+          reject: () => {},
+        };
+      })
+      .filter((entry): entry is QueuedRequest => !!entry);
+
+    if (!requestQueue.length) return;
+
+    requestQueue = requestQueue.filter(request => Date.now() - request.timestamp <= MAX_QUEUED_AGE_MS);
+    if (!requestQueue.length) {
+      localStorage.removeItem(QUEUE_STORAGE_KEY);
+      return;
+    }
+
+    debugLog(`[Network] Restored queued requests from storage: ${requestQueue.length}`);
+  } catch {
+    debugLog('[Network] Failed to restore request queue');
+    requestQueue = [];
+  }
+};
+
 const saveQueueToStorage = (): void => {
   try {
+    if (typeof localStorage === 'undefined') return;
+
+    if (requestQueue.length === 0) {
+      localStorage.removeItem(QUEUE_STORAGE_KEY);
+      return;
+    }
+
     const queueData = requestQueue.map(r => ({
       id: r.id,
       url: r.url,
       options: {
         method: r.options.method,
-        headers: r.options.headers,
-        body: typeof r.options.body === 'string' ? r.options.body : null,
+        headers: sanitizeHeaders(r.options.headers),
+        body: getPersistedBody(r.options.body),
       },
+      retryCount: r.retryCount,
       timestamp: r.timestamp,
     }));
-    localStorage.setItem('looksim-request-queue', JSON.stringify(queueData));
+
+    localStorage.setItem(QUEUE_STORAGE_KEY, JSON.stringify(queueData));
   } catch {
-    // Storage 에러 무시
+    debugLog('[Network] Failed to persist request queue');
   }
 };
 
-/**
- * 현재 연결 상태 가져오기
- */
 export const getConnectionStatus = (): {
   isOnline: boolean;
   quality: 'good' | 'slow' | 'offline';
@@ -318,9 +443,6 @@ export const getConnectionStatus = (): {
   queuedRequests: requestQueue.length,
 });
 
-/**
- * 이미지 로딩 최적화 (연결 품질에 따라)
- */
 export const getOptimalImageQuality = (): 'high' | 'medium' | 'low' => {
   switch (connectionQuality) {
     case 'good':
@@ -334,9 +456,6 @@ export const getOptimalImageQuality = (): 'high' | 'medium' | 'low' => {
   }
 };
 
-/**
- * API 요청 타임아웃 (연결 품질에 따라)
- */
 export const getOptimalTimeout = (): number => {
   switch (connectionQuality) {
     case 'good':
@@ -350,9 +469,6 @@ export const getOptimalTimeout = (): number => {
   }
 };
 
-/**
- * 배치 요청 (여러 요청을 모아서 처리)
- */
 export const batchRequests = async <T>(
   requests: Array<() => Promise<T>>,
   concurrency: number = connectionQuality === 'slow' ? 2 : 4
@@ -373,9 +489,6 @@ export const batchRequests = async <T>(
   return results;
 };
 
-/**
- * 프리로드 (연결 품질이 좋을 때)
- */
 export const preloadWhenIdle = (urls: string[]): void => {
   if (connectionQuality !== 'good') return;
 
@@ -391,7 +504,6 @@ export const preloadWhenIdle = (urls: string[]): void => {
   }
 };
 
-// 앱 시작 시 초기화
 if (typeof window !== 'undefined') {
   initNetworkMonitoring();
 }

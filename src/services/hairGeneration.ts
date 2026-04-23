@@ -1,3 +1,4 @@
+import { logger } from './logger';
 /**
  * Hair Generation Service - Free Version
  *
@@ -12,9 +13,28 @@
 import type { HairStyle, HairSettings, HairTexture } from '../stores/useAppStore';
 import { hairColors, hairTextures } from '../data/hairStyles';
 import { createHairMaskWithGemini, compositeHairOntoOriginal } from './hairSegmentation';
+import { resilientFetch } from './networkResilience';
+
+const isDebug = import.meta.env.DEV || import.meta.env.MODE === 'test';
+
+const debugLog = (...args: unknown[]): void => {
+  if (isDebug) {
+    logger.log(...args);
+  }
+};
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 const GEMINI_IMAGE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent';
+const GEMINI_RETRY_CONFIG = {
+  maxRetries: 2,
+  baseDelay: 1200,
+  maxDelay: 12000,
+  retryableStatuses: [408, 429, 500, 502, 503, 504],
+};
+
+const fetchWithRetry = (url: string, options: RequestInit): Promise<Response> => {
+  return resilientFetch(url, options, GEMINI_RETRY_CONFIG);
+};
 
 interface GenerateHairStyleParams {
   userPhoto: string;
@@ -87,7 +107,7 @@ export async function generateHairStyleFree(
   const stylePrompt = buildPrompt(style, settings, texture);
 
   try {
-    console.log('Step 1: Creating hair mask...');
+    debugLog('Step 1: Creating hair mask...');
 
     // Step 1: Create hair mask
     const maskResult = await createHairMaskWithGemini(userPhoto);
@@ -95,8 +115,8 @@ export async function generateHairStyleFree(
       return { success: false, error: `Mask creation failed: ${maskResult.error}` };
     }
 
-    console.log('Hair mask created successfully');
-    console.log('Step 2: Generating new hairstyle with Gemini...');
+    debugLog('Hair mask created successfully');
+    debugLog('Step 2: Generating new hairstyle with Gemini...');
 
     // Step 2: Generate image with new hairstyle
     const generatedResult = await generateWithGemini(userPhoto, style, stylePrompt);
@@ -104,8 +124,8 @@ export async function generateHairStyleFree(
       return { success: false, error: generatedResult.error || 'Generation failed' };
     }
 
-    console.log('New hairstyle generated');
-    console.log('Step 3: Compositing hair onto original...');
+    debugLog('New hairstyle generated');
+    debugLog('Step 3: Compositing hair onto original...');
 
     // Step 3: Composite - take hair from generated, face from original
     const finalImage = await compositeHairOntoOriginal(
@@ -114,7 +134,7 @@ export async function generateHairStyleFree(
       maskResult.hairMask
     );
 
-    console.log('Compositing complete!');
+    debugLog('Compositing complete!');
 
     return {
       success: true,
@@ -122,7 +142,7 @@ export async function generateHairStyleFree(
     };
 
   } catch (error) {
-    console.error('Hair generation error:', error);
+    logger.error('Hair generation error:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -160,9 +180,12 @@ CRITICAL RULES:
 Generate the image with the new hairstyle applied.`;
 
   try {
-    const response = await fetch(`${GEMINI_IMAGE_URL}?key=${GEMINI_API_KEY}`, {
+    const response = await fetchWithRetry(GEMINI_IMAGE_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-goog-api-key': GEMINI_API_KEY,
+      },
       body: JSON.stringify({
         contents: [{
           role: 'user',
@@ -186,7 +209,7 @@ Generate the image with the new hairstyle applied.`;
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Gemini error:', response.status, errorText);
+      logger.error('Gemini error:', response.status, errorText);
 
       if (response.status === 429) {
         return { success: false, error: 'Too many requests. Please wait a moment.' };
@@ -226,7 +249,7 @@ Generate the image with the new hairstyle applied.`;
     return { success: false, error: 'No image in response' };
 
   } catch (error) {
-    console.error('Gemini generation error:', error);
+    logger.error('Gemini generation error:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Generation failed',
@@ -253,7 +276,7 @@ export async function generateFromReferenceFree(
   }
 
   try {
-    console.log('Step 1: Creating hair mask...');
+    debugLog('Step 1: Creating hair mask...');
 
     // Step 1: Create hair mask
     const maskResult = await createHairMaskWithGemini(userPhoto);
@@ -261,7 +284,7 @@ export async function generateFromReferenceFree(
       return { success: false, error: `Mask creation failed: ${maskResult.error}` };
     }
 
-    console.log('Step 2: Generating with reference...');
+    debugLog('Step 2: Generating with reference...');
 
     // Step 2: Generate with reference
     const generatedResult = await generateWithReference(userPhoto, referencePhoto, settings);
@@ -269,7 +292,7 @@ export async function generateFromReferenceFree(
       return { success: false, error: generatedResult.error || 'Generation failed' };
     }
 
-    console.log('Step 3: Compositing...');
+    debugLog('Step 3: Compositing...');
 
     // Step 3: Composite
     const finalImage = await compositeHairOntoOriginal(
@@ -284,7 +307,7 @@ export async function generateFromReferenceFree(
     };
 
   } catch (error) {
-    console.error('Reference generation error:', error);
+    logger.error('Reference generation error:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -323,9 +346,12 @@ CRITICAL RULES:
 Generate the image with the reference hairstyle applied.`;
 
   try {
-    const response = await fetch(`${GEMINI_IMAGE_URL}?key=${GEMINI_API_KEY}`, {
+    const response = await fetchWithRetry(GEMINI_IMAGE_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-goog-api-key': GEMINI_API_KEY,
+      },
       body: JSON.stringify({
         contents: [{
           role: 'user',
@@ -350,7 +376,7 @@ Generate the image with the reference hairstyle applied.`;
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Gemini reference error:', response.status, errorText);
+      logger.error('Gemini reference error:', response.status, errorText);
       return { success: false, error: `API error: ${response.status}` };
     }
 
@@ -372,7 +398,7 @@ Generate the image with the reference hairstyle applied.`;
     return { success: false, error: 'No image in response' };
 
   } catch (error) {
-    console.error('Reference generation error:', error);
+    logger.error('Reference generation error:', error);
     return { success: false, error: error instanceof Error ? error.message : 'Failed' };
   }
 }

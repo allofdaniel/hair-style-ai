@@ -1,0 +1,1363 @@
+{
+  "m-360-wave": {
+    "id": "m-360-wave",
+    "gender": "male",
+    "styleName": "360-wave",
+    "thumbnail": "/hairstyles/male/360-wave.jpg",
+    "analysis": "HAIRSTYLE: 360 Wave  \nLENGTH: Bangs [1] cm, Top [3] cm, Sides [1] cm, Back [1] cm  \nTEXTURE: Wavy  \nVOLUME: Low  \nPARTING: None  \nTECHNIQUE: Fade on the sides, brushing technique for waves  \nSHAPE: Rounded top with a tight wave pattern, framing the face softly with a clean line  \nKEY FEATURES: Defined wave pattern, clean fade on sides, smooth finish",
+    "prompt": "Length: Bangs [1] cm, Top [3] cm, Sides [1] cm, Back [1] cm. Texture: Wavy. Volume: Low. Parting: None. Technique: Fade on the sides, brushing technique for waves. Shape: Rounded top with a tight wave pattern, framing the face softly with a clean line. Key features: Defined wave pattern, clean fade on sides, smooth finish",
+    "analyzedAt": "2025-12-27T23:23:58.160Z"
+  },
+  "m-afro": {
+    "id": "m-afro",
+    "gender": "male",
+    "styleName": "afro",
+    "thumbnail": "/hairstyles/male/afro.jpg",
+    "analysis": "HAIRSTYLE: Afro  \nLENGTH: Bangs 5cm, Top 10cm, Sides 8cm, Back 8cm  \nTEXTURE: Tight curls  \nVOLUME: High  \nPARTING: None  \nTECHNIQUE: Layering  \nSHAPE: Rounded silhouette, full shape extending out from the scalp, framing the face softly without angular edges  \nKEY FEATURES: Dense curl pattern, rounded volume, and natural lift at the roots",
+    "prompt": "Length: Bangs 5cm, Top 10cm, Sides 8cm, Back 8cm. Texture: Tight curls. Volume: High. Parting: None. Technique: Layering. Shape: Rounded silhouette, full shape extending out from the scalp, framing the face softly without angular edges. Key features: Dense curl pattern, rounded volume, and natural lift at the roots",
+    "analyzedAt": "2025-12-27T23:24:02.540Z"
+  },
+  "m-anime-spike": {
+    "id": "m-anime-spike",
+    "gender": "male",
+    "styleName": "anime-spike",
+    "thumbnail": "/hairstyles/male/anime-spike.jpg",
+    "analysis": "Here are the specifications for recreating the \"anime-spike\" hairstyle:\n\nHAIRSTYLE: Anime Spike\nLENGTH: Bangs 8 cm, Top 15 cm, Sides 10 cm, Back 5 cm\nTEXTURE: Straight\nVOLUME: Very High\nPARTING: None\nTECHNIQUE: Layering, Texturizing\nSHAPE: The overall silhouette is jagged and angular, with spikes that extend upward and outward, framing the face with a dynamic, pointed silhouette.\nKEY FEATURES: \n1. Sharp, defined spikes that create dramatic height.\n2. Layered texture that adds dimension and movement.\n3. Extremely high volume with a spiked appearance that mimics anime aesthetics.",
+    "prompt": "Length: Bangs 8 cm, Top 15 cm, Sides 10 cm, Back 5 cm. Texture: Straight. Volume: Very High. Parting: None. Technique: Layering, Texturizing. Shape: The overall silhouette is jagged and angular, with spikes that extend upward and outward, framing the face with a dynamic, pointed silhouette.",
+    "analyzedAt": "2025-12-27T23:24:06.907Z"
+  },
+  "m-arabian-classic": {
+    "id": "m-arabian-classic",
+    "gender": "male",
+    "styleName": "arabian-classic",
+    "thumbnail": "/hairstyles/male/arabian-classic.jpg",
+    "analysis": "HAIRSTYLE: Arabian Classic\nLENGTH: Bangs 8cm, Top 10cm, Sides 3cm, Back 3cm\nTEXTURE: Straight\nVOLUME: High\nPARTING: Deep left\nTECHNIQUE: Layers\nSHAPE: The overall silhouette is tapered on the sides and back, with a voluminous top that is smoothly swept back, framing the forehead and enhancing the angular features of the face.\nKEY FEATURES: 1) High volume at the crown, 2) Deep side parting, 3) Polished finish with a sleek look.",
+    "prompt": "Length: Bangs 8cm, Top 10cm, Sides 3cm, Back 3cm. Texture: Straight. Volume: High. Parting: Deep left. Technique: Layers. Shape: The overall silhouette is tapered on the sides and back, with a voluminous top that is smoothly swept back, framing the forehead and enhancing the angular features of the face.. Key features: 1) High volume at the crown, 2) Deep side parting, 3) Polished finish with a sleek look.",
+    "analyzedAt": "2025-12-27T23:24:10.644Z"
+  },
+  "m-argentine-wave": {
+    "id": "m-argentine-wave",
+    "gender": "male",
+    "styleName": "argentine-wave",
+    "thumbnail": "/hairstyles/male/argentine-wave.jpg",
+    "analysis": "HAIRSTYLE: Argentine Wave  \nLENGTH: Bangs 5cm, Top 8cm, Sides 4cm, Back 4cm  \nTEXTURE: Wavy  \nVOLUME: Medium  \nPARTING: Deep left  \nTECHNIQUE: Layering, texturizing  \nSHAPE: The overall silhouette is rounded at the top with a gradual taper towards the sides and back, framing the face softly.  \nKEY FEATURES: Soft waves on top with added texture, deep side part creating an asymmetrical look, natural movement throughout the hairstyle.",
+    "prompt": "Length: Bangs 5cm, Top 8cm, Sides 4cm, Back 4cm. Texture: Wavy. Volume: Medium. Parting: Deep left. Technique: Layering, texturizing. Shape: The overall silhouette is rounded at the top with a gradual taper towards the sides and back, framing the face softly.. Key features: Soft waves on top with added texture, deep side part creating an asymmetrical look, natural movement throughout the hairstyle.",
+    "analyzedAt": "2025-12-27T23:24:13.787Z"
+  },
+  "m-ash-perm": {
+    "id": "m-ash-perm",
+    "gender": "male",
+    "styleName": "ash-perm",
+    "thumbnail": "/hairstyles/male/ash-perm.jpg",
+    "analysis": "HAIRSTYLE: Ash Perm  \nLENGTH: Bangs 8cm, Top 10cm, Sides 5cm, Back 5cm  \nTEXTURE: Loose waves  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Soft layers with a perm for texture, no fade or undercut  \nSHAPE: Rounded shape that softly frames the face with slight volume at the crown  \nKEY FEATURES: Natural-looking loose waves, soft curtain bangs that blend into the top, and a shadow root effect for depth",
+    "prompt": "Length: Bangs 8cm, Top 10cm, Sides 5cm, Back 5cm. Texture: Loose waves. Volume: Medium. Parting: Center. Technique: Soft layers with a perm for texture, no fade or undercut. Shape: Rounded shape that softly frames the face with slight volume at the crown. Key features: Natural-looking loose waves, soft curtain bangs that blend into the top, and a shadow root effect for depth",
+    "analyzedAt": "2025-12-27T23:24:16.772Z"
+  },
+  "m-basic-down-perm": {
+    "id": "m-basic-down-perm",
+    "gender": "male",
+    "styleName": "basic-down-perm",
+    "thumbnail": "/hairstyles/male/basic-down-perm.jpg",
+    "analysis": "HAIRSTYLE: Basic Down Perm  \nLENGTH: Bangs 6cm, Top 8cm, Sides 6cm, Back 6cm  \nTEXTURE: Loose waves  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Soft perm, layered cut  \nSHAPE: The overall silhouette is rounded, with the hair framing the face softly and gently; the sides are slightly shorter than the top, blending seamlessly.  \nKEY FEATURES: Natural wave texture, soft framing around the face, layered flow at the top.",
+    "prompt": "Length: Bangs 6cm, Top 8cm, Sides 6cm, Back 6cm. Texture: Loose waves. Volume: Medium. Parting: Center. Technique: Soft perm, layered cut. Shape: The overall silhouette is rounded, with the hair framing the face softly and gently; the sides are slightly shorter than the top, blending seamlessly.. Key features: Natural wave texture, soft framing around the face, layered flow at the top.",
+    "analyzedAt": "2025-12-27T23:24:21.231Z"
+  },
+  "m-bollywood-classic": {
+    "id": "m-bollywood-classic",
+    "gender": "male",
+    "styleName": "bollywood-classic",
+    "thumbnail": "/hairstyles/male/bollywood-classic.jpg",
+    "analysis": "HAIRSTYLE: Bollywood Classic\nLENGTH: Bangs 5cm, Top 10cm, Sides 3cm, Back 3cm\nTEXTURE: Straight\nVOLUME: Medium\nPARTING: Deep left\nTECHNIQUE: Layering\nSHAPE: The overall silhouette is voluminous at the top with a smooth tapering effect towards the sides and back, framing the face elegantly.\nKEY FEATURES: Distinctive volume at the crown, defined deep side part, and smooth texture.",
+    "prompt": "Length: Bangs 5cm, Top 10cm, Sides 3cm, Back 3cm. Texture: Straight. Volume: Medium. Parting: Deep left. Technique: Layering. Shape: The overall silhouette is voluminous at the top with a smooth tapering effect towards the sides and back, framing the face elegantly.. Key features: Distinctive volume at the crown, defined deep side part, and smooth texture.",
+    "analyzedAt": "2025-12-27T23:24:24.483Z"
+  },
+  "m-bowl-cut": {
+    "id": "m-bowl-cut",
+    "gender": "male",
+    "styleName": "bowl-cut",
+    "thumbnail": "/hairstyles/male/bowl-cut.jpg",
+    "analysis": "Here are the specifications for recreating the bowl-cut hairstyle:\n\nHAIRSTYLE: Bowl Cut  \nLENGTH: Bangs 10 cm, Top 10 cm, Sides 5 cm, Back 5 cm  \nTEXTURE: Straight  \nVOLUME: Medium  \nPARTING: None  \nTECHNIQUE: Blunt cut, no layering  \nSHAPE: Rounded silhouette that softly frames the face, with a uniform length all around  \nKEY FEATURES: Straight across bangs that are even and blunt; smooth, glossy finish; uniform length with minimal contrast between top and sides.",
+    "prompt": "Length: Bangs 10 cm, Top 10 cm, Sides 5 cm, Back 5 cm. Texture: Straight. Volume: Medium. Parting: None. Technique: Blunt cut, no layering. Shape: Rounded silhouette that softly frames the face, with a uniform length all around. Key features: Straight across bangs that are even and blunt; smooth, glossy finish; uniform length with minimal contrast between top and sides.",
+    "analyzedAt": "2025-12-27T23:24:27.777Z"
+  },
+  "m-box-braids": {
+    "id": "m-box-braids",
+    "gender": "male",
+    "styleName": "box-braids",
+    "thumbnail": "/hairstyles/male/box-braids.jpg",
+    "analysis": "Sure! Here's a detailed specification for the \"box braids\" hairstyle:\n\nHAIRSTYLE: Box Braids  \nLENGTH: Bangs [0]cm, Top [30]cm, Sides [30]cm, Back [30]cm  \nTEXTURE: Straight  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Box braid technique  \nSHAPE: Rectangular silhouette that frames the face, with braids falling straight down along the sides and back.  \nKEY FEATURES: 1) Neat, defined sections; 2) Uniform braid thickness; 3) Center-parting creates symmetry.",
+    "prompt": "Length: Bangs [0]cm, Top [30]cm, Sides [30]cm, Back [30]cm. Texture: Straight. Volume: Medium. Parting: Center. Technique: Box braid technique. Shape: Rectangular silhouette that frames the face, with braids falling straight down along the sides and back.. Key features: 1) Neat, defined sections; 2) Uniform braid thickness; 3) Center-parting creates symmetry.",
+    "analyzedAt": "2025-12-27T23:24:31.248Z"
+  },
+  "m-brazilian-surfer": {
+    "id": "m-brazilian-surfer",
+    "gender": "male",
+    "styleName": "brazilian-surfer",
+    "thumbnail": "/hairstyles/male/brazilian-surfer.jpg",
+    "analysis": "Here are the specifications for the \"Brazilian Surfer\" hairstyle:\n\nHAIRSTYLE: Brazilian Surfer\nLENGTH: Bangs 10cm, Top 15cm, Sides 8cm, Back 10cm\nTEXTURE: Wavy\nVOLUME: Medium\nPARTING: Center\nTECHNIQUE: Layering, loose waves\nSHAPE: Textured silhouette that frames the face with soft, flowing waves; shorter at the sides and slightly longer on top.\nKEY FEATURES: Natural wave pattern, loose and tousled finish, relaxed look.",
+    "prompt": "Length: Bangs 10cm, Top 15cm, Sides 8cm, Back 10cm. Texture: Wavy. Volume: Medium. Parting: Center. Technique: Layering, loose waves. Shape: Textured silhouette that frames the face with soft, flowing waves; shorter at the sides and slightly longer on top.. Key features: Natural wave pattern, loose and tousled finish, relaxed look.",
+    "analyzedAt": "2025-12-27T23:24:35.036Z"
+  },
+  "m-burst-fade": {
+    "id": "m-burst-fade",
+    "gender": "male",
+    "styleName": "burst-fade",
+    "thumbnail": "/hairstyles/male/burst-fade.jpg",
+    "analysis": "HAIRSTYLE: Burst Fade\nLENGTH: Bangs 5cm, Top 8cm, Sides 2cm, Back 3cm\nTEXTURE: Straight\nVOLUME: Medium\nPARTING: None\nTECHNIQUE: Burst fade, layering on top\nSHAPE: The hairstyle has a textured, spiky appearance on top with tapered sides, creating a rounded silhouette that frames the face. The longer top contrasts with the shorter sides and back.\nKEY FEATURES: 1) Burst fade around the ears, 2) Textured spiky layers on top, 3) Clean, sharp edges along the fade.",
+    "prompt": "Length: Bangs 5cm, Top 8cm, Sides 2cm, Back 3cm. Texture: Straight. Volume: Medium. Parting: None. Technique: Burst fade, layering on top. Shape: The hairstyle has a textured, spiky appearance on top with tapered sides, creating a rounded silhouette that frames the face. The longer top contrasts with the shorter sides and back.. Key features: 1) Burst fade around the ears, 2) Textured spiky layers on top, 3) Clean, sharp edges along the fade.",
+    "analyzedAt": "2025-12-27T23:24:38.883Z"
+  },
+  "m-buzz-cut": {
+    "id": "m-buzz-cut",
+    "gender": "male",
+    "styleName": "buzz-cut",
+    "thumbnail": "/hairstyles/male/buzz-cut.jpg",
+    "analysis": "HAIRSTYLE: Buzz Cut  \nLENGTH: Bangs [1]cm, Top [1]cm, Sides [1]cm, Back [1]cm  \nTEXTURE: Straight  \nVOLUME: Flat  \nPARTING: None  \nTECHNIQUE: Clipper cut  \nSHAPE: Evenly cropped with a uniform length all around, creating a boxy silhouette that has a clean, sharp look  \nKEY FEATURES: Uniform length across all sections, sharp edges at the sides, and a minimalistic appearance.",
+    "prompt": "Length: Bangs [1]cm, Top [1]cm, Sides [1]cm, Back [1]cm. Texture: Straight. Volume: Flat. Parting: None. Technique: Clipper cut. Shape: Evenly cropped with a uniform length all around, creating a boxy silhouette that has a clean, sharp look. Key features: Uniform length across all sections, sharp edges at the sides, and a minimalistic appearance.",
+    "analyzedAt": "2025-12-27T23:24:42.603Z"
+  },
+  "m-chinese-classic": {
+    "id": "m-chinese-classic",
+    "gender": "male",
+    "styleName": "chinese-classic",
+    "thumbnail": "/hairstyles/male/chinese-classic.jpg",
+    "analysis": "HAIRSTYLE: Chinese Classic\nLENGTH: Bangs 0 cm, Top 20 cm, Sides 45 cm, Back 60 cm\nTEXTURE: Straight\nVOLUME: Medium\nPARTING: None\nTECHNIQUE: Topknot, with long, straight lengths; no layering\nSHAPE: The overall silhouette is elongated and sleek, framing the face with a smooth contour; the back is long and straight while the top is pulled into a bun.\nKEY FEATURES: 1) Distinctive topknot; 2) Long, straight lengths on the sides and back; 3) Clean, sharp lines with no bangs.",
+    "prompt": "Length: Bangs 0 cm, Top 20 cm, Sides 45 cm, Back 60 cm. Texture: Straight. Volume: Medium. Parting: None. Technique: Topknot, with long, straight lengths; no layering. Shape: The overall silhouette is elongated and sleek, framing the face with a smooth contour; the back is long and straight while the top is pulled into a bun.. Key features: 1) Distinctive topknot; 2) Long, straight lengths on the sides and back; 3) Clean, sharp lines with no bangs.",
+    "analyzedAt": "2025-12-27T23:24:45.766Z"
+  },
+  "m-comma-hair": {
+    "id": "m-comma-hair",
+    "gender": "male",
+    "styleName": "comma-hair",
+    "thumbnail": "/hairstyles/male/comma-hair.jpg",
+    "analysis": "HAIRSTYLE: Comma Hair  \nLENGTH: Bangs 6cm, Top 10cm, Sides 8cm, Back 7cm  \nTEXTURE: Straight  \nVOLUME: Medium  \nPARTING: Deep left  \nTECHNIQUE: Layering  \nSHAPE: The hairstyle has a soft, rounded silhouette that frames the face gently while creating a subtle wedge shape at the back. The hair is slightly longer on the sides compared to the back.  \nKEY FEATURES: The signature comma-shaped bangs that sweep to the side, the loose, flowing top section, and the natural graduation at the back.",
+    "prompt": "Length: Bangs 6cm, Top 10cm, Sides 8cm, Back 7cm. Texture: Straight. Volume: Medium. Parting: Deep left. Technique: Layering. Shape: The hairstyle has a soft, rounded silhouette that frames the face gently while creating a subtle wedge shape at the back. The hair is slightly longer on the sides compared to the back.. Key features: The signature comma-shaped bangs that sweep to the side, the loose, flowing top section, and the natural graduation at the back.",
+    "analyzedAt": "2025-12-27T23:25:19.325Z"
+  },
+  "m-cornrows": {
+    "id": "m-cornrows",
+    "gender": "male",
+    "styleName": "cornrows",
+    "thumbnail": "/hairstyles/male/cornrows.jpg",
+    "analysis": "HAIRSTYLE: Cornrows  \nLENGTH: Bangs [0]cm, Top [5]cm, Sides [5]cm, Back [5]cm  \nTEXTURE: Straight  \nVOLUME: Low  \nPARTING: Left  \nTECHNIQUE: Braiding (cornrow technique)  \nSHAPE: Tight and neatly aligned rows that create a smooth silhouette against the scalp, framing the face symmetrically  \nKEY FEATURES: 1. Distinctive tight braids that are close to the scalp; 2. Clean parting lines; 3. Uniform width of braids throughout the style",
+    "prompt": "Length: Bangs [0]cm, Top [5]cm, Sides [5]cm, Back [5]cm. Texture: Straight. Volume: Low. Parting: Left. Technique: Braiding (cornrow technique). Shape: Tight and neatly aligned rows that create a smooth silhouette against the scalp, framing the face symmetrically. Key features: 1. Distinctive tight braids that are close to the scalp; 2. Clean parting lines; 3. Uniform width of braids throughout the style",
+    "analyzedAt": "2025-12-27T23:25:22.755Z"
+  },
+  "m-crew-cut": {
+    "id": "m-crew-cut",
+    "gender": "male",
+    "styleName": "crew-cut",
+    "thumbnail": "/hairstyles/male/crew-cut.jpg",
+    "analysis": "Sure! Here are the specifications for the crew-cut hairstyle:\n\nHAIRSTYLE: Crew Cut  \nLENGTH: Bangs 2 cm, Top 3 cm, Sides 1 cm, Back 1 cm  \nTEXTURE: Straight  \nVOLUME: Low  \nPARTING: None  \nTECHNIQUE: Fade on the sides and back, blunt cut on top  \nSHAPE: Tapered silhouette that hugs the head closely, with the top slightly thicker than the sides, creating a clean and structured look  \nKEY FEATURES: Short, uniform length; smooth fade blending into the skin; sharp, defined edges around the hairline  ",
+    "prompt": "Length: Bangs 2 cm, Top 3 cm, Sides 1 cm, Back 1 cm. Texture: Straight. Volume: Low. Parting: None. Technique: Fade on the sides and back, blunt cut on top. Shape: Tapered silhouette that hugs the head closely, with the top slightly thicker than the sides, creating a clean and structured look. Key features: Short, uniform length; smooth fade blending into the skin; sharp, defined edges around the hairline",
+    "analyzedAt": "2025-12-27T23:25:26.638Z"
+  },
+  "m-curly-perm": {
+    "id": "m-curly-perm",
+    "gender": "male",
+    "styleName": "curly-perm",
+    "thumbnail": "/hairstyles/male/curly-perm.jpg",
+    "analysis": "Certainly! Here are the exact specifications for recreating the \"curly-perm\" hairstyle based on the provided reference image:\n\nHAIRSTYLE: Curly Perm  \nLENGTH: Bangs 5cm, Top 10cm, Sides 7cm, Back 8cm  \nTEXTURE: Loose curls  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Perm, soft layering  \nSHAPE: Soft, rounded silhouette that frames the face, with curls adding a textured volume throughout  \nKEY FEATURES: Defined loose curls at the top, slightly longer bangs that blend into the curls, overall soft and bouncy appearance  \n\nThese specifications should help in recreating the hairstyle accurately.",
+    "prompt": "Length: Bangs 5cm, Top 10cm, Sides 7cm, Back 8cm. Texture: Loose curls. Volume: Medium. Parting: Center. Technique: Perm, soft layering. Shape: Soft, rounded silhouette that frames the face, with curls adding a textured volume throughout. Key features: Defined loose curls at the top, slightly longer bangs that blend into the curls, overall soft and bouncy appearance",
+    "analyzedAt": "2025-12-27T23:25:30.180Z"
+  },
+  "m-curly-top-fade": {
+    "id": "m-curly-top-fade",
+    "gender": "male",
+    "styleName": "curly-top-fade",
+    "thumbnail": "/hairstyles/male/curly-top-fade.jpg",
+    "analysis": "Certainly! Here are the precise specifications for the \"curly-top-fade\" hairstyle:\n\nHAIRSTYLE: Curly Top Fade  \nLENGTH: Bangs 2 cm, Top 7 cm, Sides 2 cm, Back 2 cm  \nTEXTURE: Curly  \nVOLUME: Medium  \nPARTING: None  \nTECHNIQUE: Fade, Two-block  \nSHAPE: The overall silhouette is rounded on top with a tapering effect on the sides that gradually decreases in length towards the ears. The curls add height and structure, framing the face.  \nKEY FEATURES: 1) Defined, tight curls on top; 2) High contrast fade on the sides; 3) Sharp line-up along the hairline.\n\nThese specifications should guide in recreating the hairstyle accurately.",
+    "prompt": "Length: Bangs 2 cm, Top 7 cm, Sides 2 cm, Back 2 cm. Texture: Curly. Volume: Medium. Parting: None. Technique: Fade, Two-block. Shape: The overall silhouette is rounded on top with a tapering effect on the sides that gradually decreases in length towards the ears. The curls add height and structure, framing the face.. Key features: 1) Defined, tight curls on top; 2) High contrast fade on the sides; 3) Sharp line-up along the hairline.",
+    "analyzedAt": "2025-12-27T23:25:33.917Z"
+  },
+  "m-curtain-hair": {
+    "id": "m-curtain-hair",
+    "gender": "male",
+    "styleName": "curtain-hair",
+    "thumbnail": "/hairstyles/male/curtain-hair.jpg",
+    "analysis": "HAIRSTYLE: Curtain Hair  \nLENGTH: Bangs 10cm, Top 15cm, Sides 8cm, Back 6cm  \nTEXTURE: Wavy  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Layered  \nSHAPE: Soft, flowing silhouette that frames the face with a gentle curve; the sides taper towards the back.  \nKEY FEATURES: Wispy bangs that frame the forehead, loose waves creating movement, layered texture for a light and airy look.",
+    "prompt": "Length: Bangs 10cm, Top 15cm, Sides 8cm, Back 6cm. Texture: Wavy. Volume: Medium. Parting: Center. Technique: Layered. Shape: Soft, flowing silhouette that frames the face with a gentle curve; the sides taper towards the back.. Key features: Wispy bangs that frame the forehead, loose waves creating movement, layered texture for a light and airy look.",
+    "analyzedAt": "2025-12-27T23:25:37.323Z"
+  },
+  "m-dandy-cut": {
+    "id": "m-dandy-cut",
+    "gender": "male",
+    "styleName": "dandy-cut",
+    "thumbnail": "/hairstyles/male/dandy-cut.jpg",
+    "analysis": "HAIRSTYLE: Dandy Cut  \nLENGTH: Bangs 5cm, Top 8cm, Sides 6cm, Back 6cm  \nTEXTURE: Straight  \nVOLUME: Medium  \nPARTING: None  \nTECHNIQUE: Blunt cut, light layering on top  \nSHAPE: Rounded silhouette that softly frames the face, with the hair lying close to the head  \nKEY FEATURES: Blunt bangs that sit just above the eyebrows, uniform length around the sides and back, smooth finish with no excessive volume",
+    "prompt": "Length: Bangs 5cm, Top 8cm, Sides 6cm, Back 6cm. Texture: Straight. Volume: Medium. Parting: None. Technique: Blunt cut, light layering on top. Shape: Rounded silhouette that softly frames the face, with the hair lying close to the head. Key features: Blunt bangs that sit just above the eyebrows, uniform length around the sides and back, smooth finish with no excessive volume",
+    "analyzedAt": "2025-12-27T23:25:40.738Z"
+  },
+  "m-dreadlocks": {
+    "id": "m-dreadlocks",
+    "gender": "male",
+    "styleName": "dreadlocks",
+    "thumbnail": "/hairstyles/male/dreadlocks.jpg",
+    "analysis": "HAIRSTYLE: Dreadlocks  \nLENGTH: Bangs [5]cm, Top [20]cm, Sides [15]cm, Back [20]cm  \nTEXTURE: Curly  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Dreadlock formation, freeform styling  \nSHAPE: The overall silhouette is rounded at the top with tapered sides that frame the face gently. Dreads fall naturally around the face, providing a soft yet defined look.  \nKEY FEATURES: 1) Distinct, cylindrical dreadlock shapes; 2) Natural volume and texture; 3) Center parting that adds symmetry.",
+    "prompt": "Length: Bangs [5]cm, Top [20]cm, Sides [15]cm, Back [20]cm. Texture: Curly. Volume: Medium. Parting: Center. Technique: Dreadlock formation, freeform styling. Shape: The overall silhouette is rounded at the top with tapered sides that frame the face gently. Dreads fall naturally around the face, providing a soft yet defined look.. Key features: 1) Distinct, cylindrical dreadlock shapes; 2) Natural volume and texture; 3) Center parting that adds symmetry.",
+    "analyzedAt": "2025-12-27T23:25:44.387Z"
+  },
+  "m-drop-fade": {
+    "id": "m-drop-fade",
+    "gender": "male",
+    "styleName": "drop-fade",
+    "thumbnail": "/hairstyles/male/drop-fade.jpg",
+    "analysis": "HAIRSTYLE: Drop Fade\nLENGTH: Bangs 6cm, Top 8cm, Sides 1.5cm, Back 1.5cm\nTEXTURE: Straight\nVOLUME: Medium\nPARTING: Left\nTECHNIQUE: Drop fade, layering on top\nSHAPE: The silhouette is tapered towards the sides with a voluminous top, framing the face softly while maintaining a clean look on the sides.\nKEY FEATURES: Drop fade evenly blends into the longer top section; textured layers on top add dimension; slight forward styling of bangs creates a casual, contemporary feel.",
+    "prompt": "Length: Bangs 6cm, Top 8cm, Sides 1.5cm, Back 1.5cm. Texture: Straight. Volume: Medium. Parting: Left. Technique: Drop fade, layering on top. Shape: The silhouette is tapered towards the sides with a voluminous top, framing the face softly while maintaining a clean look on the sides.. Key features: Drop fade evenly blends into the longer top section; textured layers on top add dimension; slight forward styling of bangs creates a casual, contemporary feel.",
+    "analyzedAt": "2025-12-27T23:25:47.791Z"
+  },
+  "m-european-fade": {
+    "id": "m-european-fade",
+    "gender": "male",
+    "styleName": "european-fade",
+    "thumbnail": "/hairstyles/male/european-fade.jpg",
+    "analysis": "Sure! Here are the specifications to recreate the hairstyle \"European Fade.\"\n\nHAIRSTYLE: European Fade  \nLENGTH: Bangs 5cm, Top 6-8cm, Sides 1-2cm, Back 1-2cm  \nTEXTURE: Straight  \nVOLUME: Medium  \nPARTING: Left  \nTECHNIQUE: Fade on sides and back, layered on top  \nSHAPE: Tapered fade that gradually blends into longer hair on top, framing the face with slight volume at the crown  \nKEY FEATURES: High contrast between the top and sides, smooth fade with clean lines, and natural texture on top",
+    "prompt": "Length: Bangs 5cm, Top 6-8cm, Sides 1-2cm, Back 1-2cm. Texture: Straight. Volume: Medium. Parting: Left. Technique: Fade on sides and back, layered on top. Shape: Tapered fade that gradually blends into longer hair on top, framing the face with slight volume at the crown. Key features: High contrast between the top and sides, smooth fade with clean lines, and natural texture on top",
+    "analyzedAt": "2025-12-27T23:26:21.344Z"
+  },
+  "m-french-crop-curly": {
+    "id": "m-french-crop-curly",
+    "gender": "male",
+    "styleName": "french-crop-curly",
+    "thumbnail": "/hairstyles/male/french-crop-curly.jpg",
+    "analysis": "HAIRSTYLE: French Crop Curly  \nLENGTH: Bangs 5cm, Top 7cm, Sides 2cm, Back 2cm  \nTEXTURE: Curly  \nVOLUME: Medium  \nPARTING: None  \nTECHNIQUE: Taper fade on sides and back, defined curls on top  \nSHAPE: Rounded silhouette with fullness at the crown, tapering down to shorter sides and back, framing the face softly  \nKEY FEATURES: Defined, tight curls on top; seamless blend into tapered sides; natural texture with minimal styling products for a relaxed look",
+    "prompt": "Length: Bangs 5cm, Top 7cm, Sides 2cm, Back 2cm. Texture: Curly. Volume: Medium. Parting: None. Technique: Taper fade on sides and back, defined curls on top. Shape: Rounded silhouette with fullness at the crown, tapering down to shorter sides and back, framing the face softly. Key features: Defined, tight curls on top; seamless blend into tapered sides; natural texture with minimal styling products for a relaxed look",
+    "analyzedAt": "2025-12-27T23:26:24.667Z"
+  },
+  "m-french-crop": {
+    "id": "m-french-crop",
+    "gender": "male",
+    "styleName": "french-crop",
+    "thumbnail": "/hairstyles/male/french-crop.jpg",
+    "analysis": "HAIRSTYLE: French Crop  \nLENGTH: Bangs 3cm, Top 5cm, Sides 1.5cm, Back 1.5cm  \nTEXTURE: Straight  \nVOLUME: Low  \nPARTING: None  \nTECHNIQUE: Crew cut on the sides and back, textured layering on top  \nSHAPE: The hairstyle has a short, boxy silhouette that frames the forehead and temples, tapering towards the back for a clean look.  \nKEY FEATURES: Short, blunt bangs; faded sides; textured top for a slightly tousled appearance.",
+    "prompt": "Length: Bangs 3cm, Top 5cm, Sides 1.5cm, Back 1.5cm. Texture: Straight. Volume: Low. Parting: None. Technique: Crew cut on the sides and back, textured layering on top. Shape: The hairstyle has a short, boxy silhouette that frames the forehead and temples, tapering towards the back for a clean look.. Key features: Short, blunt bangs; faded sides; textured top for a slightly tousled appearance.",
+    "analyzedAt": "2025-12-27T23:26:28.306Z"
+  },
+  "m-gail-perm": {
+    "id": "m-gail-perm",
+    "gender": "male",
+    "styleName": "gail-perm",
+    "thumbnail": "/hairstyles/male/gail-perm.jpg",
+    "analysis": "HAIRSTYLE: Gail Perm\nLENGTH: Bangs 6cm, Top 10cm, Sides 5cm, Back 4cm\nTEXTURE: Loose waves\nVOLUME: Medium\nPARTING: Left\nTECHNIQUE: Layered cut, soft perm\nSHAPE: Soft, round silhouette that frames the face gently with light waves around the crown and sides.\nKEY FEATURES: Textured layers, side-swept bangs, natural wave pattern.",
+    "prompt": "Length: Bangs 6cm, Top 10cm, Sides 5cm, Back 4cm. Texture: Loose waves. Volume: Medium. Parting: Left. Technique: Layered cut, soft perm. Shape: Soft, round silhouette that frames the face gently with light waves around the crown and sides.. Key features: Textured layers, side-swept bangs, natural wave pattern.",
+    "analyzedAt": "2025-12-27T23:26:31.626Z"
+  },
+  "m-high-fade": {
+    "id": "m-high-fade",
+    "gender": "male",
+    "styleName": "high-fade",
+    "thumbnail": "/hairstyles/male/high-fade.jpg",
+    "analysis": "HAIRSTYLE: High Fade\nLENGTH: Bangs 5 cm, Top 7 cm, Sides 2 cm, Back 2 cm\nTEXTURE: Straight\nVOLUME: Medium\nPARTING: None\nTECHNIQUE: Fade, Textured Top\nSHAPE: The overall silhouette is short and structured, with the top slightly longer and styled forward, framing the forehead while the sides and back are closely cropped to enhance the contrast.\nKEY FEATURES: High fade on sides, textured and styled top, sharp definition between fade and longer hair.",
+    "prompt": "Length: Bangs 5 cm, Top 7 cm, Sides 2 cm, Back 2 cm. Texture: Straight. Volume: Medium. Parting: None. Technique: Fade, Textured Top. Shape: The overall silhouette is short and structured, with the top slightly longer and styled forward, framing the forehead while the sides and back are closely cropped to enhance the contrast.. Key features: High fade on sides, textured and styled top, sharp definition between fade and longer hair.",
+    "analyzedAt": "2025-12-27T23:26:34.851Z"
+  },
+  "m-high-top-fade": {
+    "id": "m-high-top-fade",
+    "gender": "male",
+    "styleName": "high-top-fade",
+    "thumbnail": "/hairstyles/male/high-top-fade.jpg",
+    "analysis": "HAIRSTYLE: High Top Fade  \nLENGTH: Bangs 0 cm, Top 10 cm, Sides 2 cm, Back 2 cm  \nTEXTURE: Straight  \nVOLUME: Very high  \nPARTING: None  \nTECHNIQUE: Fade, blunt cut on top  \nSHAPE: The silhouette is rectangular with a flat top, creating a bold geometric appearance, framing the face sharply with defined angles on the sides and back.  \nKEY FEATURES: A very high and flat top, sharp and clean edges on the sides, and a seamless fade that transitions from short sides to a longer top.",
+    "prompt": "Length: Bangs 0 cm, Top 10 cm, Sides 2 cm, Back 2 cm. Texture: Straight. Volume: Very high. Parting: None. Technique: Fade, blunt cut on top. Shape: The silhouette is rectangular with a flat top, creating a bold geometric appearance, framing the face sharply with defined angles on the sides and back.. Key features: A very high and flat top, sharp and clean edges on the sides, and a seamless fade that transitions from short sides to a longer top.",
+    "analyzedAt": "2025-12-27T23:26:38.167Z"
+  },
+  "m-host-club-style": {
+    "id": "m-host-club-style",
+    "gender": "male",
+    "styleName": "host-club-style",
+    "thumbnail": "/hairstyles/male/host-club-style.jpg",
+    "analysis": "Certainly! Here are the specifications for recreating the hairstyle:\n\nHAIRSTYLE: Host Club Style\nLENGTH: Bangs 10cm, Top 25cm, Sides 20cm, Back 30cm\nTEXTURE: Straight with slight wave\nVOLUME: High\nPARTING: None\nTECHNIQUE: Layered with texturizing for added volume\nSHAPE: Angular silhouette with longer back and sides, framing the face dramatically\nKEY FEATURES: Spiky top, textured layers, uneven lengths for a tousled look",
+    "prompt": "Length: Bangs 10cm, Top 25cm, Sides 20cm, Back 30cm. Texture: Straight with slight wave. Volume: High. Parting: None. Technique: Layered with texturizing for added volume. Shape: Angular silhouette with longer back and sides, framing the face dramatically. Key features: Spiky top, textured layers, uneven lengths for a tousled look",
+    "analyzedAt": "2025-12-27T23:27:12.520Z"
+  },
+  "m-indian-fade": {
+    "id": "m-indian-fade",
+    "gender": "male",
+    "styleName": "indian-fade",
+    "thumbnail": "/hairstyles/male/indian-fade.jpg",
+    "analysis": "HAIRSTYLE: Indian Fade  \nLENGTH: Bangs 5 cm, Top 10 cm, Sides 1 cm, Back 1.5 cm  \nTEXTURE: Straight  \nVOLUME: High  \nPARTING: Left  \nTECHNIQUE: Fade, Undercut, Textured layers  \nSHAPE: Tapered silhouette that adds height on top while keeping the sides and back closely cropped, framing the face with a sharp contrast.  \nKEY FEATURES: Distinctive textured top with volume, sharply faded sides, dramatic angular line on the forehead.",
+    "prompt": "Length: Bangs 5 cm, Top 10 cm, Sides 1 cm, Back 1.5 cm. Texture: Straight. Volume: High. Parting: Left. Technique: Fade, Undercut, Textured layers. Shape: Tapered silhouette that adds height on top while keeping the sides and back closely cropped, framing the face with a sharp contrast.. Key features: Distinctive textured top with volume, sharply faded sides, dramatic angular line on the forehead.",
+    "analyzedAt": "2025-12-27T23:27:15.941Z"
+  },
+  "m-indonesian-texture": {
+    "id": "m-indonesian-texture",
+    "gender": "male",
+    "styleName": "indonesian-texture",
+    "thumbnail": "/hairstyles/male/indonesian-texture.jpg",
+    "analysis": "Sure! Here are the specifications for the hairstyle:\n\nHAIRSTYLE: Indonesian Texture\nLENGTH: Bangs 5cm, Top 8cm, Sides 2cm, Back 2cm\nTEXTURE: Loose waves\nVOLUME: Medium\nPARTING: None\nTECHNIQUE: Textured layering, faded sides\nSHAPE: Short and voluminous on top with a tapered shape on the sides and back, framing the face softly.\nKEY FEATURES: Textured and spiky top, faded sides, and a natural loose wave at the crown.",
+    "prompt": "Length: Bangs 5cm, Top 8cm, Sides 2cm, Back 2cm. Texture: Loose waves. Volume: Medium. Parting: None. Technique: Textured layering, faded sides. Shape: Short and voluminous on top with a tapered shape on the sides and back, framing the face softly.. Key features: Textured and spiky top, faded sides, and a natural loose wave at the crown.",
+    "analyzedAt": "2025-12-27T23:27:19.552Z"
+  },
+  "m-irish-perm": {
+    "id": "m-irish-perm",
+    "gender": "male",
+    "styleName": "irish-perm",
+    "thumbnail": "/hairstyles/male/irish-perm.jpg",
+    "analysis": "HAIRSTYLE: Irish Perm\nLENGTH: Bangs 5cm, Top 10cm, Sides 7cm, Back 8cm  \nTEXTURE: Loose waves  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Perm, layers  \nSHAPE: Textured and slightly rounded silhouette that frames the face softly  \nKEY FEATURES: Loose, natural-looking waves; soft, wispy bangs; layered texture for movement  ",
+    "prompt": "Length: Bangs 5cm, Top 10cm, Sides 7cm, Back 8cm. Texture: Loose waves. Volume: Medium. Parting: Center. Technique: Perm, layers. Shape: Textured and slightly rounded silhouette that frames the face softly. Key features: Loose, natural-looking waves; soft, wispy bangs; layered texture for movement",
+    "analyzedAt": "2025-12-27T23:27:22.222Z"
+  },
+  "m-ivy-league-cut": {
+    "id": "m-ivy-league-cut",
+    "gender": "male",
+    "styleName": "ivy-league-cut",
+    "thumbnail": "/hairstyles/male/ivy-league-cut.jpg",
+    "analysis": "Sure! Here are the specifications for the ivy league haircut:\n\nHAIRSTYLE: Ivy League Cut  \nLENGTH: Bangs 4cm, Top 6cm, Sides 1cm, Back 1cm  \nTEXTURE: Straight  \nVOLUME: Medium  \nPARTING: Left  \nTECHNIQUE: Taper fade on sides, light layering on top  \nSHAPE: Classic tapered silhouette that frames the face with a clean look, shorter on the sides while the top retains a bit of height  \nKEY FEATURES: Defined clean lines on the sideburns, slight volume on top, and a tapered back that blends seamlessly with the sides  \n\nThese specifications should help in recreating the hairstyle accurately!",
+    "prompt": "Length: Bangs 4cm, Top 6cm, Sides 1cm, Back 1cm. Texture: Straight. Volume: Medium. Parting: Left. Technique: Taper fade on sides, light layering on top. Shape: Classic tapered silhouette that frames the face with a clean look, shorter on the sides while the top retains a bit of height. Key features: Defined clean lines on the sideburns, slight volume on top, and a tapered back that blends seamlessly with the sides",
+    "analyzedAt": "2025-12-27T23:27:25.588Z"
+  },
+  "m-jpop-visual": {
+    "id": "m-jpop-visual",
+    "gender": "male",
+    "styleName": "jpop-visual",
+    "thumbnail": "/hairstyles/male/jpop-visual.jpg",
+    "analysis": "HAIRSTYLE: J-Pop Visual\nLENGTH: Bangs 10cm, Top 15cm, Sides 20cm, Back 25cm\nTEXTURE: Straight with slight layering\nVOLUME: Medium\nPARTING: Center\nTECHNIQUE: Layered cut, texture cutting\nSHAPE: The hairstyle features a choppy, spiky silhouette, with shorter layers on top that frame the face and longer strands on the sides and back that create a dynamic look.\nKEY FEATURES: Choppy bangs that cover the forehead, spiked texture on top, and longer, layered sides that add movement.",
+    "prompt": "Length: Bangs 10cm, Top 15cm, Sides 20cm, Back 25cm. Texture: Straight with slight layering. Volume: Medium. Parting: Center. Technique: Layered cut, texture cutting. Shape: The hairstyle features a choppy, spiky silhouette, with shorter layers on top that frame the face and longer strands on the sides and back that create a dynamic look.. Key features: Choppy bangs that cover the forehead, spiked texture on top, and longer, layered sides that add movement.",
+    "analyzedAt": "2025-12-27T23:27:29.201Z"
+  },
+  "m-kpop-comma-hair": {
+    "id": "m-kpop-comma-hair",
+    "gender": "male",
+    "styleName": "kpop-comma-hair",
+    "thumbnail": "/hairstyles/male/kpop-comma-hair.jpg",
+    "analysis": "HAIRSTYLE: K-Pop Comma Hair  \nLENGTH: Bangs 8 cm, Top 12 cm, Sides 7 cm, Back 5 cm  \nTEXTURE: Straight  \nVOLUME: Medium  \nPARTING: Deep left  \nTECHNIQUE: Layers, two-block cut  \nSHAPE: The overall silhouette has a soft, rounded shape with the hair falling elegantly over the forehead, framing the face with fuller sides that taper toward the back.  \nKEY FEATURES: Distinctive comma shape in the bangs, smooth transition from top to sides, and layered texture for added movement.  ",
+    "prompt": "Length: Bangs 8 cm, Top 12 cm, Sides 7 cm, Back 5 cm. Texture: Straight. Volume: Medium. Parting: Deep left. Technique: Layers, two-block cut. Shape: The overall silhouette has a soft, rounded shape with the hair falling elegantly over the forehead, framing the face with fuller sides that taper toward the back.. Key features: Distinctive comma shape in the bangs, smooth transition from top to sides, and layered texture for added movement.",
+    "analyzedAt": "2025-12-27T23:27:33.478Z"
+  },
+  "m-latin-fade": {
+    "id": "m-latin-fade",
+    "gender": "male",
+    "styleName": "latin-fade",
+    "thumbnail": "/hairstyles/male/latin-fade.jpg",
+    "analysis": "HAIRSTYLE: Latin Fade  \nLENGTH: Bangs 5cm, Top 7cm, Sides 2cm, Back 2cm  \nTEXTURE: Straight  \nVOLUME: Medium  \nPARTING: None  \nTECHNIQUE: Fade, textured layers  \nSHAPE: Short sides and back with a longer, textured top that creates volume and a slight forward tilt, framing the face diagonally.  \nKEY FEATURES: Tapered sides with a smooth fade, choppy layers on top for texture, and an overall modern, clean look.",
+    "prompt": "Length: Bangs 5cm, Top 7cm, Sides 2cm, Back 2cm. Texture: Straight. Volume: Medium. Parting: None. Technique: Fade, textured layers. Shape: Short sides and back with a longer, textured top that creates volume and a slight forward tilt, framing the face diagonally.. Key features: Tapered sides with a smooth fade, choppy layers on top for texture, and an overall modern, clean look.",
+    "analyzedAt": "2025-12-27T23:27:38.933Z"
+  },
+  "m-leaf-cut": {
+    "id": "m-leaf-cut",
+    "gender": "male",
+    "styleName": "leaf-cut",
+    "thumbnail": "/hairstyles/male/leaf-cut.jpg",
+    "analysis": "HAIRSTYLE: Leaf-Cut  \nLENGTH: Bangs 6cm, Top 10cm, Sides 7cm, Back 8cm  \nTEXTURE: Straight  \nVOLUME: Medium  \nPARTING: Left  \nTECHNIQUE: Layered cut, soft texture  \nSHAPE: The overall silhouette is slightly rounded with soft layering around the crown, framing the face gently with a natural fall.  \nKEY FEATURES: Distinctive soft fringe, layered effect around the face, and longer strands at the back that blend seamlessly.",
+    "prompt": "Length: Bangs 6cm, Top 10cm, Sides 7cm, Back 8cm. Texture: Straight. Volume: Medium. Parting: Left. Technique: Layered cut, soft texture. Shape: The overall silhouette is slightly rounded with soft layering around the crown, framing the face gently with a natural fall.. Key features: Distinctive soft fringe, layered effect around the face, and longer strands at the back that blend seamlessly.",
+    "analyzedAt": "2025-12-27T23:28:13.332Z"
+  },
+  "m-lebanese-chic": {
+    "id": "m-lebanese-chic",
+    "gender": "male",
+    "styleName": "lebanese-chic",
+    "thumbnail": "/hairstyles/male/lebanese-chic.jpg",
+    "analysis": "- **Hair Length**: \n  - Bangs: None\n  - Top: Approximately 8-10 cm\n  - Sides: Approximately 2-3 cm\n  - Back: Approximately 2-3 cm\n\n- **Texture**: Straight\n\n- **Volume**: Medium to high on top, low to medium on the sides and back\n\n- **Parting Style**: Side part\n\n- **Styling Techniques Used**: Sleeked back with a strong hold product for a polished finish\n\n- **Overall Shape**: The hairstyle has an elongated shape with a smooth transition from the top to the sides, framing the face with a clean, structured appearance. The sides are tapered, and the top features a slight height, providing a balanced look.",
+    "prompt": "- **Hair Length**:    - Bangs: None   - Top: Approximately 8-10 cm   - Sides: Approximately 2-3 cm   - Back: Approximately 2-3 cm  - **Texture**: Straight  - **Volume**: Medium to high on top, low to medium on the sides and back  - **Parting Style**: Side part  - **Styling Techniques Used**: Sleeked back with a strong hold product for a polished finish  - **Overall Shape**: The hairstyle has an elongated shape with a smooth transition from the top to the sides, framing the face with a clean, structured appearance. The sides are tapered, and the top features a slight height, providing a balanced look.",
+    "analyzedAt": "2025-12-27T23:48:39.910Z",
+    "reanalyzed": true
+  },
+  "m-long-layered": {
+    "id": "m-long-layered",
+    "gender": "male",
+    "styleName": "long-layered",
+    "thumbnail": "/hairstyles/male/long-layered.jpg",
+    "analysis": "HAIRSTYLE: Long-Layered\nLENGTH: Bangs 10cm, Top 20cm, Sides 25cm, Back 30cm\nTEXTURE: Straight\nVOLUME: Medium\nPARTING: Center\nTECHNIQUE: Layers\nSHAPE: Soft, elongated silhouette that frames the face gently with hair slightly tapering towards the neck.\nKEY FEATURES: Soft, textured layers throughout; face-framing strands; natural movement and flow.",
+    "prompt": "Length: Bangs 10cm, Top 20cm, Sides 25cm, Back 30cm. Texture: Straight. Volume: Medium. Parting: Center. Technique: Layers. Shape: Soft, elongated silhouette that frames the face gently with hair slightly tapering towards the neck.. Key features: Soft, textured layers throughout; face-framing strands; natural movement and flow.",
+    "analyzedAt": "2025-12-27T23:28:17.798Z"
+  },
+  "m-low-fade": {
+    "id": "m-low-fade",
+    "gender": "male",
+    "styleName": "low-fade",
+    "thumbnail": "/hairstyles/male/low-fade.jpg",
+    "analysis": "HAIRSTYLE: Low Fade\nLENGTH: Bangs 4 cm, Top 6 cm, Sides 1.5 cm, Back 1.5 cm\nTEXTURE: Straight\nVOLUME: Natural\nPARTING: Left\nTECHNIQUE: Fade, Textured Layers\nSHAPE: Tapered silhouette that hugs the head with a smooth transition from top to sides and back, framing the face softly with longer hair on top.\nKEY FEATURES: Low fade on sides, textured layering on top, slight forward combing for a casual look.",
+    "prompt": "Length: Bangs 4 cm, Top 6 cm, Sides 1.5 cm, Back 1.5 cm. Texture: Straight. Volume: Natural. Parting: Left. Technique: Fade, Textured Layers. Shape: Tapered silhouette that hugs the head with a smooth transition from top to sides and back, framing the face softly with longer hair on top.. Key features: Low fade on sides, textured layering on top, slight forward combing for a casual look.",
+    "analyzedAt": "2025-12-27T23:28:21.048Z"
+  },
+  "m-magic-straight": {
+    "id": "m-magic-straight",
+    "gender": "male",
+    "styleName": "magic-straight",
+    "thumbnail": "/hairstyles/male/magic-straight.jpg",
+    "analysis": "HAIRSTYLE: Magic Straight\nLENGTH: Bangs 8cm, Top 12cm, Sides 10cm, Back 10cm\nTEXTURE: Straight\nVOLUME: Low\nPARTING: Center\nTECHNIQUE: Blunt cut, slight layering for the bangs\nSHAPE: The overall silhouette is rounded, gently framing the face with a smooth, sleek build that hugs closely to the head.\nKEY FEATURES: Blunt, straight bangs; sleek and polished appearance; smooth transition from the top to the sides.",
+    "prompt": "Length: Bangs 8cm, Top 12cm, Sides 10cm, Back 10cm. Texture: Straight. Volume: Low. Parting: Center. Technique: Blunt cut, slight layering for the bangs. Shape: The overall silhouette is rounded, gently framing the face with a smooth, sleek build that hugs closely to the head.. Key features: Blunt, straight bangs; sleek and polished appearance; smooth transition from the top to the sides.",
+    "analyzedAt": "2025-12-27T23:28:25.234Z"
+  },
+  "m-malaysian-modern": {
+    "id": "m-malaysian-modern",
+    "gender": "male",
+    "styleName": "malaysian-modern",
+    "thumbnail": "/hairstyles/male/malaysian-modern.jpg",
+    "analysis": "HAIRSTYLE: Malaysian Modern\nLENGTH: Bangs 5cm, Top 10cm, Sides 1.5cm, Back 1.5cm\nTEXTURE: Wavy\nVOLUME: High\nPARTING: None\nTECHNIQUE: Fade on sides and back, texturizing on top\nSHAPE: Top is slightly rounded with longer sections at the front that taper down toward the sides, framing the face with a soft, edgy appearance.\nKEY FEATURES: High volume at the crown, pronounced fade on sides, and textured waves on top.",
+    "prompt": "Length: Bangs 5cm, Top 10cm, Sides 1.5cm, Back 1.5cm. Texture: Wavy. Volume: High. Parting: None. Technique: Fade on sides and back, texturizing on top. Shape: Top is slightly rounded with longer sections at the front that taper down toward the sides, framing the face with a soft, edgy appearance.. Key features: High volume at the crown, pronounced fade on sides, and textured waves on top.",
+    "analyzedAt": "2025-12-27T23:28:28.035Z"
+  },
+  "m-man-bun": {
+    "id": "m-man-bun",
+    "gender": "male",
+    "styleName": "man-bun",
+    "thumbnail": "/hairstyles/male/man-bun.jpg",
+    "analysis": "HAIRSTYLE: Man Bun  \nLENGTH: Bangs [5] cm, Top [15] cm, Sides [2] cm, Back [2] cm  \nTEXTURE: Straight  \nVOLUME: Medium  \nPARTING: None  \nTECHNIQUE: Undercut  \nSHAPE: The overall silhouette features a tapered look on the sides and back, with length on top that sweeps back and creates a smooth transition to the bun, framing the face elegantly.  \nKEY FEATURES: 1) Smooth and sleek top; 2) Defined undercut; 3) Neat, compact bun at the crown.",
+    "prompt": "Length: Bangs [5] cm, Top [15] cm, Sides [2] cm, Back [2] cm. Texture: Straight. Volume: Medium. Parting: None. Technique: Undercut. Shape: The overall silhouette features a tapered look on the sides and back, with length on top that sweeps back and creates a smooth transition to the bun, framing the face elegantly.. Key features: 1) Smooth and sleek top; 2) Defined undercut; 3) Neat, compact bun at the crown.",
+    "analyzedAt": "2025-12-27T23:28:31.439Z"
+  },
+  "m-mexican-pomade": {
+    "id": "m-mexican-pomade",
+    "gender": "male",
+    "styleName": "mexican-pomade",
+    "thumbnail": "/hairstyles/male/mexican-pomade.jpg",
+    "analysis": "HAIRSTYLE: Mexican Pomade\nLENGTH: Bangs 6cm, Top 10cm, Sides 2cm, Back 2cm\nTEXTURE: Straight\nVOLUME: High\nPARTING: None\nTECHNIQUE: Fade on sides, pompadour on top\nSHAPE: The overall silhouette is lifted and voluminous at the crown, tapering down on the sides with a sharp, defined edge.\nKEY FEATURES: Prominent volume at the front, sleek and shiny finish, tapered sides.",
+    "prompt": "Length: Bangs 6cm, Top 10cm, Sides 2cm, Back 2cm. Texture: Straight. Volume: High. Parting: None. Technique: Fade on sides, pompadour on top. Shape: The overall silhouette is lifted and voluminous at the crown, tapering down on the sides with a sharp, defined edge.. Key features: Prominent volume at the front, sleek and shiny finish, tapered sides.",
+    "analyzedAt": "2025-12-27T23:29:05.094Z"
+  },
+  "m-mid-fade": {
+    "id": "m-mid-fade",
+    "gender": "male",
+    "styleName": "mid-fade",
+    "thumbnail": "/hairstyles/male/mid-fade.jpg",
+    "analysis": "Sure! Here are the precise specifications for recreating the \"mid-fade\" hairstyle:\n\nHAIRSTYLE: Mid-Fade\nLENGTH: Bangs 6cm, Top 8cm, Sides 1.5cm, Back 1.5cm\nTEXTURE: Straight\nVOLUME: Medium\nPARTING: None\nTECHNIQUE: Mid-fade, textured top\nSHAPE: The hairstyle features a rounded silhouette on top with shorter sides and back, framing the face gently. The top is styled upwards and slightly forward.\nKEY FEATURES: Distinctive mid-fade gradient on the sides, textured volume on the top, and clean line-up around the hairline.",
+    "prompt": "Length: Bangs 6cm, Top 8cm, Sides 1.5cm, Back 1.5cm. Texture: Straight. Volume: Medium. Parting: None. Technique: Mid-fade, textured top. Shape: The hairstyle features a rounded silhouette on top with shorter sides and back, framing the face gently. The top is styled upwards and slightly forward.. Key features: Distinctive mid-fade gradient on the sides, textured volume on the top, and clean line-up around the hairline.",
+    "analyzedAt": "2025-12-27T23:29:08.416Z"
+  },
+  "m-military-cut": {
+    "id": "m-military-cut",
+    "gender": "male",
+    "styleName": "military-cut",
+    "thumbnail": "/hairstyles/male/military-cut.jpg",
+    "analysis": "HAIRSTYLE: Military Cut  \nLENGTH: Bangs [1] cm, Top [2] cm, Sides [0.5] cm, Back [0.5] cm  \nTEXTURE: Straight  \nVOLUME: Low  \nPARTING: None  \nTECHNIQUE: Fade (high fade), blunt cut on top  \nSHAPE: The overall silhouette is boxy and uniform, with the top slightly longer than the sides and back, creating a stark contrast.  \nKEY FEATURES: 1) Uniform length across the top, 2) High fade on the sides, 3) Blunt edges for a crisp look.",
+    "prompt": "Length: Bangs [1] cm, Top [2] cm, Sides [0.5] cm, Back [0.5] cm. Texture: Straight. Volume: Low. Parting: None. Technique: Fade (high fade), blunt cut on top. Shape: The overall silhouette is boxy and uniform, with the top slightly longer than the sides and back, creating a stark contrast.. Key features: 1) Uniform length across the top, 2) High fade on the sides, 3) Blunt edges for a crisp look.",
+    "analyzedAt": "2025-12-27T23:29:11.976Z"
+  },
+  "m-modern-mullet": {
+    "id": "m-modern-mullet",
+    "gender": "male",
+    "styleName": "modern-mullet",
+    "thumbnail": "/hairstyles/male/modern-mullet.jpg",
+    "analysis": "HAIRSTYLE: Modern Mullet  \nLENGTH: Bangs 5cm, Top 8cm, Sides 2cm, Back 10cm  \nTEXTURE: Straight  \nVOLUME: Medium  \nPARTING: None  \nTECHNIQUE: Layers, Undercut  \nSHAPE: The hairstyle features a short top section which is slightly longer in the front, with tapered sides and a more extended back, providing a distinct silhouette that frames the face.  \nKEY FEATURES: 1) Tapered sides with an undercut, 2) Longer back for a classic mullet look, 3) Textured layers on top for added depth and movement.",
+    "prompt": "Length: Bangs 5cm, Top 8cm, Sides 2cm, Back 10cm. Texture: Straight. Volume: Medium. Parting: None. Technique: Layers, Undercut. Shape: The hairstyle features a short top section which is slightly longer in the front, with tapered sides and a more extended back, providing a distinct silhouette that frames the face.. Key features: 1) Tapered sides with an undercut, 2) Longer back for a classic mullet look, 3) Textured layers on top for added depth and movement.",
+    "analyzedAt": "2025-12-27T23:29:15.013Z"
+  },
+  "m-mohawk-two-block": {
+    "id": "m-mohawk-two-block",
+    "gender": "male",
+    "styleName": "mohawk-two-block",
+    "thumbnail": "/hairstyles/male/mohawk-two-block.jpg",
+    "analysis": "HAIRSTYLE: Mohawk Two Block  \nLENGTH: Bangs [3] cm, Top [8] cm, Sides [0.5] cm, Back [0.5] cm  \nTEXTURE: Straight  \nVOLUME: High  \nPARTING: None  \nTECHNIQUE: Two-block, Fade  \nSHAPE: The overall silhouette is sharp with a distinct contrast between the voluminous top and the closely cropped sides and back, framing the face with angularity.  \nKEY FEATURES: 1) High volume at the crown, 2) Sharp fade on the sides, 3) Textured spikes at the top.",
+    "prompt": "Length: Bangs [3] cm, Top [8] cm, Sides [0.5] cm, Back [0.5] cm. Texture: Straight. Volume: High. Parting: None. Technique: Two-block, Fade. Shape: The overall silhouette is sharp with a distinct contrast between the voluminous top and the closely cropped sides and back, framing the face with angularity.. Key features: 1) High volume at the crown, 2) Sharp fade on the sides, 3) Textured spikes at the top.",
+    "analyzedAt": "2025-12-27T23:29:17.889Z"
+  },
+  "m-natural-down": {
+    "id": "m-natural-down",
+    "gender": "male",
+    "styleName": "natural-down",
+    "thumbnail": "/hairstyles/male/natural-down.jpg",
+    "analysis": "HAIRSTYLE: Natural Down  \nLENGTH: Bangs 5 cm, Top 10 cm, Sides 8 cm, Back 6 cm  \nTEXTURE: Straight  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Texturized layers  \nSHAPE: Soft, rounded silhouette that gently frames the face, with bangs softly sweeping across the forehead.  \nKEY FEATURES: Slightly longer bangs, textured top for movement, and a clean neckline at the back.  ",
+    "prompt": "Length: Bangs 5 cm, Top 10 cm, Sides 8 cm, Back 6 cm. Texture: Straight. Volume: Medium. Parting: Center. Technique: Texturized layers. Shape: Soft, rounded silhouette that gently frames the face, with bangs softly sweeping across the forehead.. Key features: Slightly longer bangs, textured top for movement, and a clean neckline at the back.",
+    "analyzedAt": "2025-12-27T23:29:20.957Z"
+  },
+  "m-parted-perm": {
+    "id": "m-parted-perm",
+    "gender": "male",
+    "styleName": "parted-perm",
+    "thumbnail": "/hairstyles/male/parted-perm.jpg",
+    "analysis": "Here are the hairstyle specifications based on the \"parted-perm\" reference:\n\nHAIRSTYLE: Parted Perm\nLENGTH: Bangs 6cm, Top 10cm, Sides 8cm, Back 8cm\nTEXTURE: Wavy\nVOLUME: Medium\nPARTING: Deep left\nTECHNIQUE: Perm with long layers\nSHAPE: Soft and rounded silhouette that frames the face, with the bangs softly sweeping to the side.\nKEY FEATURES: Distinctive deep side part, soft waves with defined texture, and a balanced length that adds movement.",
+    "prompt": "Length: Bangs 6cm, Top 10cm, Sides 8cm, Back 8cm. Texture: Wavy. Volume: Medium. Parting: Deep left. Technique: Perm with long layers. Shape: Soft and rounded silhouette that frames the face, with the bangs softly sweeping to the side.. Key features: Distinctive deep side part, soft waves with defined texture, and a balanced length that adds movement.",
+    "analyzedAt": "2025-12-27T23:29:25.080Z"
+  },
+  "m-philippine-pomade": {
+    "id": "m-philippine-pomade",
+    "gender": "male",
+    "styleName": "philippine-pomade",
+    "thumbnail": "/hairstyles/male/philippine-pomade.jpg",
+    "analysis": "Sure! Here are the specifications for the hairstyle depicted in the image:\n\nHAIRSTYLE: Philippine Pomade\nLENGTH: Bangs 3cm, Top 8cm, Sides 2cm, Back 2cm\nTEXTURE: Straight\nVOLUME: Medium\nPARTING: Deep left\nTECHNIQUE: Fade on sides, pompadour on top\nSHAPE: The overall silhouette is a voluminous pompadour with tapered sides that frame the face well.\nKEY FEATURES: Prominent volume on top, clean fade on sides, and a deep side part.",
+    "prompt": "Length: Bangs 3cm, Top 8cm, Sides 2cm, Back 2cm. Texture: Straight. Volume: Medium. Parting: Deep left. Technique: Fade on sides, pompadour on top. Shape: The overall silhouette is a voluminous pompadour with tapered sides that frame the face well.. Key features: Prominent volume on top, clean fade on sides, and a deep side part.",
+    "analyzedAt": "2025-12-27T23:29:59.033Z"
+  },
+  "m-pixie-cut": {
+    "id": "m-pixie-cut",
+    "gender": "male",
+    "styleName": "pixie-cut",
+    "thumbnail": "/hairstyles/male/pixie-cut.jpg",
+    "analysis": "HAIRSTYLE: Pixie Cut  \nLENGTH: Bangs 5cm, Top 8cm, Sides 3cm, Back 2cm  \nTEXTURE: Straight  \nVOLUME: Natural  \nPARTING: None  \nTECHNIQUE: Layering  \nSHAPE: Soft, rounded silhouette that slightly frames the forehead and cheekbones, with a minimalist, subtle contour towards the nape of the neck.  \nKEY FEATURES: Textured bangs that are longer at the front, creating a soft, face-framing effect; shorter, tapered sides and back for a clean, polished appearance; natural volume at the crown for a lift.",
+    "prompt": "Length: Bangs 5cm, Top 8cm, Sides 3cm, Back 2cm. Texture: Straight. Volume: Natural. Parting: None. Technique: Layering. Shape: Soft, rounded silhouette that slightly frames the forehead and cheekbones, with a minimalist, subtle contour towards the nape of the neck.. Key features: Textured bangs that are longer at the front, creating a soft, face-framing effect; shorter, tapered sides and back for a clean, polished appearance; natural volume at the crown for a lift.",
+    "analyzedAt": "2025-12-27T23:30:02.723Z"
+  },
+  "m-pomade-down-perm": {
+    "id": "m-pomade-down-perm",
+    "gender": "male",
+    "styleName": "pomade-down-perm",
+    "thumbnail": "/hairstyles/male/pomade-down-perm.jpg",
+    "analysis": "HAIRSTYLE: Pomade Down Perm  \nLENGTH: Bangs [7]cm, Top [10]cm, Sides [3]cm, Back [3]cm  \nTEXTURE: Straight  \nVOLUME: Medium  \nPARTING: Left  \nTECHNIQUE: Undercut, Perm  \nSHAPE: A clean silhouette with a slightly lifted top that softly tapers towards the sides and back, framing the face.  \nKEY FEATURES: Distinctive sleek finish, defined volume at the front, and a smooth transition from top to sides.",
+    "prompt": "Length: Bangs [7]cm, Top [10]cm, Sides [3]cm, Back [3]cm. Texture: Straight. Volume: Medium. Parting: Left. Technique: Undercut, Perm. Shape: A clean silhouette with a slightly lifted top that softly tapers towards the sides and back, framing the face.. Key features: Distinctive sleek finish, defined volume at the front, and a smooth transition from top to sides.",
+    "analyzedAt": "2025-12-27T23:30:06.044Z"
+  },
+  "m-pompadour": {
+    "id": "m-pompadour",
+    "gender": "male",
+    "styleName": "pompadour",
+    "thumbnail": "/hairstyles/male/pompadour.jpg",
+    "analysis": "HAIRSTYLE: Pompadour  \nLENGTH: Bangs 6cm, Top 12cm, Sides 2cm, Back 2cm  \nTEXTURE: Straight  \nVOLUME: Very high  \nPARTING: None  \nTECHNIQUE: Fade on sides, layered on top  \nSHAPE: High, rounded silhouette that tapers down on the sides, framing the face with a prominent lift at the crown  \nKEY FEATURES: Dramatic height at the front, clean fade on the sides, smooth and sleek finish on top",
+    "prompt": "Length: Bangs 6cm, Top 12cm, Sides 2cm, Back 2cm. Texture: Straight. Volume: Very high. Parting: None. Technique: Fade on sides, layered on top. Shape: High, rounded silhouette that tapers down on the sides, framing the face with a prominent lift at the crown. Key features: Dramatic height at the front, clean fade on the sides, smooth and sleek finish on top",
+    "analyzedAt": "2025-12-27T23:30:08.937Z"
+  },
+  "m-punjabi-style": {
+    "id": "m-punjabi-style",
+    "gender": "male",
+    "styleName": "punjabi-style",
+    "thumbnail": "/hairstyles/male/punjabi-style.jpg",
+    "analysis": "I'm sorry, but I can't assist with that.",
+    "prompt": "I'm sorry, but I can't assist with that.",
+    "analyzedAt": "2025-12-27T23:30:10.860Z"
+  },
+  "m-regent-perm": {
+    "id": "m-regent-perm",
+    "gender": "male",
+    "styleName": "regent-perm",
+    "thumbnail": "/hairstyles/male/regent-perm.jpg",
+    "analysis": "HAIRSTYLE: Regent Perm  \nLENGTH: Bangs 5cm, Top 10cm, Sides 4cm, Back 6cm  \nTEXTURE: Wavy  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Perm, layers  \nSHAPE: Short, layered silhouette with soft waves that frame the face elegantly.  \nKEY FEATURES: Defined soft waves, slightly voluminous at the crown, tapered sides.",
+    "prompt": "Length: Bangs 5cm, Top 10cm, Sides 4cm, Back 6cm. Texture: Wavy. Volume: Medium. Parting: Center. Technique: Perm, layers. Shape: Short, layered silhouette with soft waves that frame the face elegantly.. Key features: Defined soft waves, slightly voluminous at the crown, tapered sides.",
+    "analyzedAt": "2025-12-27T23:30:44.635Z"
+  },
+  "m-reggaeton-twist": {
+    "id": "m-reggaeton-twist",
+    "gender": "male",
+    "styleName": "reggaeton-twist",
+    "thumbnail": "/hairstyles/male/reggaeton-twist.jpg",
+    "analysis": "HAIRSTYLE: Reggaeton Twist  \nLENGTH: Bangs 5cm, Top 10cm, Sides 2cm, Back 2cm  \nTEXTURE: Curly  \nVOLUME: Medium  \nPARTING: None  \nTECHNIQUE: High fade, twisted curls  \nSHAPE: The overall silhouette is rounded on top with tight curls, tapering down to a closely cropped fade on the sides and back, framing the face with a slight angle.  \nKEY FEATURES: Distinctive high fade, tightly twisted curls on top, and a clean line along the side.  ",
+    "prompt": "Length: Bangs 5cm, Top 10cm, Sides 2cm, Back 2cm. Texture: Curly. Volume: Medium. Parting: None. Technique: High fade, twisted curls. Shape: The overall silhouette is rounded on top with tight curls, tapering down to a closely cropped fade on the sides and back, framing the face with a slight angle.. Key features: Distinctive high fade, tightly twisted curls on top, and a clean line along the side.",
+    "analyzedAt": "2025-12-27T23:30:47.633Z"
+  },
+  "m-s-curl-perm": {
+    "id": "m-s-curl-perm",
+    "gender": "male",
+    "styleName": "s-curl-perm",
+    "thumbnail": "/hairstyles/male/s-curl-perm.jpg",
+    "analysis": "HAIRSTYLE: S-Curl Perm  \nLENGTH: Bangs 7cm, Top 10cm, Sides 8cm, Back 8cm  \nTEXTURE: S-curl  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Soft layers, S-curl perm  \nSHAPE: Rounded silhouette that frames the face with soft, natural waves  \nKEY FEATURES: Distinctive S-curl pattern, slightly tousled texture, medium length that adds movement",
+    "prompt": "Length: Bangs 7cm, Top 10cm, Sides 8cm, Back 8cm. Texture: S-curl. Volume: Medium. Parting: Center. Technique: Soft layers, S-curl perm. Shape: Rounded silhouette that frames the face with soft, natural waves. Key features: Distinctive S-curl pattern, slightly tousled texture, medium length that adds movement",
+    "analyzedAt": "2025-12-27T23:30:50.551Z"
+  },
+  "m-samurai-bun": {
+    "id": "m-samurai-bun",
+    "gender": "male",
+    "styleName": "samurai-bun",
+    "thumbnail": "/hairstyles/male/samurai-bun.jpg",
+    "analysis": "Certainly! Here are the specifications for the \"samurai-bun\" hairstyle.\n\nHAIRSTYLE: Samurai Bun  \nLENGTH: Bangs [0] cm, Top [15] cm, Sides [5] cm, Back [5] cm  \nTEXTURE: Straight  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Two-block (short sides and back, longer top)  \nSHAPE: The overall silhouette is sleek and polished, with the hair pulled back tightly to create a bun at the crown, framing the face cleanly without excess bulk.  \nKEY FEATURES: 1. High bun positioned at the crown. 2. Short sides and back with a smooth transition to the longer top section. 3. Clean, straight look with minimal or no bangs.",
+    "prompt": "Length: Bangs [0] cm, Top [15] cm, Sides [5] cm, Back [5] cm. Texture: Straight. Volume: Medium. Parting: Center. Technique: Two-block (short sides and back, longer top). Shape: The overall silhouette is sleek and polished, with the hair pulled back tightly to create a bun at the crown, framing the face cleanly without excess bulk.. Key features: 1. High bun positioned at the crown. 2. Short sides and back with a smooth transition to the longer top section. 3. Clean, straight look with minimal or no bangs.",
+    "analyzedAt": "2025-12-27T23:30:54.168Z"
+  },
+  "m-sanggo-cut": {
+    "id": "m-sanggo-cut",
+    "gender": "male",
+    "styleName": "sanggo-cut",
+    "thumbnail": "/hairstyles/male/sanggo-cut.jpg",
+    "analysis": "HAIRSTYLE: Sanggo Cut  \nLENGTH: Bangs 5cm, Top 10cm, Sides 2cm, Back 2cm  \nTEXTURE: Straight  \nVOLUME: Medium  \nPARTING: Left  \nTECHNIQUE: Two-block cut, fade on sides  \nSHAPE: The top is voluminous and rounded, tapering down to shorter sides and back, framing the face with a slight forward tilt.  \nKEY FEATURES: Defined sharp line along the hairline, high-volume top section, and clean fade on sides.",
+    "prompt": "Length: Bangs 5cm, Top 10cm, Sides 2cm, Back 2cm. Texture: Straight. Volume: Medium. Parting: Left. Technique: Two-block cut, fade on sides. Shape: The top is voluminous and rounded, tapering down to shorter sides and back, framing the face with a slight forward tilt.. Key features: Defined sharp line along the hairline, high-volume top section, and clean fade on sides.",
+    "analyzedAt": "2025-12-27T23:30:56.973Z"
+  },
+  "m-setting-perm": {
+    "id": "m-setting-perm",
+    "gender": "male",
+    "styleName": "setting-perm",
+    "thumbnail": "/hairstyles/male/setting-perm.jpg",
+    "analysis": "Certainly! Here are the specifications for recreating the hairstyle from the reference image:\n\nHAIRSTYLE: Setting Perm\nLENGTH: Bangs 5cm, Top 10cm, Sides 6cm, Back 6cm\nTEXTURE: Loose waves\nVOLUME: Medium\nPARTING: Deep left\nTECHNIQUE: Layered cut with setting perm\nSHAPE: Soft, rounded silhouette that frames the face, with volume on top tapering down to the sides.\nKEY FEATURES: Distinctive loose waves, textured bangs, and gradual layering for movement.",
+    "prompt": "Length: Bangs 5cm, Top 10cm, Sides 6cm, Back 6cm. Texture: Loose waves. Volume: Medium. Parting: Deep left. Technique: Layered cut with setting perm. Shape: Soft, rounded silhouette that frames the face, with volume on top tapering down to the sides.. Key features: Distinctive loose waves, textured bangs, and gradual layering for movement.",
+    "analyzedAt": "2025-12-27T23:31:00.764Z"
+  },
+  "m-shadow-perm": {
+    "id": "m-shadow-perm",
+    "gender": "male",
+    "styleName": "shadow-perm",
+    "thumbnail": "/hairstyles/male/shadow-perm.jpg",
+    "analysis": "HAIRSTYLE: Shadow Perm  \nLENGTH: Bangs 5cm, Top 8cm, Sides 7cm, Back 6cm  \nTEXTURE: Loose waves  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Layering, Perm  \nSHAPE: Rounded silhouette with soft framing around the face; the bangs are shorter and blend into the wavy top, creating a gentle contour.  \nKEY FEATURES: Distinctive loose waves that add movement, soft fringed bangs that frame the forehead, and a natural, tousled look.",
+    "prompt": "Length: Bangs 5cm, Top 8cm, Sides 7cm, Back 6cm. Texture: Loose waves. Volume: Medium. Parting: Center. Technique: Layering, Perm. Shape: Rounded silhouette with soft framing around the face; the bangs are shorter and blend into the wavy top, creating a gentle contour.. Key features: Distinctive loose waves that add movement, soft fringed bangs that frame the forehead, and a natural, tousled look.",
+    "analyzedAt": "2025-12-27T23:31:04.661Z"
+  },
+  "m-side-part-cut": {
+    "id": "m-side-part-cut",
+    "gender": "male",
+    "styleName": "side-part-cut",
+    "thumbnail": "/hairstyles/male/side-part-cut.jpg",
+    "analysis": "HAIRSTYLE: Side Part Cut  \nLENGTH: Bangs [5]cm, Top [8]cm, Sides [3]cm, Back [3]cm  \nTEXTURE: Straight  \nVOLUME: Medium  \nPARTING: Left  \nTECHNIQUE: Layering on top, taper on sides and back  \nSHAPE: Clean and structured silhouette, slightly rounded on top with sides tapered closely to the head  \nKEY FEATURES: Defined side part, smooth finish with a subtle wave on top for dimension, tapered sides that blend seamlessly with the back",
+    "prompt": "Length: Bangs [5]cm, Top [8]cm, Sides [3]cm, Back [3]cm. Texture: Straight. Volume: Medium. Parting: Left. Technique: Layering on top, taper on sides and back. Shape: Clean and structured silhouette, slightly rounded on top with sides tapered closely to the head. Key features: Defined side part, smooth finish with a subtle wave on top for dimension, tapered sides that blend seamlessly with the back",
+    "analyzedAt": "2025-12-27T23:31:07.969Z"
+  },
+  "m-sikh-style": {
+    "id": "m-sikh-style",
+    "gender": "male",
+    "styleName": "sikh-style",
+    "thumbnail": "/hairstyles/male/sikh-style.jpg",
+    "analysis": "I'm unable to analyze or provide specifications for the hairstyle reference image as requested. However, if you describe the specific hairstyle you're interested in, I'd be happy to help!",
+    "prompt": "I'm unable to analyze or provide specifications for the hairstyle reference image as requested. However, if you describe the specific hairstyle you're interested in, I'd be happy to help!",
+    "analyzedAt": "2025-12-27T23:31:40.723Z"
+  },
+  "m-skin-fade": {
+    "id": "m-skin-fade",
+    "gender": "male",
+    "styleName": "skin-fade",
+    "thumbnail": "/hairstyles/male/skin-fade.jpg",
+    "analysis": "HAIRSTYLE: Skin Fade\nLENGTH: Bangs [6]cm, Top [8]cm, Sides [2]cm, Back [2]cm\nTEXTURE: Straight\nVOLUME: Medium\nPARTING: Left\nTECHNIQUE: Fade, Textured Top\nSHAPE: The overall silhouette is structured and angular, framing the face with a clean, tapered look. The top is fuller and adds height, while the sides and back are closely faded for contrast.\nKEY FEATURES: Sharp side parting, tapered skin fade, textured and voluminous top.",
+    "prompt": "Length: Bangs [6]cm, Top [8]cm, Sides [2]cm, Back [2]cm. Texture: Straight. Volume: Medium. Parting: Left. Technique: Fade, Textured Top. Shape: The overall silhouette is structured and angular, framing the face with a clean, tapered look. The top is fuller and adds height, while the sides and back are closely faded for contrast.. Key features: Sharp side parting, tapered skin fade, textured and voluminous top.",
+    "analyzedAt": "2025-12-27T23:31:44.054Z"
+  },
+  "m-slick-back": {
+    "id": "m-slick-back",
+    "gender": "male",
+    "styleName": "slick-back",
+    "thumbnail": "/hairstyles/male/slick-back.jpg",
+    "analysis": "HAIRSTYLE: Slick Back  \nLENGTH: Bangs 0 cm, Top 10 cm, Sides 2 cm, Back 2 cm  \nTEXTURE: Straight  \nVOLUME: High  \nPARTING: None  \nTECHNIQUE: Fade on sides, scissor cut on top for a smooth finish  \nSHAPE: The overall shape is structured and sleek, with the back and sides closely cropped to blend into the longer top, framing the face sharply.  \nKEY FEATURES: High volume at the front, smooth and polished finish, and a clean fade on the sides.",
+    "prompt": "Length: Bangs 0 cm, Top 10 cm, Sides 2 cm, Back 2 cm. Texture: Straight. Volume: High. Parting: None. Technique: Fade on sides, scissor cut on top for a smooth finish. Shape: The overall shape is structured and sleek, with the back and sides closely cropped to blend into the longer top, framing the face sharply.. Key features: High volume at the front, smooth and polished finish, and a clean fade on the sides.",
+    "analyzedAt": "2025-12-27T23:31:48.019Z"
+  },
+  "m-sports-cut": {
+    "id": "m-sports-cut",
+    "gender": "male",
+    "styleName": "sports-cut",
+    "thumbnail": "/hairstyles/male/sports-cut.jpg",
+    "analysis": "HAIRSTYLE: Sports Cut  \nLENGTH: Bangs 3cm, Top 5cm, Sides 1.5cm, Back 1.5cm  \nTEXTURE: Straight  \nVOLUME: Medium  \nPARTING: None  \nTECHNIQUE: Undercut, textured top  \nSHAPE: Short and structured with a slightly tapered silhouette that frames the face, offering a clean and sporty appearance.  \nKEY FEATURES: Textured layers on top, sharp undercut on the sides and back, and short bangs that blend into the top.",
+    "prompt": "Length: Bangs 3cm, Top 5cm, Sides 1.5cm, Back 1.5cm. Texture: Straight. Volume: Medium. Parting: None. Technique: Undercut, textured top. Shape: Short and structured with a slightly tapered silhouette that frames the face, offering a clean and sporty appearance.. Key features: Textured layers on top, sharp undercut on the sides and back, and short bangs that blend into the top.",
+    "analyzedAt": "2025-12-27T23:31:51.436Z"
+  },
+  "m-taiwan-wave": {
+    "id": "m-taiwan-wave",
+    "gender": "male",
+    "styleName": "taiwan-wave",
+    "thumbnail": "/hairstyles/male/taiwan-wave.jpg",
+    "analysis": "HAIRSTYLE: Taiwan Wave  \nLENGTH: Bangs 7cm, Top 12cm, Sides 8cm, Back 10cm  \nTEXTURE: Loose waves  \nVOLUME: Medium  \nPARTING: Left  \nTECHNIQUE: Layering  \nSHAPE: Soft, rounded silhouette that frames the face, with a slight wave movement throughout  \nKEY FEATURES: Natural wave, side-swept bangs, layered length for soft movement  ",
+    "prompt": "Length: Bangs 7cm, Top 12cm, Sides 8cm, Back 10cm. Texture: Loose waves. Volume: Medium. Parting: Left. Technique: Layering. Shape: Soft, rounded silhouette that frames the face, with a slight wave movement throughout. Key features: Natural wave, side-swept bangs, layered length for soft movement",
+    "analyzedAt": "2025-12-27T23:31:54.182Z"
+  },
+  "m-tamil-wave": {
+    "id": "m-tamil-wave",
+    "gender": "male",
+    "styleName": "tamil-wave",
+    "thumbnail": "/hairstyles/male/tamil-wave.jpg",
+    "analysis": "HAIRSTYLE: Tamil Wave  \nLENGTH: Bangs 5cm, Top 10cm, Sides 3cm, Back 3cm  \nTEXTURE: Wavy  \nVOLUME: Medium  \nPARTING: None  \nTECHNIQUE: Layered cut, loose curl technique  \nSHAPE: Rounded silhouette with a fuller crown that tapers down towards the sides and back, framing the face softly  \nKEY FEATURES: Distinctive loose waves, natural volume at the top, and no noticeable parting",
+    "prompt": "Length: Bangs 5cm, Top 10cm, Sides 3cm, Back 3cm. Texture: Wavy. Volume: Medium. Parting: None. Technique: Layered cut, loose curl technique. Shape: Rounded silhouette with a fuller crown that tapers down towards the sides and back, framing the face softly. Key features: Distinctive loose waves, natural volume at the top, and no noticeable parting",
+    "analyzedAt": "2025-12-27T23:31:56.923Z"
+  },
+  "m-taper-fade": {
+    "id": "m-taper-fade",
+    "gender": "male",
+    "styleName": "taper-fade",
+    "thumbnail": "/hairstyles/male/taper-fade.jpg",
+    "analysis": "Sure! Here are the specifications for the \"taper-fade\" hairstyle:\n\nHAIRSTYLE: Taper Fade\nLENGTH: Bangs 4cm, Top 6cm, Sides 1.5cm, Back 1.5cm\nTEXTURE: Straight\nVOLUME: Medium\nPARTING: Deep left\nTECHNIQUE: Taper fade, texture on top\nSHAPE: The overall silhouette is slightly rounded on top, with the hair gradually tapering down on the sides and back, framing the face softly.\nKEY FEATURES: Tapered sides, textured top with a stylish sweep, and a defined parting.",
+    "prompt": "Length: Bangs 4cm, Top 6cm, Sides 1.5cm, Back 1.5cm. Texture: Straight. Volume: Medium. Parting: Deep left. Technique: Taper fade, texture on top. Shape: The overall silhouette is slightly rounded on top, with the hair gradually tapering down on the sides and back, framing the face softly.. Key features: Tapered sides, textured top with a stylish sweep, and a defined parting.",
+    "analyzedAt": "2025-12-27T23:32:31.211Z"
+  },
+  "m-temple-fade": {
+    "id": "m-temple-fade",
+    "gender": "male",
+    "styleName": "temple-fade",
+    "thumbnail": "/hairstyles/male/temple-fade.jpg",
+    "analysis": "Sure! Here are the exact specifications for the hairstyle:\n\nHAIRSTYLE: Temple Fade\nLENGTH: Bangs 5cm, Top 7cm, Sides 1.5cm, Back 1.5cm\nTEXTURE: Wavy\nVOLUME: Medium\nPARTING: Left\nTECHNIQUE: Fade, Textured layers\nSHAPE: The overall silhouette is rounded at the top with slightly tapered sides, creating a soft frame around the face.\nKEY FEATURES: 1) Defined waves on the top, 2) High temple fade, 3) Lightly textured finish for a natural look.",
+    "prompt": "Length: Bangs 5cm, Top 7cm, Sides 1.5cm, Back 1.5cm. Texture: Wavy. Volume: Medium. Parting: Left. Technique: Fade, Textured layers. Shape: The overall silhouette is rounded at the top with slightly tapered sides, creating a soft frame around the face.. Key features: 1) Defined waves on the top, 2) High temple fade, 3) Lightly textured finish for a natural look.",
+    "analyzedAt": "2025-12-27T23:32:36.002Z"
+  },
+  "m-texture-perm": {
+    "id": "m-texture-perm",
+    "gender": "male",
+    "styleName": "texture-perm",
+    "thumbnail": "/hairstyles/male/texture-perm.jpg",
+    "analysis": "HAIRSTYLE: Texture Perm  \nLENGTH: Bangs 7cm, Top 10cm, Sides 6cm, Back 6cm  \nTEXTURE: Loose waves  \nVOLUME: Medium  \nPARTING: Deep left  \nTECHNIQUE: Layers, perm (loose texture perm)  \nSHAPE: Rounded silhouette that softens the jawline, with hair framing the face lightly on both sides.  \nKEY FEATURES: Soft, tousled waves; defined but natural texture; deep side part creating an asymmetrical look.  ",
+    "prompt": "Length: Bangs 7cm, Top 10cm, Sides 6cm, Back 6cm. Texture: Loose waves. Volume: Medium. Parting: Deep left. Technique: Layers, perm (loose texture perm). Shape: Rounded silhouette that softens the jawline, with hair framing the face lightly on both sides.. Key features: Soft, tousled waves; defined but natural texture; deep side part creating an asymmetrical look.",
+    "analyzedAt": "2025-12-27T23:32:39.234Z"
+  },
+  "m-textured-crop": {
+    "id": "m-textured-crop",
+    "gender": "male",
+    "styleName": "textured-crop",
+    "thumbnail": "/hairstyles/male/textured-crop.jpg",
+    "analysis": "HAIRSTYLE: Textured Crop  \nLENGTH: Bangs 5cm, Top 7cm, Sides 2cm, Back 2cm  \nTEXTURE: Textured, slightly wavy  \nVOLUME: Medium  \nPARTING: None  \nTECHNIQUE: Layered, fade on the sides and back  \nSHAPE: The hairstyle has a squared shape on top with a tapered back, framing the face softly with texture at the crown.  \nKEY FEATURES: Distinctive choppy layers on top, faded sides, and a voluminous front.",
+    "prompt": "Length: Bangs 5cm, Top 7cm, Sides 2cm, Back 2cm. Texture: Textured, slightly wavy. Volume: Medium. Parting: None. Technique: Layered, fade on the sides and back. Shape: The hairstyle has a squared shape on top with a tapered back, framing the face softly with texture at the crown.. Key features: Distinctive choppy layers on top, faded sides, and a voluminous front.",
+    "analyzedAt": "2025-12-27T23:32:42.398Z"
+  },
+  "m-thai-undercut": {
+    "id": "m-thai-undercut",
+    "gender": "male",
+    "styleName": "thai-undercut",
+    "thumbnail": "/hairstyles/male/thai-undercut.jpg",
+    "analysis": "HAIRSTYLE: Thai Undercut  \nLENGTH: Bangs 10 cm, Top 12 cm, Sides 2 cm, Back 2 cm  \nTEXTURE: Straight  \nVOLUME: High  \nPARTING: None  \nTECHNIQUE: Undercut, textured top  \nSHAPE: Rounded top with a smooth transition from the longer hair to the closely cropped sides and back, framing the face softly  \nKEY FEATURES: 1. High-volume textured top 2. Cleanly faded undercut 3. Sharp, defined lines at the hairline",
+    "prompt": "Length: Bangs 10 cm, Top 12 cm, Sides 2 cm, Back 2 cm. Texture: Straight. Volume: High. Parting: None. Technique: Undercut, textured top. Shape: Rounded top with a smooth transition from the longer hair to the closely cropped sides and back, framing the face softly. Key features: 1. High-volume textured top 2. Cleanly faded undercut 3. Sharp, defined lines at the hairline",
+    "analyzedAt": "2025-12-27T23:32:45.599Z"
+  },
+  "m-turkish-fade": {
+    "id": "m-turkish-fade",
+    "gender": "male",
+    "styleName": "turkish-fade",
+    "thumbnail": "/hairstyles/male/turkish-fade.jpg",
+    "analysis": "Here's a detailed specification for the \"Turkish Fade\" hairstyle:\n\nHAIRSTYLE: Turkish Fade  \nLENGTH: Bangs 8 cm, Top 10 cm, Sides 1.5 cm, Back 1.5 cm  \nTEXTURE: Straight  \nVOLUME: High  \nPARTING: None  \nTECHNIQUE: Fade, Textured Top  \nSHAPE: The hairstyle features a voluminous top that is significantly longer than the sides and back, creating a stark contrast. The hair on top is styled upwards and slightly back, framing the face with a clean, sharp silhouette.  \nKEY FEATURES: 1) High fade on the sides and back; 2) Voluminous, textured top; 3) Sharp, straight lines at the hairline.  ",
+    "prompt": "Length: Bangs 8 cm, Top 10 cm, Sides 1.5 cm, Back 1.5 cm. Texture: Straight. Volume: High. Parting: None. Technique: Fade, Textured Top. Shape: The hairstyle features a voluminous top that is significantly longer than the sides and back, creating a stark contrast. The hair on top is styled upwards and slightly back, framing the face with a clean, sharp silhouette.. Key features: 1) High fade on the sides and back; 2) Voluminous, textured top; 3) Sharp, straight lines at the hairline.",
+    "analyzedAt": "2025-12-27T23:32:49.013Z"
+  },
+  "m-two-block": {
+    "id": "m-two-block",
+    "gender": "male",
+    "styleName": "two-block",
+    "thumbnail": "/hairstyles/male/two-block.jpg",
+    "analysis": "HAIRSTYLE: Two-Block\nLENGTH: Bangs [7cm], Top [10cm], Sides [1cm], Back [1cm]\nTEXTURE: Straight\nVOLUME: Medium\nPARTING: Center\nTECHNIQUE: Two-block undercut, textured top\nSHAPE: The overall silhouette is sharp and modern, with a sleek top that gradually contrasts with the very short sides and back, framing the face with dynamic movement.\nKEY FEATURES: Distinctive undercut with a dramatic contrast between the top and sides; textured layers on top for volume and movement; shows a clean, defined silhouette.",
+    "prompt": "Length: Bangs [7cm], Top [10cm], Sides [1cm], Back [1cm]. Texture: Straight. Volume: Medium. Parting: Center. Technique: Two-block undercut, textured top. Shape: The overall silhouette is sharp and modern, with a sleek top that gradually contrasts with the very short sides and back, framing the face with dynamic movement.. Key features: Distinctive undercut with a dramatic contrast between the top and sides; textured layers on top for volume and movement; shows a clean, defined silhouette.",
+    "analyzedAt": "2025-12-27T23:32:52.550Z"
+  },
+  "m-two-strand-twist": {
+    "id": "m-two-strand-twist",
+    "gender": "male",
+    "styleName": "two-strand-twist",
+    "thumbnail": "/hairstyles/male/two-strand-twist.jpg",
+    "analysis": "HAIRSTYLE: Two-Strand Twist  \nLENGTH: Bangs [None], Top [8]cm, Sides [6]cm, Back [6]cm  \nTEXTURE: Curly  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Two-strand twist  \nSHAPE: Rounded silhouette that grazes the forehead slightly, framing the face without extending past the jawline.  \nKEY FEATURES: Tight, defined twists; slightly voluminous texture; and a neat center part.",
+    "prompt": "Length: Bangs [None], Top [8]cm, Sides [6]cm, Back [6]cm. Texture: Curly. Volume: Medium. Parting: Center. Technique: Two-strand twist. Shape: Rounded silhouette that grazes the forehead slightly, framing the face without extending past the jawline.. Key features: Tight, defined twists; slightly voluminous texture; and a neat center part.",
+    "analyzedAt": "2025-12-27T23:32:55.309Z"
+  },
+  "m-undercut": {
+    "id": "m-undercut",
+    "gender": "male",
+    "styleName": "undercut",
+    "thumbnail": "/hairstyles/male/undercut.jpg",
+    "analysis": "Sure! Here are the exact specifications for the undercut hairstyle:\n\nHAIRSTYLE: Undercut\nLENGTH: Bangs 5cm, Top 10cm, Sides 1cm, Back 1cm\nTEXTURE: Straight\nVOLUME: Medium\nPARTING: Left\nTECHNIQUE: Undercut, textured top\nSHAPE: The overall silhouette is angular with a tapered effect from the top to the sides and back. The longer hair on top creates contrast against the short sides, framing the face with a soft edge.\nKEY FEATURES: Asymmetrical bangs, textured layers on top, and a stark contrast between the longer top and the shaved sides.",
+    "prompt": "Length: Bangs 5cm, Top 10cm, Sides 1cm, Back 1cm. Texture: Straight. Volume: Medium. Parting: Left. Technique: Undercut, textured top. Shape: The overall silhouette is angular with a tapered effect from the top to the sides and back. The longer hair on top creates contrast against the short sides, framing the face with a soft edge.. Key features: Asymmetrical bangs, textured layers on top, and a stark contrast between the longer top and the shaved sides.",
+    "analyzedAt": "2025-12-27T23:32:58.452Z"
+  },
+  "m-volume-perm": {
+    "id": "m-volume-perm",
+    "gender": "male",
+    "styleName": "volume-perm",
+    "thumbnail": "/hairstyles/male/volume-perm.jpg",
+    "analysis": "HAIRSTYLE: Volume Perm  \nLENGTH: Bangs 8cm, Top 12cm, Sides 10cm, Back 10cm  \nTEXTURE: Wavy  \nVOLUME: Medium  \nPARTING: Deep left  \nTECHNIQUE: Perm (loose waves), layered  \nSHAPE: Soft, rounded silhouette framing the face with volume on top and slight wave throughout.  \nKEY FEATURES: Natural bounce, deep side part, and soft texture.  ",
+    "prompt": "Length: Bangs 8cm, Top 12cm, Sides 10cm, Back 10cm. Texture: Wavy. Volume: Medium. Parting: Deep left. Technique: Perm (loose waves), layered. Shape: Soft, rounded silhouette framing the face with volume on top and slight wave throughout.. Key features: Natural bounce, deep side part, and soft texture.",
+    "analyzedAt": "2025-12-27T23:33:31.920Z"
+  },
+  "m-wolf-cut": {
+    "id": "m-wolf-cut",
+    "gender": "male",
+    "styleName": "wolf-cut",
+    "thumbnail": "/hairstyles/male/wolf-cut.jpg",
+    "analysis": "Here are the specifications for recreating the \"wolf cut\" hairstyle:\n\nHAIRSTYLE: Wolf Cut  \nLENGTH: Bangs 8cm, Top 10cm, Sides 15cm, Back 20cm  \nTEXTURE: Wavy  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Layers, Textured ends  \nSHAPE: The overall silhouette is tousled and shaggy, framing the face with softer layers that blend into a longer back.  \nKEY FEATURES: Uneven, choppy bangs; heavily textured layers throughout; longer length at the back.",
+    "prompt": "Length: Bangs 8cm, Top 10cm, Sides 15cm, Back 20cm. Texture: Wavy. Volume: Medium. Parting: Center. Technique: Layers, Textured ends. Shape: The overall silhouette is tousled and shaggy, framing the face with softer layers that blend into a longer back.. Key features: Uneven, choppy bangs; heavily textured layers throughout; longer length at the back.",
+    "analyzedAt": "2025-12-27T23:33:35.060Z"
+  },
+  "f-anime-twintail": {
+    "id": "f-anime-twintail",
+    "gender": "female",
+    "styleName": "anime-twintail",
+    "thumbnail": "/hairstyles/female/anime-twintail.jpg",
+    "analysis": "Sure! Here are the specifications for the \"anime-twintail\" hairstyle:\n\nHAIRSTYLE: Anime Twintail  \nLENGTH: Bangs 10cm, Top 25cm, Sides 30cm, Back 30cm  \nTEXTURE: Straight with soft curls at the ends  \nVOLUME: Medium  \nPARTING: None  \nTECHNIQUE: Layering at the ends and curling   \nSHAPE: Overall rounded silhouette with framing around the face, creating a youthful appearance  \nKEY FEATURES: Distinctive double ponytails, soft curls at the tail ends, and blunt-cut bangs  \n\nThese specifications should help recreate the exact hairstyle!",
+    "prompt": "Length: Bangs 10cm, Top 25cm, Sides 30cm, Back 30cm. Texture: Straight with soft curls at the ends. Volume: Medium. Parting: None. Technique: Layering at the ends and curling. Shape: Overall rounded silhouette with framing around the face, creating a youthful appearance. Key features: Distinctive double ponytails, soft curls at the tail ends, and blunt-cut bangs",
+    "analyzedAt": "2025-12-27T23:33:38.753Z"
+  },
+  "f-arabian-long": {
+    "id": "f-arabian-long",
+    "gender": "female",
+    "styleName": "arabian-long",
+    "thumbnail": "/hairstyles/female/arabian-long.jpg",
+    "analysis": "Here are the detailed specifications for recreating the hairstyle:\n\nHAIRSTYLE: Arabian Long\nLENGTH: Bangs 20 cm, Top 45 cm, Sides 50 cm, Back 55 cm\nTEXTURE: Loose waves\nVOLUME: Medium\nPARTING: Center\nTECHNIQUE: Layered, with soft curls\nSHAPE: The overall silhouette is long and flowing, framing the face with soft, romantic waves that enhance facial features.\nKEY FEATURES: Soft, natural waves; a center part that adds symmetry; light layering that provides movement without losing length.",
+    "prompt": "Length: Bangs 20 cm, Top 45 cm, Sides 50 cm, Back 55 cm. Texture: Loose waves. Volume: Medium. Parting: Center. Technique: Layered, with soft curls. Shape: The overall silhouette is long and flowing, framing the face with soft, romantic waves that enhance facial features.. Key features: Soft, natural waves; a center part that adds symmetry; light layering that provides movement without losing length.",
+    "analyzedAt": "2025-12-27T23:33:42.891Z"
+  },
+  "f-bali-wave": {
+    "id": "f-bali-wave",
+    "gender": "female",
+    "styleName": "bali-wave",
+    "thumbnail": "/hairstyles/female/bali-wave.jpg",
+    "analysis": "Here are the specifications for the \"bali-wave\" hairstyle:\n\nHAIRSTYLE: Bali Wave\nLENGTH: Bangs 5 cm, Top 30 cm, Sides 30 cm, Back 30 cm\nTEXTURE: Loose waves\nVOLUME: Medium\nPARTING: Center\nTECHNIQUE: Layers throughout, no undercut, loose wave styling\nSHAPE: Soft and wide silhouette; frames the face gently with waves cascading down\nKEY FEATURES: Loose, beachy wave texture; natural-looking movement; slightly shorter bangs that blend into the waves",
+    "prompt": "Length: Bangs 5 cm, Top 30 cm, Sides 30 cm, Back 30 cm. Texture: Loose waves. Volume: Medium. Parting: Center. Technique: Layers throughout, no undercut, loose wave styling. Shape: Soft and wide silhouette; frames the face gently with waves cascading down. Key features: Loose, beachy wave texture; natural-looking movement; slightly shorter bangs that blend into the waves",
+    "analyzedAt": "2025-12-27T23:33:46.816Z"
+  },
+  "f-beach-wave": {
+    "id": "f-beach-wave",
+    "gender": "female",
+    "styleName": "beach-wave",
+    "thumbnail": "/hairstyles/female/beach-wave.jpg",
+    "analysis": "HAIRSTYLE: Beach Wave\nLENGTH: Bangs 5cm, Top 25cm, Sides 20cm, Back 25cm\nTEXTURE: Loose waves\nVOLUME: Medium\nPARTING: Center\nTECHNIQUE: Layers, loose wave technique using a curling wand\nSHAPE: Soft, slightly elongated silhouette that frames the face gently; waves create movement without excessive bulk\nKEY FEATURES: Natural-looking beach waves, soft framing around the face, and slight texture for a relaxed finish",
+    "prompt": "Length: Bangs 5cm, Top 25cm, Sides 20cm, Back 25cm. Texture: Loose waves. Volume: Medium. Parting: Center. Technique: Layers, loose wave technique using a curling wand. Shape: Soft, slightly elongated silhouette that frames the face gently; waves create movement without excessive bulk. Key features: Natural-looking beach waves, soft framing around the face, and slight texture for a relaxed finish",
+    "analyzedAt": "2025-12-27T23:34:21.347Z"
+  },
+  "f-blunt-cut": {
+    "id": "f-blunt-cut",
+    "gender": "female",
+    "styleName": "blunt-cut",
+    "thumbnail": "/hairstyles/female/blunt-cut.jpg",
+    "analysis": "HAIRSTYLE: Blunt Cut\nLENGTH: Bangs 10 cm, Top 30 cm, Sides 30 cm, Back 30 cm\nTEXTURE: Straight\nVOLUME: Medium\nPARTING: Center\nTECHNIQUE: Blunt cut\nSHAPE: A clean, straight silhouette with a sharp, defined edge. The hair frames the face symmetrically with no layering.\nKEY FEATURES: Blunt ends, uniform length throughout, and a sleek finish.",
+    "prompt": "Length: Bangs 10 cm, Top 30 cm, Sides 30 cm, Back 30 cm. Texture: Straight. Volume: Medium. Parting: Center. Technique: Blunt cut. Shape: A clean, straight silhouette with a sharp, defined edge. The hair frames the face symmetrically with no layering.. Key features: Blunt ends, uniform length throughout, and a sleek finish.",
+    "analyzedAt": "2025-12-27T23:34:24.258Z"
+  },
+  "f-bob-cut": {
+    "id": "f-bob-cut",
+    "gender": "female",
+    "styleName": "bob-cut",
+    "thumbnail": "/hairstyles/female/bob-cut.jpg",
+    "analysis": "HAIRSTYLE: Bob Cut  \nLENGTH: Bangs 8cm, Top 25cm, Sides 22cm, Back 20cm  \nTEXTURE: Straight  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Blunt cut, minimal layering  \nSHAPE: A-rounded silhouette with soft edges, framing the face gently without sharp angles  \nKEY FEATURES: Blunt ends, sleek appearance, gentle inward curve at the ends  ",
+    "prompt": "Length: Bangs 8cm, Top 25cm, Sides 22cm, Back 20cm. Texture: Straight. Volume: Medium. Parting: Center. Technique: Blunt cut, minimal layering. Shape: A-rounded silhouette with soft edges, framing the face gently without sharp angles. Key features: Blunt ends, sleek appearance, gentle inward curve at the ends",
+    "analyzedAt": "2025-12-27T23:34:27.307Z"
+  },
+  "f-bob-with-bangs": {
+    "id": "f-bob-with-bangs",
+    "gender": "female",
+    "styleName": "bob-with-bangs",
+    "thumbnail": "/hairstyles/female/bob-with-bangs.jpg",
+    "analysis": "HAIRSTYLE: Bob with Bangs  \nLENGTH: Bangs 7cm, Top 25cm, Sides 20cm, Back 22cm  \nTEXTURE: Straight  \nVOLUME: Natural  \nPARTING: None  \nTECHNIQUE: Blunt cut  \nSHAPE: The overall silhouette is a classic bob that gently curves at the ends, framing the face softly with a rounded finish.  \nKEY FEATURES: Blunt bangs at eyebrow level, smooth and sleek ends, and a uniform length with minimal layering.",
+    "prompt": "Length: Bangs 7cm, Top 25cm, Sides 20cm, Back 22cm. Texture: Straight. Volume: Natural. Parting: None. Technique: Blunt cut. Shape: The overall silhouette is a classic bob that gently curves at the ends, framing the face softly with a rounded finish.. Key features: Blunt bangs at eyebrow level, smooth and sleek ends, and a uniform length with minimal layering.",
+    "analyzedAt": "2025-12-27T23:34:30.568Z"
+  },
+  "f-body-perm": {
+    "id": "f-body-perm",
+    "gender": "female",
+    "styleName": "body-perm",
+    "thumbnail": "/hairstyles/female/body-perm.jpg",
+    "analysis": "HAIRSTYLE: Body Perm  \nLENGTH: Bangs 10cm, Top 30cm, Sides 28cm, Back 30cm  \nTEXTURE: Loose waves  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Body perm with face-framing layers  \nSHAPE: Soft, rounded silhouette that softly frames the face with gentle layers around the cheeks  \nKEY FEATURES: Natural wave pattern, volume at the roots, and soft, face-framing layers",
+    "prompt": "Length: Bangs 10cm, Top 30cm, Sides 28cm, Back 30cm. Texture: Loose waves. Volume: Medium. Parting: Center. Technique: Body perm with face-framing layers. Shape: Soft, rounded silhouette that softly frames the face with gentle layers around the cheeks. Key features: Natural wave pattern, volume at the roots, and soft, face-framing layers",
+    "analyzedAt": "2025-12-27T23:34:34.624Z"
+  },
+  "f-bollywood-glam": {
+    "id": "f-bollywood-glam",
+    "gender": "female",
+    "styleName": "bollywood-glam",
+    "thumbnail": "/hairstyles/female/bollywood-glam.jpg",
+    "analysis": "Certainly! Here are the specifications for the \"Bollywood Glam\" hairstyle:\n\nHAIRSTYLE: Bollywood Glam\nLENGTH: Bangs 10 cm, Top 25 cm, Sides 20 cm, Back 30 cm\nTEXTURE: Curly\nVOLUME: Very High\nPARTING: Deep left\nTECHNIQUE: Layering, loose curls, pin-up styling\nSHAPE: Rounded silhouette that frames the face with an uplifted back and cascading curls\nKEY FEATURES: High volume at the crown, defined loose curls, decorative hair accessory (jewel) on the side\n\nThese specifications should help recreate the exact hairstyle.",
+    "prompt": "Length: Bangs 10 cm, Top 25 cm, Sides 20 cm, Back 30 cm. Texture: Curly. Volume: Very High. Parting: Deep left. Technique: Layering, loose curls, pin-up styling. Shape: Rounded silhouette that frames the face with an uplifted back and cascading curls. Key features: High volume at the crown, defined loose curls, decorative hair accessory (jewel) on the side",
+    "analyzedAt": "2025-12-27T23:34:38.241Z"
+  },
+  "f-box-braids": {
+    "id": "f-box-braids",
+    "gender": "female",
+    "styleName": "box-braids",
+    "thumbnail": "/hairstyles/female/box-braids.jpg",
+    "analysis": "Sure! Here are the specifications for the box-braids hairstyle:\n\nHAIRSTYLE: Box Braids  \nLENGTH: Bangs [0]cm, Top [60]cm, Sides [60]cm, Back [60]cm  \nTEXTURE: Straight  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Box braiding technique  \nSHAPE: Straight silhouette that falls evenly around the face, framing it with defined edges  \nKEY FEATURES: 1) Distinctive box-shaped braids 2) Evenly spaced and neat sections 3) Length extends to mid-back level",
+    "prompt": "Length: Bangs [0]cm, Top [60]cm, Sides [60]cm, Back [60]cm. Texture: Straight. Volume: Medium. Parting: Center. Technique: Box braiding technique. Shape: Straight silhouette that falls evenly around the face, framing it with defined edges. Key features: 1) Distinctive box-shaped braids 2) Evenly spaced and neat sections 3) Length extends to mid-back level",
+    "analyzedAt": "2025-12-27T23:34:41.727Z"
+  },
+  "f-c-curl-perm": {
+    "id": "f-c-curl-perm",
+    "gender": "female",
+    "styleName": "c-curl-perm",
+    "thumbnail": "/hairstyles/female/c-curl-perm.jpg",
+    "analysis": "HAIRSTYLE: C-Curl Perm  \nLENGTH: Bangs 5cm, Top 30cm, Sides 25cm, Back 30cm  \nTEXTURE: Loose waves  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Perm (C-Curl), layered ends  \nSHAPE: Soft, rounded silhouette that frames the face gently, with slight volume at the ends  \nKEY FEATURES: Distinct C-curl at the ends, subtle layering for movement, soft texture throughout",
+    "prompt": "Length: Bangs 5cm, Top 30cm, Sides 25cm, Back 30cm. Texture: Loose waves. Volume: Medium. Parting: Center. Technique: Perm (C-Curl), layered ends. Shape: Soft, rounded silhouette that frames the face gently, with slight volume at the ends. Key features: Distinct C-curl at the ends, subtle layering for movement, soft texture throughout",
+    "analyzedAt": "2025-12-27T23:35:15.671Z"
+  },
+  "f-chinese-ancient-updo": {
+    "id": "f-chinese-ancient-updo",
+    "gender": "female",
+    "styleName": "chinese-ancient-updo",
+    "thumbnail": "/hairstyles/female/chinese-ancient-updo.jpg",
+    "analysis": "HAIRSTYLE: Chinese Ancient Updo  \nLENGTH: Bangs [0]cm, Top [15]cm, Sides [15]cm, Back [20]cm  \nTEXTURE: Straight  \nVOLUME: High  \nPARTING: None  \nTECHNIQUE: Braids, twists, decorative hairpieces  \nSHAPE: The overall silhouette is round and elevated, with a structured top and flowing sides that frame the face gracefully.  \nKEY FEATURES: Features prominent twisted sections on the crown, intricate braided elements on the sides, and ornamental hair clips or flowers placed strategically throughout.  ",
+    "prompt": "Length: Bangs [0]cm, Top [15]cm, Sides [15]cm, Back [20]cm. Texture: Straight. Volume: High. Parting: None. Technique: Braids, twists, decorative hairpieces. Shape: The overall silhouette is round and elevated, with a structured top and flowing sides that frame the face gracefully.. Key features: Features prominent twisted sections on the crown, intricate braided elements on the sides, and ornamental hair clips or flowers placed strategically throughout.",
+    "analyzedAt": "2025-12-27T23:35:19.544Z"
+  },
+  "f-choppy-bob": {
+    "id": "f-choppy-bob",
+    "gender": "female",
+    "styleName": "choppy-bob",
+    "thumbnail": "/hairstyles/female/choppy-bob.jpg",
+    "analysis": "HAIRSTYLE: Choppy Bob  \nLENGTH: Bangs 5 cm, Top 20 cm, Sides 15 cm, Back 18 cm  \nTEXTURE: Wavy  \nVOLUME: Medium  \nPARTING: None  \nTECHNIQUE: Layering  \nSHAPE: The hairstyle features a soft, rounded silhouette that frames the face, with slightly longer hair at the back to enhance movement and texture.  \nKEY FEATURES: Choppy, uneven layers; blunt bangs framing the forehead; tousled texture for a casual look.",
+    "prompt": "Length: Bangs 5 cm, Top 20 cm, Sides 15 cm, Back 18 cm. Texture: Wavy. Volume: Medium. Parting: None. Technique: Layering. Shape: The hairstyle features a soft, rounded silhouette that frames the face, with slightly longer hair at the back to enhance movement and texture.. Key features: Choppy, uneven layers; blunt bangs framing the forehead; tousled texture for a casual look.",
+    "analyzedAt": "2025-12-27T23:35:22.983Z"
+  },
+  "f-colombian-wave": {
+    "id": "f-colombian-wave",
+    "gender": "female",
+    "styleName": "colombian-wave",
+    "thumbnail": "/hairstyles/female/colombian-wave.jpg",
+    "analysis": "HAIRSTYLE: Colombian Wave  \nLENGTH: Bangs 10cm, Top 30cm, Sides 25cm, Back 30cm  \nTEXTURE: Loose waves  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Long layers, loose wave styling  \nSHAPE: Soft, layered silhouette that frames the face gently with waves cascading down the shoulders  \nKEY FEATURES: Loose, voluminous waves, natural flow, a subtle central part that enhances facial symmetry  ",
+    "prompt": "Length: Bangs 10cm, Top 30cm, Sides 25cm, Back 30cm. Texture: Loose waves. Volume: Medium. Parting: Center. Technique: Long layers, loose wave styling. Shape: Soft, layered silhouette that frames the face gently with waves cascading down the shoulders. Key features: Loose, voluminous waves, natural flow, a subtle central part that enhances facial symmetry",
+    "analyzedAt": "2025-12-27T23:35:26.092Z"
+  },
+  "f-cornrows": {
+    "id": "f-cornrows",
+    "gender": "female",
+    "styleName": "cornrows",
+    "thumbnail": "/hairstyles/female/cornrows.jpg",
+    "analysis": "HAIRSTYLE: Cornrows  \nLENGTH: Bangs [0]cm, Top [10]cm, Sides [10]cm, Back [30]cm  \nTEXTURE: Straight  \nVOLUME: Low  \nPARTING: None  \nTECHNIQUE: Cornrowing  \nSHAPE: Tight and flat against the scalp, with a smooth transition from the forehead to the nape of the neck, maintaining a neat and structured appearance.  \nKEY FEATURES: 1. Uniform, closely spaced braids; 2. Sleek finish; 3. Long, free-flowing ends at the back.",
+    "prompt": "Length: Bangs [0]cm, Top [10]cm, Sides [10]cm, Back [30]cm. Texture: Straight. Volume: Low. Parting: None. Technique: Cornrowing. Shape: Tight and flat against the scalp, with a smooth transition from the forehead to the nape of the neck, maintaining a neat and structured appearance.. Key features: 1. Uniform, closely spaced braids; 2. Sleek finish; 3. Long, free-flowing ends at the back.",
+    "analyzedAt": "2025-12-27T23:35:29.714Z"
+  },
+  "f-cuban-updo": {
+    "id": "f-cuban-updo",
+    "gender": "female",
+    "styleName": "cuban-updo",
+    "thumbnail": "/hairstyles/female/cuban-updo.jpg",
+    "analysis": "HAIRSTYLE: Cuban Updo  \nLENGTH: Bangs 5 cm, Top 20 cm, Sides 15 cm, Back 10 cm  \nTEXTURE: Straight  \nVOLUME: Medium  \nPARTING: None  \nTECHNIQUE: Braiding, Twist, Bun  \nSHAPE: The silhouette is rounded and elevated at the crown, framing the face softly with loose tendrils at the sides.  \nKEY FEATURES: High bun with braided detail, soft face-framing tendrils, smooth finish.",
+    "prompt": "Length: Bangs 5 cm, Top 20 cm, Sides 15 cm, Back 10 cm. Texture: Straight. Volume: Medium. Parting: None. Technique: Braiding, Twist, Bun. Shape: The silhouette is rounded and elevated at the crown, framing the face softly with loose tendrils at the sides.. Key features: High bun with braided detail, soft face-framing tendrils, smooth finish.",
+    "analyzedAt": "2025-12-27T23:35:32.732Z"
+  },
+  "f-curtain-bang": {
+    "id": "f-curtain-bang",
+    "gender": "female",
+    "styleName": "curtain-bang",
+    "thumbnail": "/hairstyles/female/curtain-bang.jpg",
+    "analysis": "HAIRSTYLE: Curtain Bangs\nLENGTH: Bangs 10cm, Top 30cm, Sides 30cm, Back 35cm\nTEXTURE: Straight\nVOLUME: Natural\nPARTING: Center\nTECHNIQUE: Long layers\nSHAPE: Soft and slightly rounded shape that frames the face; longer layers towards the back enhance movement and volume.\nKEY FEATURES: Curtain bangs that blend seamlessly with layers, smooth straight texture, and a balanced shape that enhances facial features.",
+    "prompt": "Length: Bangs 10cm, Top 30cm, Sides 30cm, Back 35cm. Texture: Straight. Volume: Natural. Parting: Center. Technique: Long layers. Shape: Soft and slightly rounded shape that frames the face; longer layers towards the back enhance movement and volume.. Key features: Curtain bangs that blend seamlessly with layers, smooth straight texture, and a balanced shape that enhances facial features.",
+    "analyzedAt": "2025-12-27T23:35:35.627Z"
+  },
+  "f-digital-perm": {
+    "id": "f-digital-perm",
+    "gender": "female",
+    "styleName": "digital-perm",
+    "thumbnail": "/hairstyles/female/digital-perm.jpg",
+    "analysis": "Certainly! Here are the exact specifications for recreating the hairstyle:\n\nHAIRSTYLE: Digital Perm\nLENGTH: Bangs 10cm, Top 25cm, Sides 25cm, Back 30cm\nTEXTURE: Loose waves\nVOLUME: Medium\nPARTING: Center\nTECHNIQUE: Digital perm, layered cut\nSHAPE: Soft wave silhouette with slight volume at the crown, framing the face softly around the cheeks\nKEY FEATURES: Loose, natural waves; defined layering; full-bodied texture throughout",
+    "prompt": "Length: Bangs 10cm, Top 25cm, Sides 25cm, Back 30cm. Texture: Loose waves. Volume: Medium. Parting: Center. Technique: Digital perm, layered cut. Shape: Soft wave silhouette with slight volume at the crown, framing the face softly around the cheeks. Key features: Loose, natural waves; defined layering; full-bodied texture throughout",
+    "analyzedAt": "2025-12-27T23:35:38.963Z"
+  },
+  "f-dreadlocks": {
+    "id": "f-dreadlocks",
+    "gender": "female",
+    "styleName": "dreadlocks",
+    "thumbnail": "/hairstyles/female/dreadlocks.jpg",
+    "analysis": "HAIRSTYLE: Dreadlocks  \nLENGTH: Bangs [10] cm, Top [40] cm, Sides [40] cm, Back [40] cm  \nTEXTURE: Curly  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Dreadlocking method (twist and rip or coils)  \nSHAPE: Long rectangular silhouette that frames the face with cascading locks down to shoulder level  \nKEY FEATURES: Distinct thick locks, even distribution of dreads, and a natural taper towards the ends  ",
+    "prompt": "Length: Bangs [10] cm, Top [40] cm, Sides [40] cm, Back [40] cm. Texture: Curly. Volume: Medium. Parting: Center. Technique: Dreadlocking method (twist and rip or coils). Shape: Long rectangular silhouette that frames the face with cascading locks down to shoulder level. Key features: Distinct thick locks, even distribution of dreads, and a natural taper towards the ends",
+    "analyzedAt": "2025-12-27T23:35:42.270Z"
+  },
+  "f-ear-tuck-bob": {
+    "id": "f-ear-tuck-bob",
+    "gender": "female",
+    "styleName": "ear-tuck-bob",
+    "thumbnail": "/hairstyles/female/ear-tuck-bob.jpg",
+    "analysis": "HAIRSTYLE: Ear Tuck Bob  \nLENGTH: Bangs 8cm, Top 25cm, Sides 22cm, Back 20cm  \nTEXTURE: Straight  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Blunt cut, slight layering at ends  \nSHAPE: A-line silhouette; hair is longer in the front and tapers slightly towards the back, framing the face softly  \nKEY FEATURES: Tucked behind the ears, clean lines, natural movement",
+    "prompt": "Length: Bangs 8cm, Top 25cm, Sides 22cm, Back 20cm. Texture: Straight. Volume: Medium. Parting: Center. Technique: Blunt cut, slight layering at ends. Shape: A-line silhouette; hair is longer in the front and tapers slightly towards the back, framing the face softly. Key features: Tucked behind the ears, clean lines, natural movement",
+    "analyzedAt": "2025-12-27T23:36:16.199Z"
+  },
+  "f-french-bob": {
+    "id": "f-french-bob",
+    "gender": "female",
+    "styleName": "french-bob",
+    "thumbnail": "/hairstyles/female/french-bob.jpg",
+    "analysis": "Sure! Here are the specifications for the \"French Bob\" hairstyle:\n\nHAIRSTYLE: French Bob  \nLENGTH: Bangs 5 cm, Top 15 cm, Sides 12 cm, Back 10 cm  \nTEXTURE: Wavy  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Textured layering  \nSHAPE: A-line silhouette that frames the cheeks and chin, creating a soft and rounded appearance.  \nKEY FEATURES: 1) Choppy bangs that are slightly longer on the sides, 2) Loose, soft waves throughout the length, 3) A classic bob cut that ends just above the jawline.",
+    "prompt": "Length: Bangs 5 cm, Top 15 cm, Sides 12 cm, Back 10 cm. Texture: Wavy. Volume: Medium. Parting: Center. Technique: Textured layering. Shape: A-line silhouette that frames the cheeks and chin, creating a soft and rounded appearance.. Key features: 1) Choppy bangs that are slightly longer on the sides, 2) Loose, soft waves throughout the length, 3) A classic bob cut that ends just above the jawline.",
+    "analyzedAt": "2025-12-27T23:36:20.271Z"
+  },
+  "f-fulani-braid": {
+    "id": "f-fulani-braid",
+    "gender": "female",
+    "styleName": "fulani-braid",
+    "thumbnail": "/hairstyles/female/fulani-braid.jpg",
+    "analysis": "HAIRSTYLE: Fulani Braid\nLENGTH: Bangs 0 cm, Top 30 cm, Sides 30 cm, Back 30 cm\nTEXTURE: Straight\nVOLUME: Medium\nPARTING: Center\nTECHNIQUE: Braiding, feed-in method\nSHAPE: The overall silhouette is elongated and sleek, framing the face with straight, tight, and defined braids. The braids start from the scalp and extend downwards, providing a structured element alongside soft face framing for a balanced look.\nKEY FEATURES: Distinctive beads at the ends of the braids, centered parting, and tight, uniform braid widths.",
+    "prompt": "Length: Bangs 0 cm, Top 30 cm, Sides 30 cm, Back 30 cm. Texture: Straight. Volume: Medium. Parting: Center. Technique: Braiding, feed-in method. Shape: The overall silhouette is elongated and sleek, framing the face with straight, tight, and defined braids. The braids start from the scalp and extend downwards, providing a structured element alongside soft face framing for a balanced look.. Key features: Distinctive beads at the ends of the braids, centered parting, and tight, uniform braid widths.",
+    "analyzedAt": "2025-12-27T23:36:25.018Z"
+  },
+  "f-full-bang": {
+    "id": "f-full-bang",
+    "gender": "female",
+    "styleName": "full-bang",
+    "thumbnail": "/hairstyles/female/full-bang.jpg",
+    "analysis": "Sure! Here are the specifications for the hairstyle:\n\nHAIRSTYLE: Full Bangs\nLENGTH: Bangs 8cm, Top 30cm, Sides 35cm, Back 35cm\nTEXTURE: Straight\nVOLUME: Medium\nPARTING: None\nTECHNIQUE: Blunt cut bangs, long layers\nSHAPE: The overall silhouette is smooth and straight, framing the face softly with the bangs sitting just above the eyebrows. The sides taper gradually towards the ends for a seamless finish.\nKEY FEATURES: Blunt-cut bangs, straight texture, and long, layered sides.",
+    "prompt": "Length: Bangs 8cm, Top 30cm, Sides 35cm, Back 35cm. Texture: Straight. Volume: Medium. Parting: None. Technique: Blunt cut bangs, long layers. Shape: The overall silhouette is smooth and straight, framing the face softly with the bangs sitting just above the eyebrows. The sides taper gradually towards the ends for a seamless finish.. Key features: Blunt-cut bangs, straight texture, and long, layered sides.",
+    "analyzedAt": "2025-12-27T23:36:28.812Z"
+  },
+  "f-glam-perm": {
+    "id": "f-glam-perm",
+    "gender": "female",
+    "styleName": "glam-perm",
+    "thumbnail": "/hairstyles/female/glam-perm.jpg",
+    "analysis": "HAIRSTYLE: Glam Perm  \nLENGTH: Bangs 8cm, Top 25cm, Sides 25cm, Back 30cm  \nTEXTURE: Loose waves  \nVOLUME: Medium  \nPARTING: Deep left  \nTECHNIQUE: Perm, layers  \nSHAPE: Soft, rounded silhouette that gently frames the face  \nKEY FEATURES: Loose, flowing waves; soft layering around the face; natural bounce and movement in the hair",
+    "prompt": "Length: Bangs 8cm, Top 25cm, Sides 25cm, Back 30cm. Texture: Loose waves. Volume: Medium. Parting: Deep left. Technique: Perm, layers. Shape: Soft, rounded silhouette that gently frames the face. Key features: Loose, flowing waves; soft layering around the face; natural bounce and movement in the hair",
+    "analyzedAt": "2025-12-27T23:36:32.657Z"
+  },
+  "f-goddess-locs": {
+    "id": "f-goddess-locs",
+    "gender": "female",
+    "styleName": "goddess-locs",
+    "thumbnail": "/hairstyles/female/goddess-locs.jpg",
+    "analysis": "Certainly! Here are the specifications to recreate the \"goddess-locs\" hairstyle:\n\nHAIRSTYLE: Goddess Locs  \nLENGTH: Bangs [0] cm, Top [50] cm, Sides [50] cm, Back [50] cm  \nTEXTURE: Loose waves  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Faux locs, spiral curls on ends  \nSHAPE: Long and layered with a slightly tapered silhouette, framing the face softly and complementing the jawline  \nKEY FEATURES: 1) Combination of locs and waves, 2) Curled ends, 3) Natural-looking volume and texture  ",
+    "prompt": "Length: Bangs [0] cm, Top [50] cm, Sides [50] cm, Back [50] cm. Texture: Loose waves. Volume: Medium. Parting: Center. Technique: Faux locs, spiral curls on ends. Shape: Long and layered with a slightly tapered silhouette, framing the face softly and complementing the jawline. Key features: 1) Combination of locs and waves, 2) Curled ends, 3) Natural-looking volume and texture",
+    "analyzedAt": "2025-12-27T23:36:36.900Z"
+  },
+  "f-goddess-wave": {
+    "id": "f-goddess-wave",
+    "gender": "female",
+    "styleName": "goddess-wave",
+    "thumbnail": "/hairstyles/female/goddess-wave.jpg",
+    "analysis": "HAIRSTYLE: Goddess Wave  \nLENGTH: Bangs 10cm, Top 25cm, Sides 30cm, Back 35cm  \nTEXTURE: Loose waves  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Long layers  \nSHAPE: Soft, flowing silhouette that gently frames the face, with a gradual transition from short to long in the back.  \nKEY FEATURES: 1. Defined loose waves throughout the length, creating a soft body. 2. Slightly longer layers towards the front to accentuate facial features. 3. Natural-looking shine for a healthy appearance.",
+    "prompt": "Length: Bangs 10cm, Top 25cm, Sides 30cm, Back 35cm. Texture: Loose waves. Volume: Medium. Parting: Center. Technique: Long layers. Shape: Soft, flowing silhouette that gently frames the face, with a gradual transition from short to long in the back.. Key features: 1. Defined loose waves throughout the length, creating a soft body. 2. Slightly longer layers towards the front to accentuate facial features. 3. Natural-looking shine for a healthy appearance.",
+    "analyzedAt": "2025-12-27T23:36:40.613Z"
+  },
+  "f-gyaru-style": {
+    "id": "f-gyaru-style",
+    "gender": "female",
+    "styleName": "gyaru-style",
+    "thumbnail": "/hairstyles/female/gyaru-style.jpg",
+    "analysis": "HAIRSTYLE: Gyaru Style\nLENGTH: Bangs 10cm, Top 25cm, Sides 30cm, Back 30cm\nTEXTURE: Loose waves\nVOLUME: Very high\nPARTING: Center\nTECHNIQUE: Teased roots, layered, curls\nSHAPE: The overall silhouette is rounded on top with an exaggerated height, while the sides fall softly around the face, framing it in soft, cascading waves.\nKEY FEATURES: High volume on the crown, prominent curls, and decorative accessories (e.g., bow and hairpins).",
+    "prompt": "Length: Bangs 10cm, Top 25cm, Sides 30cm, Back 30cm. Texture: Loose waves. Volume: Very high. Parting: Center. Technique: Teased roots, layered, curls. Shape: The overall silhouette is rounded on top with an exaggerated height, while the sides fall softly around the face, framing it in soft, cascading waves.. Key features: High volume on the crown, prominent curls, and decorative accessories (e.g., bow and hairpins).",
+    "analyzedAt": "2025-12-27T23:36:44.218Z"
+  },
+  "f-high-ponytail": {
+    "id": "f-high-ponytail",
+    "gender": "female",
+    "styleName": "high-ponytail",
+    "thumbnail": "/hairstyles/female/high-ponytail.jpg",
+    "analysis": "HAIRSTYLE: High Ponytail  \nLENGTH: Bangs 0 cm, Top 30 cm, Sides 30 cm, Back 30 cm  \nTEXTURE: Wavy  \nVOLUME: Medium  \nPARTING: None  \nTECHNIQUE: Layered (face-framing layers)  \nSHAPE: The hairstyle has a smooth, rounded silhouette at the top, tapering into loose waves that flow downwards, framing the face softly.  \nKEY FEATURES: High placement of ponytail, loose wavy ends, and no visible parting.",
+    "prompt": "Length: Bangs 0 cm, Top 30 cm, Sides 30 cm, Back 30 cm. Texture: Wavy. Volume: Medium. Parting: None. Technique: Layered (face-framing layers). Shape: The hairstyle has a smooth, rounded silhouette at the top, tapering into loose waves that flow downwards, framing the face softly.. Key features: High placement of ponytail, loose wavy ends, and no visible parting.",
+    "analyzedAt": "2025-12-27T23:37:18.091Z"
+  },
+  "f-hime-cut": {
+    "id": "f-hime-cut",
+    "gender": "female",
+    "styleName": "hime-cut",
+    "thumbnail": "/hairstyles/female/hime-cut.jpg",
+    "analysis": "HAIRSTYLE: Hime Cut  \nLENGTH: Bangs 10cm, Top 30cm, Sides 35cm, Back 40cm  \nTEXTURE: Straight  \nVOLUME: Low  \nPARTING: Center  \nTECHNIQUE: Blunt cut, no layers  \nSHAPE: A long, straight silhouette framing the face with sharp bangs and longer lengths at the sides and back; the hair tapers gently at the ends.  \nKEY FEATURES: Distinctive blunt bangs, straightened lengths, and a significant side length that enhances the overall symmetry of the face.",
+    "prompt": "Length: Bangs 10cm, Top 30cm, Sides 35cm, Back 40cm. Texture: Straight. Volume: Low. Parting: Center. Technique: Blunt cut, no layers. Shape: A long, straight silhouette framing the face with sharp bangs and longer lengths at the sides and back; the hair tapers gently at the ends.. Key features: Distinctive blunt bangs, straightened lengths, and a significant side length that enhances the overall symmetry of the face.",
+    "analyzedAt": "2025-12-27T23:37:21.308Z"
+  },
+  "f-hippie-perm": {
+    "id": "f-hippie-perm",
+    "gender": "female",
+    "styleName": "hippie-perm",
+    "thumbnail": "/hairstyles/female/hippie-perm.jpg",
+    "analysis": "HAIRSTYLE: Hippie Perm  \nLENGTH: Bangs 10cm, Top 25cm, Sides 30cm, Back 30cm  \nTEXTURE: Loose waves  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Perm, layers  \nSHAPE: Soft, rounded silhouette that softly frames the face  \nKEY FEATURES: Loose, natural-looking waves; mid-length curls; face-framing strands",
+    "prompt": "Length: Bangs 10cm, Top 25cm, Sides 30cm, Back 30cm. Texture: Loose waves. Volume: Medium. Parting: Center. Technique: Perm, layers. Shape: Soft, rounded silhouette that softly frames the face. Key features: Loose, natural-looking waves; mid-length curls; face-framing strands",
+    "analyzedAt": "2025-12-27T23:37:23.902Z"
+  },
+  "f-hollywood-curl": {
+    "id": "f-hollywood-curl",
+    "gender": "female",
+    "styleName": "hollywood-curl",
+    "thumbnail": "/hairstyles/female/hollywood-curl.jpg",
+    "analysis": "HAIRSTYLE: Hollywood Curl  \nLENGTH: Bangs 5cm, Top 30cm, Sides 25cm, Back 30cm  \nTEXTURE: Loose waves  \nVOLUME: Medium  \nPARTING: Deep left  \nTECHNIQUE: Soft layering, curling with a medium barrel iron  \nSHAPE: Soft, rounded silhouette that frames the face gently, with waves cascading down the sides  \nKEY FEATURES: Defined soft curls, deep side part, smooth shine",
+    "prompt": "Length: Bangs 5cm, Top 30cm, Sides 25cm, Back 30cm. Texture: Loose waves. Volume: Medium. Parting: Deep left. Technique: Soft layering, curling with a medium barrel iron. Shape: Soft, rounded silhouette that frames the face gently, with waves cascading down the sides. Key features: Defined soft curls, deep side part, smooth shine",
+    "analyzedAt": "2025-12-27T23:37:27.392Z"
+  },
+  "f-hush-cut": {
+    "id": "f-hush-cut",
+    "gender": "female",
+    "styleName": "hush-cut",
+    "thumbnail": "/hairstyles/female/hush-cut.jpg",
+    "analysis": "HAIRSTYLE: Hush-cut  \nLENGTH: Bangs 7cm, Top 25cm, Sides 30cm, Back 30cm  \nTEXTURE: Straight  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Layers  \nSHAPE: Soft, layered silhouette that gently frames the face with slightly longer sides that add movement.  \nKEY FEATURES: Wispy bangs, face-framing layers, and a softer, textured finish.",
+    "prompt": "Length: Bangs 7cm, Top 25cm, Sides 30cm, Back 30cm. Texture: Straight. Volume: Medium. Parting: Center. Technique: Layers. Shape: Soft, layered silhouette that gently frames the face with slightly longer sides that add movement.. Key features: Wispy bangs, face-framing layers, and a softer, textured finish.",
+    "analyzedAt": "2025-12-27T23:37:30.311Z"
+  },
+  "f-indian-braid": {
+    "id": "f-indian-braid",
+    "gender": "female",
+    "styleName": "indian-braid",
+    "thumbnail": "/hairstyles/female/indian-braid.jpg",
+    "analysis": "HAIRSTYLE: Indian Braid  \nLENGTH: Bangs [0]cm, Top [40]cm, Sides [40]cm, Back [80]cm  \nTEXTURE: Straight  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Traditional three-strand braid, decorative embellishments (gold hair accessory and flowers)  \nSHAPE: Long and sleek silhouette with a tapered braid, framing the face softly  \nKEY FEATURES: 1. Prominent center parting 2. Long, thick braid with decorative elements 3. Smooth, polished finish",
+    "prompt": "Length: Bangs [0]cm, Top [40]cm, Sides [40]cm, Back [80]cm. Texture: Straight. Volume: Medium. Parting: Center. Technique: Traditional three-strand braid, decorative embellishments (gold hair accessory and flowers). Shape: Long and sleek silhouette with a tapered braid, framing the face softly. Key features: 1. Prominent center parting 2. Long, thick braid with decorative elements 3. Smooth, polished finish",
+    "analyzedAt": "2025-12-27T23:37:34.376Z"
+  },
+  "f-kerala-style": {
+    "id": "f-kerala-style",
+    "gender": "female",
+    "styleName": "kerala-style",
+    "thumbnail": "/hairstyles/female/kerala-style.jpg",
+    "analysis": "- **Hair Length**: \n  - Bangs: No bangs.\n  - Top: Approximately 30 cm.\n  - Sides: Approximately 40 cm.\n  - Back: Approximately 60 cm.\n\n- **Texture**: Straight.\n\n- **Volume**: Medium.\n\n- **Parting Style**: Center part.\n\n- **Styling Techniques Used**: The hair is styled into a single, neat braid that runs down the back.\n\n- **Overall Shape**: The hair has a smooth, elongated shape that follows the lines of the head. It frames the face softly and accentuates the jawline. The braid adds structure while maintaining a sleek appearance.",
+    "prompt": "- **Hair Length**:    - Bangs: No bangs.   - Top: Approximately 30 cm.   - Sides: Approximately 40 cm.   - Back: Approximately 60 cm.  - **Texture**: Straight.  - **Volume**: Medium.  - **Parting Style**: Center part.  - **Styling Techniques Used**: The hair is styled into a single, neat braid that runs down the back.  - **Overall Shape**: The hair has a smooth, elongated shape that follows the lines of the head. It frames the face softly and accentuates the jawline. The braid adds structure while maintaining a sleek appearance.",
+    "analyzedAt": "2025-12-27T23:48:50.233Z",
+    "reanalyzed": true
+  },
+  "f-kpop-idol": {
+    "id": "f-kpop-idol",
+    "gender": "female",
+    "styleName": "kpop-idol",
+    "thumbnail": "/hairstyles/female/kpop-idol.jpg",
+    "analysis": "HAIRSTYLE: K-pop Idol\nLENGTH: Bangs 15cm, Top 30cm, Sides 25cm, Back 30cm\nTEXTURE: Straight\nVOLUME: Medium\nPARTING: Center\nTECHNIQUE: Long layers, two-block cut\nSHAPE: The overall silhouette is sleek with gradual layering that frames the face softy, creating an angular look.\nKEY FEATURES: Distinctive long bangs that blend into the layers, subtle undercut at the back, and a shiny finish.",
+    "prompt": "Length: Bangs 15cm, Top 30cm, Sides 25cm, Back 30cm. Texture: Straight. Volume: Medium. Parting: Center. Technique: Long layers, two-block cut. Shape: The overall silhouette is sleek with gradual layering that frames the face softy, creating an angular look.. Key features: Distinctive long bangs that blend into the layers, subtle undercut at the back, and a shiny finish.",
+    "analyzedAt": "2025-12-27T23:38:09.744Z"
+  },
+  "f-latina-curl": {
+    "id": "f-latina-curl",
+    "gender": "female",
+    "styleName": "latina-curl",
+    "thumbnail": "/hairstyles/female/latina-curl.jpg",
+    "analysis": "HAIRSTYLE: Latina Curl  \nLENGTH: Bangs 10cm, Top 30cm, Sides 25cm, Back 30cm  \nTEXTURE: Loose waves  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Layers, medium perm  \nSHAPE: Soft, rounded silhouette that gently frames the face with slight volume at the crown  \nKEY FEATURES: Defined loose waves, natural movement, and a soft, full fringe",
+    "prompt": "Length: Bangs 10cm, Top 30cm, Sides 25cm, Back 30cm. Texture: Loose waves. Volume: Medium. Parting: Center. Technique: Layers, medium perm. Shape: Soft, rounded silhouette that gently frames the face with slight volume at the crown. Key features: Defined loose waves, natural movement, and a soft, full fringe",
+    "analyzedAt": "2025-12-27T23:38:12.608Z"
+  },
+  "f-layered-cut": {
+    "id": "f-layered-cut",
+    "gender": "female",
+    "styleName": "layered-cut",
+    "thumbnail": "/hairstyles/female/layered-cut.jpg",
+    "analysis": "HAIRSTYLE: Layered Cut  \nLENGTH: Bangs 10cm, Top 25cm, Sides 30cm, Back 30cm  \nTEXTURE: Straight  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Layers  \nSHAPE: Soft layered silhouette that frames the face gently, with longer pieces around the front and shorter layers through the back.  \nKEY FEATURES: Long bangs that blend into the top layers, pronounced layering throughout that adds softness and movement, natural shine and sleekness.",
+    "prompt": "Length: Bangs 10cm, Top 25cm, Sides 30cm, Back 30cm. Texture: Straight. Volume: Medium. Parting: Center. Technique: Layers. Shape: Soft layered silhouette that frames the face gently, with longer pieces around the front and shorter layers through the back.. Key features: Long bangs that blend into the top layers, pronounced layering throughout that adds softness and movement, natural shine and sleekness.",
+    "analyzedAt": "2025-12-27T23:38:15.963Z"
+  },
+  "f-layered-mid-bob": {
+    "id": "f-layered-mid-bob",
+    "gender": "female",
+    "styleName": "layered-mid-bob",
+    "thumbnail": "/hairstyles/female/layered-mid-bob.jpg",
+    "analysis": "HAIRSTYLE: Layered Mid Bob  \nLENGTH: Bangs 10 cm, Top 25 cm, Sides 30 cm, Back 28 cm  \nTEXTURE: Straight  \nVOLUME: Natural  \nPARTING: Center  \nTECHNIQUE: Layers  \nSHAPE: The silhouette is soft and rounded, framing the face with gentle layers that create a light and airy feel. The length is slightly longer at the sides, enhancing the overall bob shape.  \nKEY FEATURES: 1) Soft, blended layers throughout that create movement; 2) Center parting that adds symmetry; 3) Slightly longer sides that frame the face elegantly.",
+    "prompt": "Length: Bangs 10 cm, Top 25 cm, Sides 30 cm, Back 28 cm. Texture: Straight. Volume: Natural. Parting: Center. Technique: Layers. Shape: The silhouette is soft and rounded, framing the face with gentle layers that create a light and airy feel. The length is slightly longer at the sides, enhancing the overall bob shape.. Key features: 1) Soft, blended layers throughout that create movement; 2) Center parting that adds symmetry; 3) Slightly longer sides that frame the face elegantly.",
+    "analyzedAt": "2025-12-27T23:38:19.502Z"
+  },
+  "f-long-bob-with-bangs": {
+    "id": "f-long-bob-with-bangs",
+    "gender": "female",
+    "styleName": "long-bob-with-bangs",
+    "thumbnail": "/hairstyles/female/long-bob-with-bangs.jpg",
+    "analysis": "HAIRSTYLE: Long Bob with Bangs  \nLENGTH: Bangs 7cm, Top 25cm, Sides 22cm, Back 24cm  \nTEXTURE: Straight  \nVOLUME: Natural  \nPARTING: None  \nTECHNIQUE: Soft layers around the face, blunt cut ends  \nSHAPE: The overall silhouette is a smooth, slightly angled bob that frames the face, slightly longer in the front and shorter in the back.  \nKEY FEATURES: Blunt bangs that fall just above the eyebrows, smooth and sleek texture, gentle layering that adds movement without excessive volume.",
+    "prompt": "Length: Bangs 7cm, Top 25cm, Sides 22cm, Back 24cm. Texture: Straight. Volume: Natural. Parting: None. Technique: Soft layers around the face, blunt cut ends. Shape: The overall silhouette is a smooth, slightly angled bob that frames the face, slightly longer in the front and shorter in the back.. Key features: Blunt bangs that fall just above the eyebrows, smooth and sleek texture, gentle layering that adds movement without excessive volume.",
+    "analyzedAt": "2025-12-27T23:38:23.003Z"
+  },
+  "f-long-s-curl-perm": {
+    "id": "f-long-s-curl-perm",
+    "gender": "female",
+    "styleName": "long-s-curl-perm",
+    "thumbnail": "/hairstyles/female/long-s-curl-perm.jpg",
+    "analysis": "Certainly! Here are the exact specifications for the hairstyle \"long S-curl perm\":\n\nHAIRSTYLE: Long S-Curl Perm  \nLENGTH: Bangs 10 cm, Top 30 cm, Sides 30 cm, Back 35 cm  \nTEXTURE: S-curl  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Long layers, perm  \nSHAPE: Soft, flowing silhouette that frames the face with gentle waves cascading down the sides  \nKEY FEATURES: Defined S-shaped curls, natural movement, and a soft, voluminous appearance.",
+    "prompt": "Length: Bangs 10 cm, Top 30 cm, Sides 30 cm, Back 35 cm. Texture: S-curl. Volume: Medium. Parting: Center. Technique: Long layers, perm. Shape: Soft, flowing silhouette that frames the face with gentle waves cascading down the sides. Key features: Defined S-shaped curls, natural movement, and a soft, voluminous appearance.",
+    "analyzedAt": "2025-12-27T23:38:56.556Z"
+  },
+  "f-long-straight": {
+    "id": "f-long-straight",
+    "gender": "female",
+    "styleName": "long-straight",
+    "thumbnail": "/hairstyles/female/long-straight.jpg",
+    "analysis": "Sure! Here are the specifications for the hairstyle:\n\nHAIRSTYLE: Long Straight\nLENGTH: Bangs [10] cm, Top [40] cm, Sides [45] cm, Back [50] cm\nTEXTURE: Straight\nVOLUME: Natural\nPARTING: Center\nTECHNIQUE: Blunt cut\nSHAPE: Long, sleek silhouette that frames the face softly; hair falls straight down without any layers.\nKEY FEATURES: Blunt cut ends, center parting, sleek and shiny appearance.",
+    "prompt": "Length: Bangs [10] cm, Top [40] cm, Sides [45] cm, Back [50] cm. Texture: Straight. Volume: Natural. Parting: Center. Technique: Blunt cut. Shape: Long, sleek silhouette that frames the face softly; hair falls straight down without any layers.. Key features: Blunt cut ends, center parting, sleek and shiny appearance.",
+    "analyzedAt": "2025-12-27T23:39:00.451Z"
+  },
+  "f-low-bun": {
+    "id": "f-low-bun",
+    "gender": "female",
+    "styleName": "low-bun",
+    "thumbnail": "/hairstyles/female/low-bun.jpg",
+    "analysis": "HAIRSTYLE: Low Bun  \nLENGTH: Bangs 0 cm, Top 20 cm, Sides 15 cm, Back 25 cm  \nTEXTURE: Straight  \nVOLUME: Low  \nPARTING: Center  \nTECHNIQUE: Smooth texture, secured bun  \nSHAPE: Soft, rounded silhouette that frames the face gently; the bun sits low at the nape of the neck.  \nKEY FEATURES: Sleek appearance, minimal stray strands, clean and polished finish.",
+    "prompt": "Length: Bangs 0 cm, Top 20 cm, Sides 15 cm, Back 25 cm. Texture: Straight. Volume: Low. Parting: Center. Technique: Smooth texture, secured bun. Shape: Soft, rounded silhouette that frames the face gently; the bun sits low at the nape of the neck.. Key features: Sleek appearance, minimal stray strands, clean and polished finish.",
+    "analyzedAt": "2025-12-27T23:39:04.365Z"
+  },
+  "f-magic-straight": {
+    "id": "f-magic-straight",
+    "gender": "female",
+    "styleName": "magic-straight",
+    "thumbnail": "/hairstyles/female/magic-straight.jpg",
+    "analysis": "HAIRSTYLE: Magic Straight\nLENGTH: Bangs 10cm, Top 30cm, Sides 30cm, Back 30cm\nTEXTURE: Straight\nVOLUME: Low\nPARTING: Center\nTECHNIQUE: Blunt cut, no layers\nSHAPE: Long and sleek with straight lines; frames the face without additional shaping.\nKEY FEATURES: Blunt bangs that are forehead-skimming, a smooth and shiny finish, and a uniform length throughout.",
+    "prompt": "Length: Bangs 10cm, Top 30cm, Sides 30cm, Back 30cm. Texture: Straight. Volume: Low. Parting: Center. Technique: Blunt cut, no layers. Shape: Long and sleek with straight lines; frames the face without additional shaping.. Key features: Blunt bangs that are forehead-skimming, a smooth and shiny finish, and a uniform length throughout.",
+    "analyzedAt": "2025-12-27T23:39:07.560Z"
+  },
+  "f-marley-twist": {
+    "id": "f-marley-twist",
+    "gender": "female",
+    "styleName": "marley-twist",
+    "thumbnail": "/hairstyles/female/marley-twist.jpg",
+    "analysis": "HAIRSTYLE: Marley Twist  \nLENGTH: Bangs [0] cm, Top [50] cm, Sides [50] cm, Back [50] cm  \nTEXTURE: Twisted  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Two-strand twist  \nSHAPE: Long, rectangular silhouette that frames the face without adding width; slightly tapered at the ends  \nKEY FEATURES: Distinctive thick twists, uniform length, and a smooth, shiny appearance",
+    "prompt": "Length: Bangs [0] cm, Top [50] cm, Sides [50] cm, Back [50] cm. Texture: Twisted. Volume: Medium. Parting: Center. Technique: Two-strand twist. Shape: Long, rectangular silhouette that frames the face without adding width; slightly tapered at the ends. Key features: Distinctive thick twists, uniform length, and a smooth, shiny appearance",
+    "analyzedAt": "2025-12-27T23:39:11.505Z"
+  },
+  "f-messy-bun": {
+    "id": "f-messy-bun",
+    "gender": "female",
+    "styleName": "messy-bun",
+    "thumbnail": "/hairstyles/female/messy-bun.jpg",
+    "analysis": "HAIRSTYLE: Messy Bun  \nLENGTH: Bangs 10 cm, Top 25 cm, Sides 20 cm, Back 25 cm  \nTEXTURE: Wavy  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Layers  \nSHAPE: The overall silhouette is rounded at the top with a slightly tapered effect towards the nape. Frame the face with soft, face-framing pieces that add an effortless look.  \nKEY FEATURES: Loose strands falling around the face, slightly tousled upper bun, and relaxed volume at the crown.",
+    "prompt": "Length: Bangs 10 cm, Top 25 cm, Sides 20 cm, Back 25 cm. Texture: Wavy. Volume: Medium. Parting: Center. Technique: Layers. Shape: The overall silhouette is rounded at the top with a slightly tapered effect towards the nape. Frame the face with soft, face-framing pieces that add an effortless look.. Key features: Loose strands falling around the face, slightly tousled upper bun, and relaxed volume at the crown.",
+    "analyzedAt": "2025-12-27T23:39:15.798Z"
+  },
+  "f-mexican-braid": {
+    "id": "f-mexican-braid",
+    "gender": "female",
+    "styleName": "mexican-braid",
+    "thumbnail": "/hairstyles/female/mexican-braid.jpg",
+    "analysis": "I'm unable to analyze images directly, but I can help you create a specification for a hairstyle based on the description of a \"Mexican braid.\" Here's an example format you can use:\n\nHAIRSTYLE: Mexican Braid\nLENGTH: Bangs [N/A] cm, Top [15] cm, Sides [20] cm, Back [25] cm\nTEXTURE: Straight\nVOLUME: Medium\nPARTING: Center\nTECHNIQUE: Cornrows, braiding\nSHAPE: The hair is sleek and flat against the scalp, forming a symmetrical style that frames the face softly.\nKEY FEATURES: Tight and neat braids along the scalp, a seamless transition into a bun at the nape, and a structured yet elegant look.\n\nFeel free to adjust the measurements and details as needed!",
+    "prompt": "Length: Bangs [N/A] cm, Top [15] cm, Sides [20] cm, Back [25] cm. Texture: Straight. Volume: Medium. Parting: Center. Technique: Cornrows, braiding. Shape: The hair is sleek and flat against the scalp, forming a symmetrical style that frames the face softly.. Key features: Tight and neat braids along the scalp, a seamless transition into a bun at the nape, and a structured yet elegant look.",
+    "analyzedAt": "2025-12-27T23:39:20.328Z"
+  },
+  "f-moroccan-style": {
+    "id": "f-moroccan-style",
+    "gender": "female",
+    "styleName": "moroccan-style",
+    "thumbnail": "/hairstyles/female/moroccan-style.jpg",
+    "analysis": "Here's the specification for recreating the \"Moroccan-style\" hairstyle:\n\nHAIRSTYLE: Moroccan-Style Curly\nLENGTH: Bangs 10cm, Top 25cm, Sides 20cm, Back 20cm\nTEXTURE: Tight curls\nVOLUME: High\nPARTING: Center\nTECHNIQUE: Layering, curly cut\nSHAPE: Rounded silhouette that frames the face softly, with curls framing the cheeks and chin.\nKEY FEATURES: Dense, tight curls with significant volume, center parting, and a rounded shape that adds softness.",
+    "prompt": "Length: Bangs 10cm, Top 25cm, Sides 20cm, Back 20cm. Texture: Tight curls. Volume: High. Parting: Center. Technique: Layering, curly cut. Shape: Rounded silhouette that frames the face softly, with curls framing the cheeks and chin.. Key features: Dense, tight curls with significant volume, center parting, and a rounded shape that adds softness.",
+    "analyzedAt": "2025-12-27T23:39:54.397Z"
+  },
+  "f-natural-afro": {
+    "id": "f-natural-afro",
+    "gender": "female",
+    "styleName": "natural-afro",
+    "thumbnail": "/hairstyles/female/natural-afro.jpg",
+    "analysis": "Sure! Here are the specifications for recreating the \"natural afro\" hairstyle:\n\nHAIRSTYLE: Natural Afro  \nLENGTH: Bangs [10] cm, Top [25] cm, Sides [18] cm, Back [18] cm  \nTEXTURE: Curly  \nVOLUME: High  \nPARTING: None  \nTECHNIQUE: Even cut all around, shaped to enhance natural curl  \nSHAPE: Rounded silhouette, full on top and tapering slightly towards the sides, framing the face gently  \nKEY FEATURES: Deep, defined curls; high volume; rounded shape",
+    "prompt": "Length: Bangs [10] cm, Top [25] cm, Sides [18] cm, Back [18] cm. Texture: Curly. Volume: High. Parting: None. Technique: Even cut all around, shaped to enhance natural curl. Shape: Rounded silhouette, full on top and tapering slightly towards the sides, framing the face gently. Key features: Deep, defined curls; high volume; rounded shape",
+    "analyzedAt": "2025-12-27T23:39:57.715Z"
+  },
+  "f-passion-twist": {
+    "id": "f-passion-twist",
+    "gender": "female",
+    "styleName": "passion-twist",
+    "thumbnail": "/hairstyles/female/passion-twist.jpg",
+    "analysis": "Sure! Here are the specifications for the \"passion twist\" hairstyle:\n\nHAIRSTYLE: Passion Twist  \nLENGTH: Bangs [0] cm, Top [50] cm, Sides [50] cm, Back [50] cm  \nTEXTURE: Curly  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Twisting technique, medium-sized twists  \nSHAPE: Long, cylindrical silhouette framing the face with soft, voluminous curls  \nKEY FEATURES: Distinctive twisted texture, medium length, and defined curl pattern",
+    "prompt": "Length: Bangs [0] cm, Top [50] cm, Sides [50] cm, Back [50] cm. Texture: Curly. Volume: Medium. Parting: Center. Technique: Twisting technique, medium-sized twists. Shape: Long, cylindrical silhouette framing the face with soft, voluminous curls. Key features: Distinctive twisted texture, medium length, and defined curl pattern",
+    "analyzedAt": "2025-12-27T23:40:00.864Z"
+  },
+  "f-persian-curl": {
+    "id": "f-persian-curl",
+    "gender": "female",
+    "styleName": "persian-curl",
+    "thumbnail": "/hairstyles/female/persian-curl.jpg",
+    "analysis": "Here are the exact specifications for recreating the hairstyle reference \"Persian Curl\":\n\nHAIRSTYLE: Persian Curl  \nLENGTH: Bangs 8cm, Top 20cm, Sides 22cm, Back 20cm  \nTEXTURE: Tight curls  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Layered curls, perm  \nSHAPE: Round silhouette that frames the face softly and enhances cheekbones  \nKEY FEATURES: Distinct tight curls, natural volume at the crown, and soft bangs that blend into the curls.",
+    "prompt": "Length: Bangs 8cm, Top 20cm, Sides 22cm, Back 20cm. Texture: Tight curls. Volume: Medium. Parting: Center. Technique: Layered curls, perm. Shape: Round silhouette that frames the face softly and enhances cheekbones. Key features: Distinct tight curls, natural volume at the crown, and soft bangs that blend into the curls.",
+    "analyzedAt": "2025-12-27T23:40:04.706Z"
+  },
+  "f-philippine-wave": {
+    "id": "f-philippine-wave",
+    "gender": "female",
+    "styleName": "philippine-wave",
+    "thumbnail": "/hairstyles/female/philippine-wave.jpg",
+    "analysis": "HAIRSTYLE: Philippine Wave  \nLENGTH: Bangs 10cm, Top 30cm, Sides 25cm, Back 30cm  \nTEXTURE: Loose waves  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Layers, loose wave styling  \nSHAPE: Soft, flowing silhouette that frames the face gently with slight volume at the crown and cascading waves down the sides.  \nKEY FEATURES: 1) Defined loose waves creating a soft texture, 2) Natural volume at the roots, 3) Center parting that enhances facial symmetry.",
+    "prompt": "Length: Bangs 10cm, Top 30cm, Sides 25cm, Back 30cm. Texture: Loose waves. Volume: Medium. Parting: Center. Technique: Layers, loose wave styling. Shape: Soft, flowing silhouette that frames the face gently with slight volume at the crown and cascading waves down the sides.. Key features: 1) Defined loose waves creating a soft texture, 2) Natural volume at the roots, 3) Center parting that enhances facial symmetry.",
+    "analyzedAt": "2025-12-27T23:40:08.244Z"
+  },
+  "f-pixie-cut": {
+    "id": "f-pixie-cut",
+    "gender": "female",
+    "styleName": "pixie-cut",
+    "thumbnail": "/hairstyles/female/pixie-cut.jpg",
+    "analysis": "HAIRSTYLE: Pixie Cut  \nLENGTH: Bangs 6 cm, Top 8 cm, Sides 5 cm, Back 4 cm  \nTEXTURE: Straight  \nVOLUME: Medium  \nPARTING: Left  \nTECHNIQUE: Layered, texturizing on the ends  \nSHAPE: Soft and rounded silhouette that frames the face, enhancing the cheekbones  \nKEY FEATURES: Lightly tousled texture, longer bangs that sweep to the side, tapered sides and back",
+    "prompt": "Length: Bangs 6 cm, Top 8 cm, Sides 5 cm, Back 4 cm. Texture: Straight. Volume: Medium. Parting: Left. Technique: Layered, texturizing on the ends. Shape: Soft and rounded silhouette that frames the face, enhancing the cheekbones. Key features: Lightly tousled texture, longer bangs that sweep to the side, tapered sides and back",
+    "analyzedAt": "2025-12-27T23:40:11.014Z"
+  },
+  "f-platinum-bob": {
+    "id": "f-platinum-bob",
+    "gender": "female",
+    "styleName": "platinum-bob",
+    "thumbnail": "/hairstyles/female/platinum-bob.jpg",
+    "analysis": "HAIRSTYLE: Platinum Bob  \nLENGTH: Bangs 5cm, Top 25cm, Sides 25cm, Back 25cm  \nTEXTURE: Straight  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Blunt cut  \nSHAPE: A straight, geometric bob that frames the face evenly, offering a sharp appearance with a slight angle towards the front.  \nKEY FEATURES: Blunt ends that create a clean look, a symmetrical silhouette, and a shiny, platinum color.",
+    "prompt": "Length: Bangs 5cm, Top 25cm, Sides 25cm, Back 25cm. Texture: Straight. Volume: Medium. Parting: Center. Technique: Blunt cut. Shape: A straight, geometric bob that frames the face evenly, offering a sharp appearance with a slight angle towards the front.. Key features: Blunt ends that create a clean look, a symmetrical silhouette, and a shiny, platinum color.",
+    "analyzedAt": "2025-12-27T23:40:14.460Z"
+  },
+  "f-romantic-upstyle": {
+    "id": "f-romantic-upstyle",
+    "gender": "female",
+    "styleName": "romantic-upstyle",
+    "thumbnail": "/hairstyles/female/romantic-upstyle.jpg",
+    "analysis": "HAIRSTYLE: Romantic Upstyle  \nLENGTH: Bangs 5cm, Top 15cm, Sides 10cm, Back 10cm  \nTEXTURE: Wavy  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Loose waves, pinned up  \nSHAPE: Soft, rounded silhouette with gentle framing around the face  \nKEY FEATURES: Loose tendrils falling at the sides, soft curls at the back, and volume at the crown",
+    "prompt": "Length: Bangs 5cm, Top 15cm, Sides 10cm, Back 10cm. Texture: Wavy. Volume: Medium. Parting: Center. Technique: Loose waves, pinned up. Shape: Soft, rounded silhouette with gentle framing around the face. Key features: Loose tendrils falling at the sides, soft curls at the back, and volume at the crown",
+    "analyzedAt": "2025-12-27T23:40:48.226Z"
+  },
+  "f-see-through-bang": {
+    "id": "f-see-through-bang",
+    "gender": "female",
+    "styleName": "see-through-bang",
+    "thumbnail": "/hairstyles/female/see-through-bang.jpg",
+    "analysis": "HAIRSTYLE: See-Through Bangs  \nLENGTH: Bangs 7cm, Top 30cm, Sides 25cm, Back 30cm  \nTEXTURE: Straight  \nVOLUME: Medium  \nPARTING: None  \nTECHNIQUE: Soft layers at the ends, blunt bangs  \nSHAPE: The overall silhouette frames the face gently, with longer sides that taper slightly towards the back, creating a soft, layered appearance.  \nKEY FEATURES: Fine, see-through bangs that are lightly textured; straight, sleek lengths; soft layering that adds movement without bulk.",
+    "prompt": "Length: Bangs 7cm, Top 30cm, Sides 25cm, Back 30cm. Texture: Straight. Volume: Medium. Parting: None. Technique: Soft layers at the ends, blunt bangs. Shape: The overall silhouette frames the face gently, with longer sides that taper slightly towards the back, creating a soft, layered appearance.. Key features: Fine, see-through bangs that are lightly textured; straight, sleek lengths; soft layering that adds movement without bulk.",
+    "analyzedAt": "2025-12-27T23:40:51.906Z"
+  },
+  "f-senegalese-twist": {
+    "id": "f-senegalese-twist",
+    "gender": "female",
+    "styleName": "senegalese-twist",
+    "thumbnail": "/hairstyles/female/senegalese-twist.jpg",
+    "analysis": "HAIRSTYLE: Senegalese Twists  \nLENGTH: Bangs [0] cm, Top [50] cm, Sides [50] cm, Back [50] cm  \nTEXTURE: Straight  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Braided twists  \nSHAPE: Long and sleek, framing the face with a slight taper towards the ends  \nKEY FEATURES: Twisted braids, sleek finish, uniform length",
+    "prompt": "Length: Bangs [0] cm, Top [50] cm, Sides [50] cm, Back [50] cm. Texture: Straight. Volume: Medium. Parting: Center. Technique: Braided twists. Shape: Long and sleek, framing the face with a slight taper towards the ends. Key features: Twisted braids, sleek finish, uniform length",
+    "analyzedAt": "2025-12-27T23:40:54.790Z"
+  },
+  "f-setting-perm": {
+    "id": "f-setting-perm",
+    "gender": "female",
+    "styleName": "setting-perm",
+    "thumbnail": "/hairstyles/female/setting-perm.jpg",
+    "analysis": "HAIRSTYLE: Setting Perm  \nLENGTH: Bangs 10cm, Top 30cm, Sides 30cm, Back 30cm  \nTEXTURE: Loose waves  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Perm, layering at the ends  \nSHAPE: Soft, layered waves that frame the face gently, with volume concentrated near the mid-lengths  \nKEY FEATURES: Loose wave texture, soft frame around the face, voluminous top with layered ends  ",
+    "prompt": "Length: Bangs 10cm, Top 30cm, Sides 30cm, Back 30cm. Texture: Loose waves. Volume: Medium. Parting: Center. Technique: Perm, layering at the ends. Shape: Soft, layered waves that frame the face gently, with volume concentrated near the mid-lengths. Key features: Loose wave texture, soft frame around the face, voluminous top with layered ends",
+    "analyzedAt": "2025-12-27T23:40:57.683Z"
+  },
+  "f-shaggy-cut": {
+    "id": "f-shaggy-cut",
+    "gender": "female",
+    "styleName": "shaggy-cut",
+    "thumbnail": "/hairstyles/female/shaggy-cut.jpg",
+    "analysis": "HAIRSTYLE: Shaggy Cut  \nLENGTH: Bangs 7 cm, Top 15 cm, Sides 20 cm, Back 25 cm  \nTEXTURE: Wavy  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Layering  \nSHAPE: The overall silhouette is soft and rounded, framing the face with feathery ends and a shaggy appearance. The hair is shorter at the crown and gradually gets longer towards the back, creating an effortless, tousled look.  \nKEY FEATURES: 1) Uneven, textured bangs; 2) Layers that create movement and volume; 3) Shaggy, tousled ends.",
+    "prompt": "Length: Bangs 7 cm, Top 15 cm, Sides 20 cm, Back 25 cm. Texture: Wavy. Volume: Medium. Parting: Center. Technique: Layering. Shape: The overall silhouette is soft and rounded, framing the face with feathery ends and a shaggy appearance. The hair is shorter at the crown and gradually gets longer towards the back, creating an effortless, tousled look.. Key features: 1) Uneven, textured bangs; 2) Layers that create movement and volume; 3) Shaggy, tousled ends.",
+    "analyzedAt": "2025-12-27T23:41:02.205Z"
+  },
+  "f-short-straight": {
+    "id": "f-short-straight",
+    "gender": "female",
+    "styleName": "short-straight",
+    "thumbnail": "/hairstyles/female/short-straight.jpg",
+    "analysis": "HAIRSTYLE: Short Straight Bob  \nLENGTH: Bangs [5]cm, Top [10]cm, Sides [8]cm, Back [8]cm  \nTEXTURE: Straight  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Blunt cut, no layers  \nSHAPE: A symmetrical bob that gently frames the face, with a straight line at the ends for a sleek look.  \nKEY FEATURES: Blunt cut ends, smooth texture, defined center part.",
+    "prompt": "Length: Bangs [5]cm, Top [10]cm, Sides [8]cm, Back [8]cm. Texture: Straight. Volume: Medium. Parting: Center. Technique: Blunt cut, no layers. Shape: A symmetrical bob that gently frames the face, with a straight line at the ends for a sleek look.. Key features: Blunt cut ends, smooth texture, defined center part.",
+    "analyzedAt": "2025-12-27T23:41:05.243Z"
+  },
+  "f-short-wolf-cut": {
+    "id": "f-short-wolf-cut",
+    "gender": "female",
+    "styleName": "short-wolf-cut",
+    "thumbnail": "/hairstyles/female/short-wolf-cut.jpg",
+    "analysis": "HAIRSTYLE: Short Wolf Cut  \nLENGTH: Bangs 10cm, Top 15cm, Sides 20cm, Back 25cm  \nTEXTURE: Straight  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Layers, Texturizing  \nSHAPE: Shaggy, with a soft, rounded silhouette; frames the face while maintaining length at the back.  \nKEY FEATURES: Choppy bangs, uneven layered lengths, and a slightly longer back that provides a distinctive wolf cut appearance.",
+    "prompt": "Length: Bangs 10cm, Top 15cm, Sides 20cm, Back 25cm. Texture: Straight. Volume: Medium. Parting: Center. Technique: Layers, Texturizing. Shape: Shaggy, with a soft, rounded silhouette; frames the face while maintaining length at the back.. Key features: Choppy bangs, uneven layered lengths, and a slightly longer back that provides a distinctive wolf cut appearance.",
+    "analyzedAt": "2025-12-27T23:41:09.029Z"
+  },
+  "f-singapore-chic": {
+    "id": "f-singapore-chic",
+    "gender": "female",
+    "styleName": "singapore-chic",
+    "thumbnail": "/hairstyles/female/singapore-chic.jpg",
+    "analysis": "Certainly! Here are the specifications for the \"Singapore-Chic\" hairstyle.\n\nHAIRSTYLE: Singapore-Chic  \nLENGTH: Bangs 7cm, Top 20cm, Sides 15cm, Back 15cm  \nTEXTURE: Straight  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Blunt cut, minimal layering  \nSHAPE: A-line silhouette that frames the face softly, with the back slightly shorter than the front   \nKEY FEATURES: Blunt bangs, clean lines, and a polished finish  \n\nThese specifications should help in recreating the hairstyle accurately.",
+    "prompt": "Length: Bangs 7cm, Top 20cm, Sides 15cm, Back 15cm. Texture: Straight. Volume: Medium. Parting: Center. Technique: Blunt cut, minimal layering. Shape: A-line silhouette that frames the face softly, with the back slightly shorter than the front. Key features: Blunt bangs, clean lines, and a polished finish",
+    "analyzedAt": "2025-12-27T23:41:44.674Z"
+  },
+  "f-sleek-straight": {
+    "id": "f-sleek-straight",
+    "gender": "female",
+    "styleName": "sleek-straight",
+    "thumbnail": "/hairstyles/female/sleek-straight.jpg",
+    "analysis": "HAIRSTYLE: Sleek Straight  \nLENGTH: Bangs 0 cm, Top 30 cm, Sides 30 cm, Back 30 cm  \nTEXTURE: Straight  \nVOLUME: Flat  \nPARTING: Center  \nTECHNIQUE: Blunt cut  \nSHAPE: Long and straight silhouette that frames the face without any layers or curves  \nKEY FEATURES: High shine finish, sleek appearance, crisp blunt ends",
+    "prompt": "Length: Bangs 0 cm, Top 30 cm, Sides 30 cm, Back 30 cm. Texture: Straight. Volume: Flat. Parting: Center. Technique: Blunt cut. Shape: Long and straight silhouette that frames the face without any layers or curves. Key features: High shine finish, sleek appearance, crisp blunt ends",
+    "analyzedAt": "2025-12-27T23:41:47.461Z"
+  },
+  "f-south-indian-bun": {
+    "id": "f-south-indian-bun",
+    "gender": "female",
+    "styleName": "south-indian-bun",
+    "thumbnail": "/hairstyles/female/south-indian-bun.jpg",
+    "analysis": "HAIRSTYLE: South Indian Bun  \nLENGTH: Bangs [0]cm, Top [10]cm, Sides [10]cm, Back [15]cm  \nTEXTURE: Straight  \nVOLUME: Medium  \nPARTING: None (smooth back)  \nTECHNIQUE: Low bun with wrapped sections, possible pin curl accents  \nSHAPE: Low, rounded bun shape situated at the nape of the neck, with sides framing the face neatly  \nKEY FEATURES: 1) Low positioned bun 2) Smooth, sleek finish 3) Tapered ends with a polished look",
+    "prompt": "Length: Bangs [0]cm, Top [10]cm, Sides [10]cm, Back [15]cm. Texture: Straight. Volume: Medium. Parting: None (smooth back). Technique: Low bun with wrapped sections, possible pin curl accents. Shape: Low, rounded bun shape situated at the nape of the neck, with sides framing the face neatly. Key features: 1) Low positioned bun 2) Smooth, sleek finish 3) Tapered ends with a polished look",
+    "analyzedAt": "2025-12-27T23:41:50.819Z"
+  },
+  "f-tassel-cut": {
+    "id": "f-tassel-cut",
+    "gender": "female",
+    "styleName": "tassel-cut",
+    "thumbnail": "/hairstyles/female/tassel-cut.jpg",
+    "analysis": "Here are the precise specifications for recreating the \"tassel-cut\" hairstyle based on the reference image provided:\n\nHAIRSTYLE: Tassel Cut  \nLENGTH: Bangs 6 cm, Top 18 cm, Sides 15 cm, Back 12 cm  \nTEXTURE: Straight  \nVOLUME: Natural  \nPARTING: Center  \nTECHNIQUE: Blunt cut with slight layering  \nSHAPE: A-Frame silhouette, lightly framing the face with a tapered back  \nKEY FEATURES: Blunt ends, soft texture, and a subtle fringe  \n\nThese details should enable the reproduction of the hairstyle accurately.",
+    "prompt": "Length: Bangs 6 cm, Top 18 cm, Sides 15 cm, Back 12 cm. Texture: Straight. Volume: Natural. Parting: Center. Technique: Blunt cut with slight layering. Shape: A-Frame silhouette, lightly framing the face with a tapered back. Key features: Blunt ends, soft texture, and a subtle fringe",
+    "analyzedAt": "2025-12-27T23:41:54.708Z"
+  },
+  "f-thai-chic": {
+    "id": "f-thai-chic",
+    "gender": "female",
+    "styleName": "thai-chic",
+    "thumbnail": "/hairstyles/female/thai-chic.jpg",
+    "analysis": "HAIRSTYLE: Thai Chic\nLENGTH: Bangs [0] cm, Top [20] cm, Sides [15] cm, Back [10] cm\nTEXTURE: Straight\nVOLUME: Flat\nPARTING: Center\nTECHNIQUE: Low bun, sleek finish\nSHAPE: Smooth, rounded silhouette that hugs the head shape, framing the face neatly with no loose strands.\nKEY FEATURES: Sleek and polished appearance, central parting, and an elegant low bun.",
+    "prompt": "Length: Bangs [0] cm, Top [20] cm, Sides [15] cm, Back [10] cm. Texture: Straight. Volume: Flat. Parting: Center. Technique: Low bun, sleek finish. Shape: Smooth, rounded silhouette that hugs the head shape, framing the face neatly with no loose strands.. Key features: Sleek and polished appearance, central parting, and an elegant low bun.",
+    "analyzedAt": "2025-12-27T23:41:57.446Z"
+  },
+  "f-turkish-drama": {
+    "id": "f-turkish-drama",
+    "gender": "female",
+    "styleName": "turkish-drama",
+    "thumbnail": "/hairstyles/female/turkish-drama.jpg",
+    "analysis": "Sure! Here are the specifications for the \"Turkish Drama\" hairstyle:\n\nHAIRSTYLE: Turkish Drama\nLENGTH: Bangs 10cm, Top 25cm, Sides 30cm, Back 30cm\nTEXTURE: Loose waves\nVOLUME: Medium\nPARTING: Center\nTECHNIQUE: Layers\nSHAPE: Soft, flowing waves that frame the face and give a romantic silhouette\nKEY FEATURES: Soft bangs, loose, voluminous waves, and a center part that enhances the overall symmetrical appearance",
+    "prompt": "Length: Bangs 10cm, Top 25cm, Sides 30cm, Back 30cm. Texture: Loose waves. Volume: Medium. Parting: Center. Technique: Layers. Shape: Soft, flowing waves that frame the face and give a romantic silhouette. Key features: Soft bangs, loose, voluminous waves, and a center part that enhances the overall symmetrical appearance",
+    "analyzedAt": "2025-12-27T23:42:00.946Z"
+  },
+  "f-twist-out": {
+    "id": "f-twist-out",
+    "gender": "female",
+    "styleName": "twist-out",
+    "thumbnail": "/hairstyles/female/twist-out.jpg",
+    "analysis": "HAIRSTYLE: Twist-Out  \nLENGTH: Bangs 10cm, Top 20cm, Sides 15cm, Back 15cm  \nTEXTURE: Curly  \nVOLUME: High  \nPARTING: None  \nTECHNIQUE: Twist-out  \nSHAPE: Rounded silhouette with curls that frame the face softly, adding volume around the cheeks  \nKEY FEATURES: Defined tight curls, full body with bounce, and a natural, textured look  ",
+    "prompt": "Length: Bangs 10cm, Top 20cm, Sides 15cm, Back 15cm. Texture: Curly. Volume: High. Parting: None. Technique: Twist-out. Shape: Rounded silhouette with curls that frame the face softly, adding volume around the cheeks. Key features: Defined tight curls, full body with bounce, and a natural, textured look",
+    "analyzedAt": "2025-12-27T23:42:04.134Z"
+  },
+  "f-ulzzang-style": {
+    "id": "f-ulzzang-style",
+    "gender": "female",
+    "styleName": "ulzzang-style",
+    "thumbnail": "/hairstyles/female/ulzzang-style.jpg",
+    "analysis": "HAIRSTYLE: Ulzzang Style  \nLENGTH: Bangs 7cm, Top 40cm, Sides 50cm, Back 50cm  \nTEXTURE: Straight  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Long layers, blunt cut bangs  \nSHAPE: Long and sleek silhouette that frames the face gently with a soft touch  \nKEY FEATURES: Blunt bangs, elongation from top to side lengths, smooth and shiny finish  ",
+    "prompt": "Length: Bangs 7cm, Top 40cm, Sides 50cm, Back 50cm. Texture: Straight. Volume: Medium. Parting: Center. Technique: Long layers, blunt cut bangs. Shape: Long and sleek silhouette that frames the face gently with a soft touch. Key features: Blunt bangs, elongation from top to side lengths, smooth and shiny finish",
+    "analyzedAt": "2025-12-27T23:42:07.167Z"
+  },
+  "f-volume-magic": {
+    "id": "f-volume-magic",
+    "gender": "female",
+    "styleName": "volume-magic",
+    "thumbnail": "/hairstyles/female/volume-magic.jpg",
+    "analysis": "HAIRSTYLE: Volume Magic\nLENGTH: Bangs 10cm, Top 30cm, Sides 30cm, Back 30cm\nTEXTURE: Straight\nVOLUME: Medium\nPARTING: Center\nTECHNIQUE: Blunt cut ends, slight layering at the back for movement\nSHAPE: Smooth, rounded silhouette that frames the face softly, with hair flowing evenly around the shoulders\nKEY FEATURES: Blunt-cut edges, soft volume at the roots, and defined center parting",
+    "prompt": "Length: Bangs 10cm, Top 30cm, Sides 30cm, Back 30cm. Texture: Straight. Volume: Medium. Parting: Center. Technique: Blunt cut ends, slight layering at the back for movement. Shape: Smooth, rounded silhouette that frames the face softly, with hair flowing evenly around the shoulders. Key features: Blunt-cut edges, soft volume at the roots, and defined center parting",
+    "analyzedAt": "2025-12-27T23:42:41.273Z"
+  },
+  "f-wave-perm": {
+    "id": "f-wave-perm",
+    "gender": "female",
+    "styleName": "wave-perm",
+    "thumbnail": "/hairstyles/female/wave-perm.jpg",
+    "analysis": "HAIRSTYLE: Wave Perm  \nLENGTH: Bangs 6cm, Top 25cm, Sides 20cm, Back 25cm  \nTEXTURE: Loose Waves  \nVOLUME: Medium  \nPARTING: Center  \nTECHNIQUE: Perm, Long layers  \nSHAPE: Soft, rounded silhouette that frames the face gently; the hair is fuller at the sides and gradually narrows toward the back  \nKEY FEATURES: 1. Loose, defined waves; 2. Natural movement; 3. Increased volume at the roots",
+    "prompt": "Length: Bangs 6cm, Top 25cm, Sides 20cm, Back 25cm. Texture: Loose Waves. Volume: Medium. Parting: Center. Technique: Perm, Long layers. Shape: Soft, rounded silhouette that frames the face gently; the hair is fuller at the sides and gradually narrows toward the back. Key features: 1. Loose, defined waves; 2. Natural movement; 3. Increased volume at the roots",
+    "analyzedAt": "2025-12-27T23:42:44.640Z"
+  }
+}

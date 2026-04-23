@@ -1,9 +1,12 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore, type CustomHairSettings } from '../stores/useAppStore';
+import { useI18n } from '../i18n/useI18n';
+import Toast from '../components/Toast';
 
 export default function CustomStyle() {
   const navigate = useNavigate();
+  const { t } = useI18n();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const {
     myBasePhoto,
@@ -15,16 +18,58 @@ export default function CustomStyle() {
   } = useAppStore();
 
   const [activeSection, setActiveSection] = useState<'length' | 'thinning' | 'perm' | 'undercut'>('length');
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
 
-  // 사진 업로드 핸들러
+  // 파일 업로드 검증 및 핸들러
+  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+  const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif'];
+  const MAX_DIMENSION = 4096;
+
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // 파일 타입 검증
+    if (!ALLOWED_TYPES.includes(file.type) && !file.name.toLowerCase().match(/\.(jpg|jpeg|png|webp|heic|heif)$/)) {
+      setToastMessage(t('unsupported_file_format') || '지원하지 않는 파일 형식입니다. (JPG, PNG, WebP만 가능)');
+      setShowToast(true);
+      e.target.value = ''; // Reset input
+      return;
+    }
+
+    // 파일 크기 검증
+    if (file.size > MAX_FILE_SIZE) {
+      setToastMessage(t('file_too_large') || '파일 크기는 10MB 이하여야 합니다.');
+      setShowToast(true);
+      e.target.value = '';
+      return;
+    }
+
     const reader = new FileReader();
     reader.onload = (event) => {
       const result = event.target?.result as string;
-      setMyBasePhoto(result);
+
+      // 이미지 크기 검증
+      const img = new Image();
+      img.onload = () => {
+        if (img.width > MAX_DIMENSION || img.height > MAX_DIMENSION) {
+          setToastMessage(t('image_too_large') || '이미지 해상도가 너무 큽니다. (최대 4096px)');
+          setShowToast(true);
+          return;
+        }
+        setMyBasePhoto(result);
+      };
+      img.onerror = () => {
+        setToastMessage(t('invalid_image') || '유효하지 않은 이미지 파일입니다.');
+        setShowToast(true);
+      };
+      img.src = result;
+    };
+    reader.onerror = () => {
+      console.error('FileReader error in handlePhotoUpload');
+      setToastMessage(t('photo_load_failed') || '사진을 불러오는데 실패했습니다.');
+      setShowToast(true);
     };
     reader.readAsDataURL(file);
   };
@@ -100,7 +145,8 @@ export default function CustomStyle() {
   // 커스텀 스타일 적용하기
   const handleApplyCustom = () => {
     if (!myBasePhoto) {
-      alert('먼저 내 사진을 등록해주세요!');
+      setToastMessage(t('please_register_photo'));
+      setShowToast(true);
       return;
     }
 
@@ -478,6 +524,14 @@ export default function CustomStyle() {
           {myBasePhoto ? '이 설정으로 스타일 생성' : '먼저 사진을 등록해주세요'}
         </button>
       </div>
+
+      {/* Toast */}
+      <Toast
+        message={toastMessage}
+        type="error"
+        visible={showToast}
+        onClose={() => setShowToast(false)}
+      />
     </div>
   );
 }

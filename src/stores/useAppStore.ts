@@ -1,6 +1,7 @@
-import { create } from 'zustand';
+﻿import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
+import { logger } from '../services/logger';
 // Safe localStorage that handles errors and corrupted data
 const safeLocalStorage = {
   getItem: (name: string): string | null => {
@@ -12,7 +13,7 @@ const safeLocalStorage = {
       }
       return value;
     } catch (error) {
-      console.warn('Corrupted localStorage data, clearing:', error);
+      logger.warn('Corrupted localStorage data, clearing:', error);
       try {
         localStorage.removeItem(name);
       } catch {
@@ -25,14 +26,14 @@ const safeLocalStorage = {
     try {
       localStorage.setItem(name, value);
     } catch (error) {
-      console.warn('Failed to set item in localStorage:', error);
+      logger.warn('Failed to set item in localStorage:', error);
     }
   },
   removeItem: (name: string): void => {
     try {
       localStorage.removeItem(name);
     } catch (error) {
-      console.warn('Failed to remove item from localStorage:', error);
+      logger.warn('Failed to remove item from localStorage:', error);
     }
   },
 };
@@ -470,7 +471,7 @@ export const useAppStore = create<AppState>()(
           }));
         } catch {
           // If localStorage is full, clear old history and try again
-          console.warn('Storage quota exceeded, clearing old history');
+          logger.warn('Storage quota exceeded, clearing old history');
           set({ history: [{ ...item, date: new Date() }] });
         }
       },
@@ -509,7 +510,7 @@ export const useAppStore = create<AppState>()(
           };
           img.src = result;
         } catch (e) {
-          console.warn('Failed to save result:', e);
+          logger.warn('Failed to save result:', e);
         }
       },
       deleteSavedResult: (id: string) => {
@@ -614,3 +615,4 @@ export const useAppStore = create<AppState>()(
     }
   )
 );
+

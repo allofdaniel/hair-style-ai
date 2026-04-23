@@ -1,60 +1,100 @@
-const fs = require('fs');
+const sharp = require('sharp');
 const path = require('path');
+const fs = require('fs');
 
-// SVG 아이콘 생성
-const createSvgIcon = (size) => `
-<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-  <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#0F0F1A"/>
-      <stop offset="100%" style="stop-color:#1a1a2e"/>
-    </linearGradient>
-    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#ec4899"/>
-      <stop offset="100%" style="stop-color:#f97316"/>
-    </linearGradient>
-  </defs>
-  <rect width="${size}" height="${size}" rx="${size * 0.2}" fill="url(#bg)"/>
-  <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-size="${size * 0.5}" fill="url(#accent)">✨</text>
-</svg>
-`.trim();
+const sourceIcon = path.join(__dirname, '..', 'newappicon2.png');
+const androidResDir = path.join(__dirname, '..', 'android', 'app', 'src', 'main', 'res');
 
-// OG 이미지 SVG
-const createOgImage = () => `
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
-  <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#0F0F1A"/>
-      <stop offset="100%" style="stop-color:#1a1a2e"/>
-    </linearGradient>
-    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#ec4899"/>
-      <stop offset="100%" style="stop-color:#f97316"/>
-    </linearGradient>
-  </defs>
-  <rect width="1200" height="630" fill="url(#bg)"/>
-  <text x="600" y="250" dominant-baseline="middle" text-anchor="middle" font-size="120" fill="url(#accent)">✨</text>
-  <text x="600" y="380" dominant-baseline="middle" text-anchor="middle" font-family="Arial, sans-serif" font-size="72" font-weight="bold" fill="url(#accent)">LookSim</text>
-  <text x="600" y="480" dominant-baseline="middle" text-anchor="middle" font-family="Arial, sans-serif" font-size="32" fill="#9ca3af">AI 외모 시뮬레이션</text>
-</svg>
-`.trim();
+// Android mipmap sizes
+const sizes = [
+  { folder: 'mipmap-mdpi', size: 48 },
+  { folder: 'mipmap-hdpi', size: 72 },
+  { folder: 'mipmap-xhdpi', size: 96 },
+  { folder: 'mipmap-xxhdpi', size: 144 },
+  { folder: 'mipmap-xxxhdpi', size: 192 },
+];
 
-const publicDir = path.join(__dirname, '..', 'public');
+// Foreground sizes for adaptive icons (108dp safe zone)
+const foregroundSizes = [
+  { folder: 'mipmap-mdpi', size: 108 },
+  { folder: 'mipmap-hdpi', size: 162 },
+  { folder: 'mipmap-xhdpi', size: 216 },
+  { folder: 'mipmap-xxhdpi', size: 324 },
+  { folder: 'mipmap-xxxhdpi', size: 432 },
+];
 
-// 아이콘 생성
-const sizes = [192, 512];
-sizes.forEach(size => {
-  const svg = createSvgIcon(size);
-  fs.writeFileSync(path.join(publicDir, `icon-${size}.svg`), svg);
-  console.log(`Created icon-${size}.svg`);
-});
+async function generateIcons() {
+  console.log('Generating Android icons from:', sourceIcon);
 
-// Apple Touch Icon (180x180)
-fs.writeFileSync(path.join(publicDir, 'apple-touch-icon.svg'), createSvgIcon(180));
-console.log('Created apple-touch-icon.svg');
+  // Get source image metadata
+  const metadata = await sharp(sourceIcon).metadata();
+  console.log(`Source image: ${metadata.width}x${metadata.height}`);
 
-// OG Image
-fs.writeFileSync(path.join(publicDir, 'og-image.svg'), createOgImage());
-console.log('Created og-image.svg');
+  // Generate regular icons (ic_launcher.png) - fit width exactly, crop top/bottom if needed
+  for (const { folder, size } of sizes) {
+    const outputPath = path.join(androidResDir, folder, 'ic_launcher.png');
+    await sharp(sourceIcon)
+      .resize(size, size, {
+        fit: 'cover',
+        position: 'center'
+      })
+      .png()
+      .toFile(outputPath);
+    console.log(`Created: ${folder}/ic_launcher.png (${size}x${size})`);
 
-console.log('All icons generated!');
+    // Also create round version
+    const roundOutputPath = path.join(androidResDir, folder, 'ic_launcher_round.png');
+    await sharp(sourceIcon)
+      .resize(size, size, {
+        fit: 'cover',
+        position: 'center'
+      })
+      .png()
+      .toFile(roundOutputPath);
+    console.log(`Created: ${folder}/ic_launcher_round.png (${size}x${size})`);
+  }
+
+  // Generate foreground icons for adaptive icons
+  // These need padding (icon should be ~66% of total size for safe zone)
+  // Background color matches ic_launcher_background.xml (#E91E63)
+  const bgColor = { r: 191, g: 100, b: 86, alpha: 255 }; // #BF6456 warm rose-gold midpoint
+
+  for (const { folder, size } of foregroundSizes) {
+    const outputPath = path.join(androidResDir, folder, 'ic_launcher_foreground.png');
+    const innerSize = Math.round(size * 0.72); // 72% of size for safe zone
+    const padding = Math.round((size - innerSize) / 2);
+
+    // Create the icon with cover fit (width matches exactly)
+    const resizedIcon = await sharp(sourceIcon)
+      .resize(innerSize, innerSize, {
+        fit: 'cover',
+        position: 'center'
+      })
+      .png()
+      .toBuffer();
+
+    // Create canvas with pink background (same as adaptive icon background)
+    // This fills any transparent corners from the rounded source icon
+    await sharp({
+      create: {
+        width: size,
+        height: size,
+        channels: 4,
+        background: bgColor
+      }
+    })
+      .composite([{
+        input: resizedIcon,
+        left: padding,
+        top: padding
+      }])
+      .png()
+      .toFile(outputPath);
+
+    console.log(`Created: ${folder}/ic_launcher_foreground.png (${size}x${size}, inner: ${innerSize}x${innerSize})`);
+  }
+
+  console.log('\nAll icons generated successfully!');
+}
+
+generateIcons().catch(console.error);

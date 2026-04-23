@@ -1,0 +1,1627 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hair Style AI - Test Bed</title>
+<style>
+  :root {
+    --bg: #0f0f0f;
+    --card: #1a1a2e;
+    --accent: #6c63ff;
+    --accent2: #e94560;
+    --text: #eee;
+    --muted: #888;
+    --success: #2ecc71;
+    --error: #e74c3c;
+    --pending: #f39c12;
+    --growth: #00b894;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg); color: var(--text);
+    min-height: 100vh;
+  }
+  header {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    padding: 20px 24px; border-bottom: 1px solid #333;
+    position: sticky; top: 0; z-index: 100;
+  }
+  header h1 { font-size: 20px; margin-bottom: 4px; }
+  header .subtitle { color: var(--muted); font-size: 13px; }
+  .controls {
+    display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+    padding: 16px 24px; background: #111; border-bottom: 1px solid #222;
+    position: sticky; top: 68px; z-index: 99;
+  }
+  .controls label { font-size: 13px; color: var(--muted); }
+  .controls select, .controls input[type="number"] {
+    background: #222; color: var(--text); border: 1px solid #444;
+    padding: 6px 10px; border-radius: 6px; font-size: 13px;
+  }
+  .upload-area {
+    margin: 20px 24px; padding: 40px; text-align: center;
+    border: 2px dashed #444; border-radius: 12px;
+    cursor: pointer; transition: border-color 0.3s;
+  }
+  .upload-area:hover { border-color: var(--accent); }
+  .upload-area.has-photo { border-color: var(--success); padding: 16px; }
+  .upload-area img { max-height: 200px; border-radius: 8px; }
+  .upload-area .label { margin-top: 8px; font-size: 13px; color: var(--muted); }
+  .btn {
+    padding: 8px 20px; border: none; border-radius: 8px;
+    font-size: 14px; font-weight: 600; cursor: pointer; transition: 0.2s;
+  }
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-primary:hover { background: #5a52e0; }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-danger { background: var(--accent2); color: white; }
+  .btn-danger:hover { background: #d63a52; }
+  .btn-outline { background: transparent; border: 1px solid #555; color: var(--text); }
+  .btn-outline:hover { border-color: var(--accent); }
+  .progress-bar {
+    margin: 0 24px; height: 6px; background: #222; border-radius: 3px;
+    overflow: hidden; display: none;
+  }
+  .progress-bar.active { display: block; }
+  .progress-bar .fill {
+    height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transition: width 0.3s; border-radius: 3px;
+  }
+  .stats {
+    padding: 8px 24px; font-size: 12px; color: var(--muted);
+    display: flex; gap: 16px;
+  }
+  .stats span { display: inline-flex; align-items: center; gap: 4px; }
+  .stats .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .stats .dot-success { background: var(--success); }
+  .stats .dot-error { background: var(--error); }
+  .stats .dot-pending { background: var(--pending); }
+  .stats .dot-processing { background: var(--accent); animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px; padding: 20px 24px;
+  }
+  .card {
+    background: var(--card); border-radius: 12px;
+    overflow: hidden; border: 1px solid #2a2a3e;
+    transition: border-color 0.3s;
+  }
+  .card.processing { border-color: var(--accent); }
+  .card.success { border-color: var(--success); }
+  .card.error { border-color: var(--error); }
+  .card-header {
+    padding: 10px 14px; display: flex; justify-content: space-between;
+    align-items: center; border-bottom: 1px solid #2a2a3e;
+  }
+  .card-header .name { font-size: 14px; font-weight: 600; }
+  .card-header .name-ko { font-size: 12px; color: var(--muted); }
+  .card-header .badge {
+    font-size: 10px; padding: 2px 8px; border-radius: 10px;
+    text-transform: uppercase; font-weight: 700;
+  }
+  .badge-male { background: #1e3a5f; color: #4a9eff; }
+  .badge-female { background: #5f1e3a; color: #ff4a9e; }
+  .card-images {
+    display: grid; grid-template-columns: 1fr 1fr; min-height: 180px;
+  }
+  .card-images .img-slot {
+    position: relative; display: flex; align-items: center;
+    justify-content: center; background: #111; min-height: 180px;
+  }
+  .card-images .img-slot img {
+    width: 100%; height: 180px; object-fit: cover;
+  }
+  .card-images .img-slot .label {
+    position: absolute; top: 4px; left: 4px; font-size: 9px;
+    background: rgba(0,0,0,0.7); padding: 2px 6px; border-radius: 4px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .card-images .img-slot .placeholder {
+    color: #444; font-size: 11px; text-align: center;
+  }
+  .card-images .img-slot .spinner {
+    width: 30px; height: 30px; border: 3px solid #333;
+    border-top-color: var(--accent); border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .card-footer {
+    padding: 8px 14px; font-size: 11px; color: var(--muted);
+    border-top: 1px solid #2a2a3e;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .card-footer .time { color: var(--accent); }
+  .card-footer .err { color: var(--error); }
+  .fullscreen-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.9); z-index: 999;
+    align-items: center; justify-content: center; cursor: zoom-out;
+  }
+  .fullscreen-overlay.active { display: flex; }
+  .fullscreen-overlay img { max-width: 95vw; max-height: 95vh; border-radius: 8px; }
+  .select-all-row {
+    padding: 0 24px 8px; display: flex; gap: 8px; align-items: center;
+  }
+  .select-all-row label { font-size: 12px; color: var(--muted); cursor: pointer; }
+  .card-header input[type="checkbox"] { cursor: pointer; }
+
+  /* Prompt editing */
+  .card-prompt { border-top: 1px solid #2a2a3e; display: none; }
+  .card-prompt.open { display: block; }
+  .card-prompt .prompt-header {
+    padding: 6px 14px; display: flex; justify-content: space-between; align-items: center;
+  }
+  .card-prompt .prompt-header span { font-size: 11px; color: var(--muted); }
+  .card-prompt .prompt-actions { display: flex; gap: 4px; }
+  .card-prompt .prompt-actions button {
+    font-size: 10px; padding: 2px 8px; border: 1px solid #444; border-radius: 4px;
+    background: transparent; color: var(--text); cursor: pointer;
+  }
+  .card-prompt .prompt-actions button:hover { border-color: var(--accent); }
+  .card-prompt .prompt-actions .btn-reset:hover { border-color: var(--error); color: var(--error); }
+  .prompt-textarea {
+    width: 100%; min-height: 140px; max-height: 400px; padding: 10px 14px;
+    background: #111; color: #ccc; border: none; font-size: 11px; line-height: 1.5;
+    font-family: 'Consolas', 'Monaco', monospace; resize: vertical; outline: none;
+  }
+  .prompt-textarea:focus { background: #1a1a2e; color: var(--text); }
+  .prompt-textarea.modified { border-left: 3px solid var(--pending); }
+  .prompt-toggle-btn {
+    font-size: 10px; padding: 2px 8px; border: 1px solid #333; border-radius: 4px;
+    background: transparent; color: var(--muted); cursor: pointer; margin-left: 4px;
+    white-space: nowrap;
+  }
+  .prompt-toggle-btn:hover { border-color: var(--accent); color: var(--text); }
+  .prompt-toggle-btn.has-custom { border-color: var(--pending); color: var(--pending); }
+
+  /* ============ Hair Growth Simulation ============ */
+  .growth-section {
+    margin: 20px 24px;
+    background: var(--card);
+    border-radius: 12px;
+    border: 1px solid #2a2a3e;
+    overflow: hidden;
+  }
+  .growth-header {
+    padding: 14px 20px;
+    display: flex; justify-content: space-between; align-items: center;
+    cursor: pointer;
+    background: linear-gradient(135deg, #0d2818, #1a1a2e);
+    border-bottom: 1px solid transparent;
+    transition: all 0.3s;
+  }
+  .growth-header:hover { background: linear-gradient(135deg, #143d24, #1e1e3e); }
+  .growth-header h2 { font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .growth-header .tag {
+    font-size: 10px; padding: 2px 8px; border-radius: 10px;
+    background: rgba(0,184,148,0.2); color: var(--growth); font-weight: 700;
+  }
+  .growth-header .collapse-arrow {
+    color: var(--muted); transition: transform 0.3s; font-size: 12px;
+  }
+  .growth-section.open .growth-header { border-bottom: 1px solid #2a2a3e; }
+  .growth-section.open .collapse-arrow { transform: rotate(180deg); }
+  .growth-body { display: none; padding: 20px; }
+  .growth-section.open .growth-body { display: block; }
+
+  .growth-controls {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+  }
+  @media (max-width: 768px) { .growth-controls { grid-template-columns: 1fr; } }
+  .growth-panel {
+    background: #111; border-radius: 10px; padding: 16px;
+    border: 1px solid #222;
+  }
+  .growth-panel h3 {
+    font-size: 13px; font-weight: 600; color: var(--growth); margin-bottom: 12px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .growth-panel label { font-size: 12px; color: var(--muted); display: block; margin-bottom: 4px; }
+  .growth-panel input[type="range"] {
+    width: 100%; margin: 4px 0 8px; accent-color: var(--growth);
+  }
+  .growth-panel input[type="number"], .growth-panel select {
+    background: #1a1a2e; color: var(--text); border: 1px solid #333;
+    padding: 6px 10px; border-radius: 6px; font-size: 13px; width: 100%;
+  }
+  .growth-radio-group {
+    display: flex; gap: 8px; margin-bottom: 12px;
+  }
+  .growth-radio-group label {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 14px; border: 1px solid #333; border-radius: 8px;
+    cursor: pointer; font-size: 13px; color: var(--text); transition: 0.2s;
+  }
+  .growth-radio-group label:hover { border-color: var(--growth); }
+  .growth-radio-group input:checked + span { color: var(--growth); }
+  .growth-radio-group label:has(input:checked) { border-color: var(--growth); background: rgba(0,184,148,0.1); }
+  .growth-presets {
+    display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0;
+  }
+  .growth-presets button {
+    padding: 4px 12px; border: 1px solid #333; border-radius: 6px;
+    background: transparent; color: var(--text); font-size: 12px;
+    cursor: pointer; transition: 0.2s;
+  }
+  .growth-presets button:hover { border-color: var(--growth); color: var(--growth); }
+  .growth-presets button.active { border-color: var(--growth); background: rgba(0,184,148,0.15); color: var(--growth); }
+  .growth-info-box {
+    background: #0a0a1a; border-radius: 8px; padding: 12px; margin-top: 12px;
+    border: 1px solid #1a1a3e;
+  }
+  .growth-info-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 4px 0; font-size: 12px;
+  }
+  .growth-info-row .label { color: var(--muted); }
+  .growth-info-row .value { color: var(--text); font-weight: 600; font-family: monospace; }
+  .growth-info-row .value.highlight { color: var(--growth); font-size: 14px; }
+  .growth-visual {
+    margin-top: 12px; padding: 12px; background: #0a0a1a; border-radius: 8px;
+    border: 1px solid #1a1a3e; position: relative; overflow: hidden;
+  }
+  .growth-visual-bar {
+    height: 8px; border-radius: 4px; background: #222; position: relative; overflow: hidden;
+  }
+  .growth-visual-bar .fill {
+    height: 100%; border-radius: 4px;
+    background: linear-gradient(90deg, var(--growth), #55efc4);
+    transition: width 0.5s ease;
+  }
+  .growth-visual-labels {
+    display: flex; justify-content: space-between; margin-top: 4px;
+    font-size: 10px; color: var(--muted);
+  }
+  .female-extra {
+    display: none; margin-top: 16px; padding-top: 16px;
+    border-top: 1px solid #222;
+  }
+  .female-extra.visible { display: block; }
+  .female-length-presets {
+    display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0;
+  }
+  .female-length-presets button {
+    padding: 4px 10px; border: 1px solid #333; border-radius: 6px;
+    background: transparent; color: var(--text); font-size: 11px;
+    cursor: pointer; transition: 0.2s;
+  }
+  .female-length-presets button:hover { border-color: #ff4a9e; color: #ff4a9e; }
+  .female-length-presets button.active { border-color: #ff4a9e; background: rgba(255,74,158,0.1); color: #ff4a9e; }
+  .growth-mode-toggle {
+    display: flex; gap: 0; margin-bottom: 12px; border: 1px solid #333; border-radius: 8px; overflow: hidden;
+  }
+  .growth-mode-toggle button {
+    flex: 1; padding: 6px 12px; border: none; background: transparent;
+    color: var(--muted); font-size: 12px; cursor: pointer; transition: 0.2s;
+  }
+  .growth-mode-toggle button.active { background: rgba(0,184,148,0.15); color: var(--growth); }
+  .growth-mode-toggle button:hover:not(.active) { color: var(--text); }
+
+  .growth-result-area {
+    margin-top: 20px; display: none;
+  }
+  .growth-result-area.visible { display: block; }
+  .growth-result-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+  }
+  @media (max-width: 600px) { .growth-result-grid { grid-template-columns: 1fr; } }
+  .growth-result-slot {
+    background: #111; border-radius: 10px; overflow: hidden;
+    border: 1px solid #222; position: relative;
+  }
+  .growth-result-slot .slot-label {
+    position: absolute; top: 8px; left: 8px; z-index: 2;
+    font-size: 10px; padding: 2px 8px; border-radius: 4px;
+    background: rgba(0,0,0,0.8); text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .growth-result-slot img {
+    width: 100%; height: auto; display: block; cursor: zoom-in;
+  }
+  .growth-result-slot .placeholder-inner {
+    display: flex; align-items: center; justify-content: center;
+    min-height: 250px; color: #444; font-size: 12px;
+  }
+  .growth-result-slot .spinner-big {
+    width: 40px; height: 40px; border: 3px solid #333;
+    border-top-color: var(--growth); border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  .growth-result-summary {
+    margin-top: 12px; padding: 12px 16px; background: #111;
+    border-radius: 8px; border: 1px solid #222; font-size: 12px;
+    color: var(--muted); display: flex; justify-content: space-between; align-items: center;
+  }
+  .growth-result-summary .time-taken { color: var(--growth); font-weight: 600; }
+
+  .growth-actions {
+    margin-top: 16px; display: flex; gap: 8px; align-items: center;
+  }
+  .btn-growth {
+    padding: 10px 24px; border: none; border-radius: 8px;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    background: linear-gradient(135deg, var(--growth), #55efc4);
+    color: #000; transition: 0.2s;
+  }
+  .btn-growth:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-growth:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  .growth-prompt-preview {
+    margin-top: 12px; display: none;
+  }
+  .growth-prompt-preview.visible { display: block; }
+  .growth-prompt-preview textarea {
+    width: 100%; min-height: 120px; padding: 10px;
+    background: #0a0a1a; color: #aaa; border: 1px solid #222; border-radius: 8px;
+    font-size: 11px; line-height: 1.5; font-family: 'Consolas', 'Monaco', monospace;
+    resize: vertical; outline: none;
+  }
+  .growth-prompt-preview textarea:focus { color: var(--text); border-color: #444; }
+  .growth-prompt-toggle {
+    font-size: 11px; color: var(--muted); cursor: pointer; background: none;
+    border: none; text-decoration: underline; padding: 0;
+  }
+  .growth-prompt-toggle:hover { color: var(--text); }
+
+  /* Multi-step simulation */
+  .growth-multi-result {
+    margin-top: 20px; display: none;
+  }
+  .growth-multi-result.visible { display: block; }
+  .growth-multi-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+  }
+  .growth-multi-card {
+    background: #111; border-radius: 10px; overflow: hidden;
+    border: 1px solid #222;
+  }
+  .growth-multi-card .card-label {
+    padding: 6px 10px; font-size: 11px; font-weight: 600;
+    color: var(--growth); background: rgba(0,184,148,0.08);
+    border-bottom: 1px solid #222;
+  }
+  .growth-multi-card img {
+    width: 100%; height: auto; display: block; cursor: zoom-in;
+  }
+  .growth-multi-card .card-info {
+    padding: 6px 10px; font-size: 10px; color: var(--muted);
+    display: flex; justify-content: space-between;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Hair Style AI - Test Bed</h1>
+  <div class="subtitle">172 styles | Gemini Image Generation | Parallel Processing | Hair Growth Simulation</div>
+</header>
+
+<div class="controls">
+  <div>
+    <label>Gender</label><br>
+    <select id="genderFilter">
+      <option value="all">All</option>
+      <option value="male">Male</option>
+      <option value="female">Female</option>
+    </select>
+  </div>
+  <div>
+    <label>Category</label><br>
+    <select id="categoryFilter"><option value="all">All</option></select>
+  </div>
+  <div>
+    <label>Concurrency</label><br>
+    <input type="number" id="concurrency" value="3" min="1" max="10" style="width:60px">
+  </div>
+  <div>
+    <label style="display:flex;align-items:center;gap:6px;cursor:pointer;margin-top:4px;">
+      <input type="checkbox" id="useRefImages" checked>
+      <span style="font-size:13px;color:var(--text);">Use ref images</span>
+    </label>
+  </div>
+  <div>
+    <label>Model</label><br>
+    <select id="modelSelect">
+      <option value="gemini-2.0-flash-exp-image-generation">gemini-2.0-flash-exp (image gen)</option>
+      <option value="gemini-2.5-flash-image">gemini-2.5-flash-image</option>
+      <option value="gemini-3-pro-image-preview">gemini-3-pro (preview)</option>
+    </select>
+  </div>
+  <div>
+    <label>Backend</label><br>
+    <select id="backendMode">
+      <option value="direct">Direct API</option>
+      <option value="n8n">n8n Webhook</option>
+    </select>
+  </div>
+  <div id="apiKeyGroup">
+    <label>API Key</label><br>
+    <input type="password" id="apiKey" placeholder="Gemini API Key" style="width:200px;background:#222;color:#eee;border:1px solid #444;padding:6px 10px;border-radius:6px;font-size:13px;">
+  </div>
+  <div id="n8nUrlGroup" style="display:none">
+    <label>n8n URL</label><br>
+    <input type="text" id="n8nUrl" placeholder="http://192.168.50.88:5678" style="width:220px;background:#222;color:#eee;border:1px solid #444;padding:6px 10px;border-radius:6px;font-size:13px;">
+  </div>
+  <div style="margin-left:auto;display:flex;gap:8px;">
+    <button class="btn btn-primary" id="btnStart" disabled>Start Generation</button>
+    <button class="btn btn-danger" id="btnStop" style="display:none">Stop</button>
+    <button class="btn btn-outline" id="btnExport">Export Results</button>
+  </div>
+</div>
+
+<div class="upload-area" id="uploadArea">
+  <div id="uploadContent">
+    <div style="font-size:40px;margin-bottom:8px;">📷</div>
+    <div>Click or drag to upload your selfie</div>
+    <div class="label">JPG/PNG, face clearly visible</div>
+  </div>
+  <input type="file" id="fileInput" accept="image/*" style="display:none">
+</div>
+
+<!-- ============ Hair Growth Simulation Section ============ -->
+<div class="growth-section" id="growthSection">
+  <div class="growth-header" onclick="toggleGrowthSection()">
+    <h2>Hair Growth Simulation <span class="tag">NEW</span></h2>
+    <span class="collapse-arrow">▼</span>
+  </div>
+  <div class="growth-body">
+    <div class="growth-controls">
+      <!-- Left panel: Growth Calculator -->
+      <div class="growth-panel">
+        <h3>Growth Calculator</h3>
+
+        <label>Gender</label>
+        <div class="growth-radio-group">
+          <label><input type="radio" name="growthGender" value="male" checked><span>Male (남성)</span></label>
+          <label><input type="radio" name="growthGender" value="female"><span>Female (여성)</span></label>
+        </div>
+
+        <div class="growth-mode-toggle" id="growthModeToggle">
+          <button class="active" onclick="setGrowthMode('time')">Time-based</button>
+          <button onclick="setGrowthMode('length')">Target Length</button>
+        </div>
+
+        <!-- Time-based mode -->
+        <div id="growthTimeMode">
+          <label>Period: <strong id="growthDaysLabel">4 weeks</strong></label>
+          <input type="range" id="growthWeeksSlider" min="1" max="26" value="4" step="1" oninput="updateGrowthFromSlider()">
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:4px;">
+            <span>1 week</span><span>26 weeks (6 months)</span>
+          </div>
+          <div class="growth-presets" id="growthPresets">
+            <button onclick="setGrowthWeeks(1)">1 week</button>
+            <button onclick="setGrowthWeeks(2)">2 weeks</button>
+            <button class="active" onclick="setGrowthWeeks(4)">1 month</button>
+            <button onclick="setGrowthWeeks(8)">2 months</button>
+            <button onclick="setGrowthWeeks(13)">3 months</button>
+            <button onclick="setGrowthWeeks(26)">6 months</button>
+          </div>
+        </div>
+
+        <!-- Target length mode (female) -->
+        <div id="growthLengthMode" style="display:none">
+          <label>Current hair length (estimated)</label>
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
+            <input type="number" id="currentHairLength" value="15" min="1" max="100" style="width:80px">
+            <span style="font-size:12px;color:var(--muted)">cm</span>
+          </div>
+          <label>Target hair length</label>
+          <input type="range" id="targetLengthSlider" min="5" max="100" value="30" oninput="updateTargetLength()">
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:8px;">
+            <span>5cm</span><span>100cm</span>
+          </div>
+          <div class="female-length-presets">
+            <button onclick="setTargetLength(15)">Ear (귀밑)</button>
+            <button onclick="setTargetLength(25)">Chin (턱선)</button>
+            <button onclick="setTargetLength(35)">Shoulder (어깨)</button>
+            <button class="active" onclick="setTargetLength(45)">Mid-back (등중간)</button>
+            <button onclick="setTargetLength(55)">Waist (허리)</button>
+            <button onclick="setTargetLength(70)">Hip (엉덩이)</button>
+          </div>
+          <div id="targetLengthInfo" class="growth-info-box" style="margin-top:8px;">
+            <div class="growth-info-row">
+              <span class="label">Current length</span>
+              <span class="value" id="tlCurrentLen">15 cm</span>
+            </div>
+            <div class="growth-info-row">
+              <span class="label">Target length</span>
+              <span class="value" id="tlTargetLen">30 cm</span>
+            </div>
+            <div class="growth-info-row">
+              <span class="label">Growth needed</span>
+              <span class="value highlight" id="tlGrowthNeeded">15.0 cm</span>
+            </div>
+            <div class="growth-info-row">
+              <span class="label">Estimated time</span>
+              <span class="value" id="tlEstTime">~16.2 months</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Growth info -->
+        <div class="growth-info-box" id="growthInfoBox">
+          <div class="growth-info-row">
+            <span class="label">Growth rate</span>
+            <span class="value" id="giRate">0.300 ~ 0.319 mm/day</span>
+          </div>
+          <div class="growth-info-row">
+            <span class="label">Period</span>
+            <span class="value" id="giPeriod">30 days</span>
+          </div>
+          <div class="growth-info-row">
+            <span class="label">Min growth</span>
+            <span class="value" id="giMin">9.0 mm</span>
+          </div>
+          <div class="growth-info-row">
+            <span class="label">Avg growth</span>
+            <span class="value highlight" id="giAvg">9.3 mm</span>
+          </div>
+          <div class="growth-info-row">
+            <span class="label">Max growth</span>
+            <span class="value" id="giMax">9.6 mm</span>
+          </div>
+        </div>
+
+        <div class="growth-visual" style="margin-top:12px;">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:6px;">Growth amount</div>
+          <div class="growth-visual-bar">
+            <div class="fill" id="growthVisualFill" style="width:8%"></div>
+          </div>
+          <div class="growth-visual-labels">
+            <span>0 mm</span>
+            <span id="growthVisualMax">~113 mm (1 year)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right panel: Simulation Settings -->
+      <div class="growth-panel">
+        <h3>Simulation Settings</h3>
+
+        <!-- Female-specific fine-tuning -->
+        <div class="female-extra" id="femaleExtraControls">
+          <label>Hair texture after growth</label>
+          <select id="growthHairTexture" style="margin-bottom:8px;">
+            <option value="natural">Natural (자연스러운)</option>
+            <option value="straight">Straight (생머리)</option>
+            <option value="wavy">Wavy (웨이브)</option>
+            <option value="curly">Curly (곱슬)</option>
+          </select>
+
+          <label>Hair volume</label>
+          <select id="growthHairVolume" style="margin-bottom:8px;">
+            <option value="natural">Natural</option>
+            <option value="thin">Thin/flat (얇은)</option>
+            <option value="medium" selected>Medium (보통)</option>
+            <option value="thick">Thick/full (풍성한)</option>
+          </select>
+
+          <label>Layering</label>
+          <select id="growthHairLayering" style="margin-bottom:8px;">
+            <option value="none">No layers (레이어 없음)</option>
+            <option value="light" selected>Light layers (가벼운 레이어)</option>
+            <option value="heavy">Heavy layers (많은 레이어)</option>
+          </select>
+
+          <label>Bangs style</label>
+          <select id="growthBangsStyle" style="margin-bottom:12px;">
+            <option value="keep" selected>Keep current (현재 유지)</option>
+            <option value="grown-out">Grown out (자란 앞머리)</option>
+            <option value="curtain">Curtain bangs (커튼뱅)</option>
+            <option value="side-swept">Side-swept (옆으로 넘긴)</option>
+          </select>
+        </div>
+
+        <label>Simulation type</label>
+        <select id="growthSimType" style="margin-bottom:12px;">
+          <option value="single">Single result</option>
+          <option value="multi">Multi-step timeline (3 stages)</option>
+        </select>
+
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;margin-bottom:12px;">
+          <input type="checkbox" id="growthShowPrompt">
+          <span style="font-size:12px;color:var(--text);">Show/edit prompt before generating</span>
+        </label>
+
+        <div class="growth-actions">
+          <button class="btn-growth" id="btnGrowthSim" disabled onclick="runGrowthSimulation()">Simulate Growth</button>
+          <button class="btn btn-outline" id="btnGrowthStop" style="display:none" onclick="stopGrowthSimulation()">Stop</button>
+        </div>
+
+        <div class="growth-prompt-preview" id="growthPromptPreview">
+          <label style="margin-top:12px;">Generated prompt:</label>
+          <textarea id="growthPromptText"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Single Result -->
+    <div class="growth-result-area" id="growthResultArea">
+      <div class="growth-result-grid">
+        <div class="growth-result-slot">
+          <span class="slot-label">Before (current)</span>
+          <div id="growthBefore" class="placeholder-inner">Upload a selfie first</div>
+        </div>
+        <div class="growth-result-slot">
+          <span class="slot-label" id="growthAfterLabel">After (30 days)</span>
+          <div id="growthAfter" class="placeholder-inner">Click "Simulate Growth"</div>
+        </div>
+      </div>
+      <div class="growth-result-summary" id="growthResultSummary" style="display:none">
+        <span id="growthResultInfo"></span>
+        <span class="time-taken" id="growthResultTime"></span>
+      </div>
+    </div>
+
+    <!-- Multi-step Result -->
+    <div class="growth-multi-result" id="growthMultiResult">
+      <div class="growth-multi-grid" id="growthMultiGrid"></div>
+    </div>
+  </div>
+</div>
+
+<div class="progress-bar" id="progressBar"><div class="fill" id="progressFill"></div></div>
+<div class="stats" id="statsBar">
+  <span><span class="dot dot-success"></span> <span id="statDone">0</span> done</span>
+  <span><span class="dot dot-processing"></span> <span id="statProcessing">0</span> processing</span>
+  <span><span class="dot dot-pending"></span> <span id="statPending">0</span> pending</span>
+  <span><span class="dot dot-error"></span> <span id="statError">0</span> errors</span>
+  <span style="margin-left:auto" id="statTime"></span>
+</div>
+
+<div class="select-all-row">
+  <input type="checkbox" id="selectAll" checked>
+  <label for="selectAll">Select All Visible</label>
+  <span style="font-size:12px;color:var(--muted);margin-left:8px" id="selectedCount"></span>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<div class="fullscreen-overlay" id="overlay">
+  <img id="overlayImg" src="">
+</div>
+
+<script>
+// ============ State ============
+let testConfig = null;
+let selfieBase64 = null;
+let selfieDataUrl = null;
+let selfieMimeType = null;
+let isRunning = false;
+let abortController = null;
+let results = {};
+let startTime = null;
+let checkedStyles = new Set();
+let customPrompts = {}; // styleId -> edited prompt string
+
+// Growth simulation state
+let growthAbortController = null;
+let isGrowthRunning = false;
+
+const GEMINI_API_KEY_DEFAULT = '';
+
+const GROWTH_RATES = {
+  male:   { min: 0.300, max: 0.319, avg: 0.310, label: '0.300 ~ 0.319 mm/day' },
+  female: { min: 0.289, max: 0.327, avg: 0.308, label: '0.289 ~ 0.327 mm/day' }
+};
+
+const IMG_BASE = (function() {
+  if (window.location.pathname.startsWith('/testbed/')) return '';
+  if (!['localhost', '127.0.0.1'].includes(window.location.hostname)) return '';
+  return '/public';
+})();
+
+const $ = id => document.getElementById(id);
+const grid = $('grid');
+const uploadArea = $('uploadArea');
+const fileInput = $('fileInput');
+const overlay = $('overlay');
+const overlayImg = $('overlayImg');
+
+// ============ Load Config ============
+async function loadConfig() {
+  try {
+    let res;
+    try { res = await fetch('test-config.json'); if (!res.ok) throw 0; }
+    catch { res = await fetch('/testbed/test-config.json'); }
+    testConfig = await res.json();
+    try { const s = localStorage.getItem('testbed-customPrompts'); if (s) customPrompts = JSON.parse(s); } catch {}
+    populateCategories();
+    renderGrid();
+    updateSelectedCount();
+    initGrowthSimulation();
+  } catch (e) {
+    console.error('Failed to load test-config.json', e);
+    grid.innerHTML = '<div style="padding:40px;text-align:center;color:var(--error)">Failed to load test-config.json</div>';
+  }
+}
+
+function populateCategories() {
+  const cats = [...new Set(testConfig.styles.map(s => s.category))].sort();
+  const sel = $('categoryFilter');
+  cats.forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = c; sel.appendChild(o); });
+}
+
+function getFilteredStyles() {
+  if (!testConfig) return [];
+  const g = $('genderFilter').value, c = $('categoryFilter').value;
+  return testConfig.styles.filter(s => (g === 'all' || s.gender === g) && (c === 'all' || s.category === c));
+}
+
+function getSelectedStyles() {
+  return getFilteredStyles().filter(s => checkedStyles.has(s.styleId));
+}
+
+function updateSelectedCount() {
+  const total = getFilteredStyles().length;
+  const selected = document.querySelectorAll('.card input[type="checkbox"]:checked').length;
+  $('selectedCount').textContent = `${selected} / ${total} selected`;
+}
+
+// ============ Prompt helpers ============
+function escapeHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function getCategoryHint(category) {
+  const hints = {
+    'perm': 'This is a perm style - focus on the curl/wave pattern, volume, and texture',
+    'two-block': 'This is a two-block cut - focus on the disconnected sides (short/shaved) vs longer top',
+    'natural': 'This is a natural/straight style - focus on clean lines, parting, and layering',
+    'classic': 'This is a classic style - focus on clean, structured, professional appearance',
+    'trendy': 'This is a trendy/modern Korean style - focus on texture, movement, and volume',
+    'long': 'This is a long hairstyle - focus on length, layers, and flow',
+    'short': 'This is a short hairstyle - focus on shape, tapering, and precision',
+    'updo': 'This is an updo style - focus on how the hair is gathered and pinned up',
+    'braids': 'This is a braided style - focus on the braid pattern and technique',
+    'bangs': 'This is a bangs style - focus on the fringe shape and forehead coverage',
+    'color': 'This style has a specific hair color - match the color from the reference',
+  };
+  return hints[category] || '';
+}
+
+function buildPrompt(style, hasRefImage) {
+  const categoryHint = getCategoryHint(style.category);
+  if (hasRefImage) {
+    return `You are a hair salon preview AI. You must create a photo showing the customer with a new hairstyle.
+
+INPUT:
+- IMAGE 1 (first image) = Reference hairstyle photo showing "${style.nameKo}" (${style.name})
+- IMAGE 2 (second image) = Customer's current photo
+
+TASK: Replace ONLY the hair in IMAGE 2 to match IMAGE 1's hairstyle EXACTLY.
+
+HAIRSTYLE INSTRUCTIONS - Copy from IMAGE 1:
+- Replicate the EXACT hair shape, silhouette, and outline
+- Match the precise curl/wave pattern and texture
+- Copy the exact hair length, layering, and volume
+- Replicate the parting direction and styling
+- Keep the customer's natural hair color (unless the style specifically requires a different color)
+${style.description && !style.description.endsWith('hairstyle') ? `- Style description: ${style.description}` : ''}
+${categoryHint ? `- ${categoryHint}` : ''}
+
+FACE PRESERVATION - CRITICAL (copy pixel-perfect from IMAGE 2):
+- Face shape, features (eyes, nose, mouth, jawline, ears)
+- Skin tone, texture, and complexion
+- Facial expression and gaze direction
+- Eyebrows (do NOT change)
+- Neck, body, and clothes
+- Background, lighting, and camera angle
+
+OUTPUT: A photorealistic image of the SAME PERSON from IMAGE 2, with ONLY the hair changed to match IMAGE 1.`;
+  }
+  return `You are a hair salon preview AI. Replace ONLY the hair in this photo.
+
+STEP 1: Copy this photo exactly as-is (every pixel).
+STEP 2: Replace ONLY the hair with: ${style.nameKo} (${style.name})
+
+HAIR DETAILS:
+- Style: ${style.description}
+${categoryHint ? `- ${categoryHint}` : ''}
+- Volume: natural, realistic volume
+- Color: keep the person's natural hair color
+
+PRESERVE EXACTLY (pixel-perfect copy):
+- Face (all features, shape, skin tone, expression)
+- Eyebrows (do NOT change)
+- Neck, body, clothes
+- Background, lighting, camera angle
+
+OUTPUT: The SAME PERSON with ONLY the hair changed. Photorealistic quality.`;
+}
+
+function getDefaultPrompt(style) {
+  const useRef = $('useRefImages')?.checked !== false;
+  return buildPrompt(style, useRef && !!style.thumbnail);
+}
+
+// ============ Prompt Editing ============
+function togglePrompt(styleId) {
+  const el = document.querySelector(`.card[data-id="${styleId}"] .card-prompt`);
+  if (el) el.classList.toggle('open');
+}
+
+function onPromptEdit(textarea) {
+  const styleId = textarea.dataset.style;
+  const style = testConfig.styles.find(s => s.styleId === styleId);
+  if (!style) return;
+  const defaultPrompt = getDefaultPrompt(style);
+  if (textarea.value.trim() === defaultPrompt.trim()) {
+    delete customPrompts[styleId];
+    textarea.classList.remove('modified');
+    updatePromptUI(styleId, false);
+  } else {
+    customPrompts[styleId] = textarea.value;
+    textarea.classList.add('modified');
+    updatePromptUI(styleId, true);
+  }
+  saveCustomPrompts();
+}
+
+function resetPrompt(styleId) {
+  delete customPrompts[styleId];
+  saveCustomPrompts();
+  const style = testConfig.styles.find(s => s.styleId === styleId);
+  if (!style) return;
+  const card = document.querySelector(`.card[data-id="${styleId}"]`);
+  const textarea = card?.querySelector('.prompt-textarea');
+  if (textarea) { textarea.value = getDefaultPrompt(style); textarea.classList.remove('modified'); }
+  updatePromptUI(styleId, false);
+}
+
+function updatePromptUI(styleId, hasCustom) {
+  const card = document.querySelector(`.card[data-id="${styleId}"]`);
+  if (!card) return;
+  const btn = card.querySelector('.prompt-toggle-btn');
+  if (btn) { btn.textContent = hasCustom ? 'Prompt*' : 'Prompt'; btn.classList.toggle('has-custom', hasCustom); }
+  const hdr = card.querySelector('.card-prompt .prompt-header span');
+  if (hdr) hdr.textContent = hasCustom ? 'Custom prompt (modified)' : 'Default prompt';
+  const act = card.querySelector('.card-prompt .prompt-actions');
+  if (act) act.innerHTML = hasCustom ? `<button class="btn-reset" onclick="resetPrompt('${styleId.replace(/'/g,"\\'")}')">Reset</button>` : '';
+}
+
+function saveCustomPrompts() {
+  try { localStorage.setItem('testbed-customPrompts', JSON.stringify(customPrompts)); } catch {}
+}
+
+// ============ Render ============
+function renderGrid() {
+  const styles = getFilteredStyles();
+  if (checkedStyles.size === 0 && styles.length > 0) styles.forEach(s => checkedStyles.add(s.styleId));
+  grid.innerHTML = '';
+  styles.forEach(s => {
+    const r = results[s.styleId] || {};
+    const status = r.status || 'idle';
+    const card = document.createElement('div');
+    card.className = `card ${status}`;
+    card.dataset.id = s.styleId;
+
+    const thumbnailSrc = s.thumbnail ? (s.thumbnail.startsWith('http') ? s.thumbnail : `${IMG_BASE}${s.thumbnail}`) : '';
+    const isChecked = checkedStyles.has(s.styleId);
+    const hasCustom = !!customPrompts[s.styleId];
+    const promptText = customPrompts[s.styleId] || getDefaultPrompt(s);
+    const eid = s.styleId.replace(/'/g, "\\'");
+
+    card.innerHTML = `
+      <div class="card-header">
+        <div>
+          <input type="checkbox" ${isChecked ? 'checked' : ''} data-style="${s.styleId}" onchange="toggleStyleCheck(this)">
+          <span class="name">${s.name}</span>
+          <div class="name-ko">${s.nameKo} &middot; ${s.category}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:4px;">
+          <button class="prompt-toggle-btn ${hasCustom ? 'has-custom' : ''}" onclick="togglePrompt('${eid}')">${hasCustom ? 'Prompt*' : 'Prompt'}</button>
+          <span class="badge badge-${s.gender}">${s.gender}</span>
+        </div>
+      </div>
+      <div class="card-images">
+        <div class="img-slot">
+          <span class="label">Reference</span>
+          ${thumbnailSrc ? `<img src="${thumbnailSrc}" alt="${s.name}" onerror="this.outerHTML='<div class=placeholder>No ref</div>'">` : '<div class="placeholder">No ref image</div>'}
+        </div>
+        <div class="img-slot result-slot" data-style="${s.styleId}">
+          <span class="label">Result</span>
+          ${status === 'processing' ? '<div class="spinner"></div>'
+            : status === 'success' ? `<img src="${r.image}" alt="result" onclick="showFullscreen(this.src)">`
+            : status === 'error' ? `<div class="placeholder" style="color:var(--error)">${r.error || 'Error'}</div>`
+            : '<div class="placeholder">Waiting...</div>'}
+        </div>
+      </div>
+      <div class="card-prompt">
+        <div class="prompt-header">
+          <span>${hasCustom ? 'Custom prompt (modified)' : 'Default prompt'}</span>
+          <div class="prompt-actions">${hasCustom ? `<button class="btn-reset" onclick="resetPrompt('${eid}')">Reset</button>` : ''}</div>
+        </div>
+        <textarea class="prompt-textarea ${hasCustom ? 'modified' : ''}" data-style="${s.styleId}" oninput="onPromptEdit(this)">${escapeHtml(promptText)}</textarea>
+      </div>
+      <div class="card-footer">
+        <span>${s.keywords?.slice(0, 3).join(', ') || ''}</span>
+        ${r.time ? `<span class="time">${(r.time / 1000).toFixed(1)}s</span>` : ''}
+        ${r.error ? `<span class="err">${r.error.substring(0, 40)}</span>` : ''}
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+function updateCard(styleId) {
+  const r = results[styleId] || {};
+  const card = document.querySelector(`.card[data-id="${styleId}"]`);
+  if (!card) return;
+  card.className = `card ${r.status || 'idle'}`;
+  const slot = card.querySelector('.result-slot');
+  if (!slot) return;
+  if (r.status === 'processing') slot.innerHTML = '<span class="label">Result</span><div class="spinner"></div>';
+  else if (r.status === 'success') slot.innerHTML = `<span class="label">Result</span><img src="${r.image}" alt="result" onclick="showFullscreen(this.src)" style="cursor:zoom-in">`;
+  else if (r.status === 'error') slot.innerHTML = `<span class="label">Result</span><div class="placeholder" style="color:var(--error)">${(r.error||'Error').substring(0,60)}</div>`;
+  const footer = card.querySelector('.card-footer');
+  if (footer && r.time) {
+    let ts = footer.querySelector('.time');
+    if (ts) ts.textContent = `${(r.time/1000).toFixed(1)}s`;
+    else { ts = document.createElement('span'); ts.className = 'time'; ts.textContent = `${(r.time/1000).toFixed(1)}s`; footer.appendChild(ts); }
+  }
+}
+
+function updateStats() {
+  const all = Object.values(results);
+  const done = all.filter(r => r.status === 'success').length;
+  const proc = all.filter(r => r.status === 'processing').length;
+  const err = all.filter(r => r.status === 'error').length;
+  const total = getSelectedStyles().length || getFilteredStyles().length;
+  $('statDone').textContent = done;
+  $('statProcessing').textContent = proc;
+  $('statPending').textContent = Math.max(0, total - done - proc - err);
+  $('statError').textContent = err;
+  $('progressFill').style.width = (total > 0 ? ((done + err) / total * 100) : 0) + '%';
+  if (startTime) $('statTime').textContent = `Elapsed: ${((Date.now() - startTime) / 1000).toFixed(0)}s`;
+}
+
+// ============ Upload ============
+uploadArea.addEventListener('click', () => fileInput.click());
+uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.style.borderColor = 'var(--accent)'; });
+uploadArea.addEventListener('dragleave', () => { uploadArea.style.borderColor = selfieBase64 ? 'var(--success)' : '#444'; });
+uploadArea.addEventListener('drop', e => { e.preventDefault(); if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]); });
+fileInput.addEventListener('change', e => { if (e.target.files.length) handleFile(e.target.files[0]); });
+
+function handleFile(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      const maxDim = 1024; let w = img.width, h = img.height;
+      if (w > maxDim || h > maxDim) { const s = maxDim / Math.max(w, h); w = Math.round(w * s); h = Math.round(h * s); }
+      const c = document.createElement('canvas'); c.width = w; c.height = h;
+      c.getContext('2d').drawImage(img, 0, 0, w, h);
+      const dataUrl = c.toDataURL('image/jpeg', 0.85);
+      selfieMimeType = 'image/jpeg'; selfieBase64 = dataUrl.split(',')[1];
+      selfieDataUrl = dataUrl;
+      const sizeKB = Math.round(selfieBase64.length * 3 / 4 / 1024);
+      uploadArea.classList.add('has-photo');
+      uploadArea.innerHTML = `<img src="${dataUrl}" alt="selfie"><div class="label">${file.name} (${sizeKB}KB) - Click to change</div>`;
+      uploadArea.onclick = () => fileInput.click();
+      $('btnStart').disabled = false;
+      $('btnGrowthSim').disabled = false;
+      // Update growth before preview
+      updateGrowthBeforePreview();
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ============ Reference Image Cache ============
+const refImageCache = new Map();
+async function loadRefImage(thumbnailPath) {
+  if (!thumbnailPath) return null;
+  if (refImageCache.has(thumbnailPath)) return refImageCache.get(thumbnailPath);
+  try {
+    return new Promise(resolve => {
+      const img = new Image(); img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        try {
+          const c = document.createElement('canvas'); const maxDim = 512;
+          let w = img.naturalWidth, h = img.naturalHeight;
+          if (w > maxDim || h > maxDim) { const s = maxDim / Math.max(w, h); w = Math.round(w * s); h = Math.round(h * s); }
+          c.width = w; c.height = h; c.getContext('2d').drawImage(img, 0, 0, w, h);
+          const b64 = c.toDataURL('image/jpeg', 0.85).split(',')[1];
+          const d = { base64: b64, mimeType: 'image/jpeg' }; refImageCache.set(thumbnailPath, d); resolve(d);
+        } catch { refImageCache.set(thumbnailPath, null); resolve(null); }
+      };
+      img.onerror = () => { refImageCache.set(thumbnailPath, null); resolve(null); };
+      img.src = thumbnailPath;
+    });
+  } catch { refImageCache.set(thumbnailPath, null); return null; }
+}
+
+// ============ Prepare style data ============
+async function prepareStyleData(style) {
+  const tp = style.thumbnail ? (style.thumbnail.startsWith('http') ? style.thumbnail : `${IMG_BASE}${style.thumbnail}`) : null;
+  const refImage = tp ? await loadRefImage(tp) : null;
+  const useRef = $('useRefImages')?.checked !== false && refImage;
+  const prompt = customPrompts[style.styleId] || buildPrompt(style, !!useRef);
+  return { refImage: useRef ? refImage : null, prompt };
+}
+
+// ============ Backends ============
+async function callGeminiDirect(style, apiKey, model, signal) {
+  const { refImage, prompt } = await prepareStyleData(style);
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+  const parts = [];
+  if (refImage) parts.push({ inline_data: { mime_type: refImage.mimeType, data: refImage.base64 } });
+  parts.push({ inline_data: { mime_type: selfieMimeType, data: selfieBase64 } });
+  parts.push({ text: prompt });
+  const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ contents: [{ parts }], generationConfig: { responseModalities: ['IMAGE', 'TEXT'], temperature: 0.1 } }), signal });
+  if (!res.ok) { const t = await res.text(); throw new Error(`API ${res.status}: ${t.substring(0, 150)}`); }
+  const data = await res.json();
+  if (data.candidates?.[0]?.content?.parts) {
+    for (const p of data.candidates[0].content.parts) { if (p.inlineData) return `data:${p.inlineData.mimeType};base64,${p.inlineData.data}`; }
+  }
+  throw new Error('No image in response');
+}
+
+async function callViaN8n(style, model, signal) {
+  const n8nUrl = $('n8nUrl').value.trim().replace(/\/$/, '');
+  if (!n8nUrl) throw new Error('n8n URL is required');
+  const { refImage, prompt } = await prepareStyleData(style);
+  const payload = { prompt, imageBase64: selfieBase64, mimeType: selfieMimeType, model, styleId: style.styleId, nameKo: style.nameKo, name: style.name };
+  if (refImage) { payload.refImageBase64 = refImage.base64; payload.refImageMimeType = refImage.mimeType; }
+  const res = await fetch(`${n8nUrl}/webhook/hair-test-generate`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), signal });
+  if (!res.ok) { const t = await res.text(); throw new Error(`n8n ${res.status}: ${t.substring(0, 150)}`); }
+  const data = await res.json();
+  if (data.success && data.image) return data.image;
+  throw new Error(data.error || 'No image from n8n');
+}
+
+async function callGemini(style, apiKey, model, signal) {
+  return $('backendMode').value === 'n8n' ? callViaN8n(style, model, signal) : callGeminiDirect(style, apiKey, model, signal);
+}
+
+// ============ Generic Gemini call (for growth simulation) ============
+async function callGeminiGeneric(prompt, apiKey, model, signal) {
+  const backend = $('backendMode').value;
+  if (backend === 'n8n') {
+    const n8nUrl = $('n8nUrl').value.trim().replace(/\/$/, '');
+    if (!n8nUrl) throw new Error('n8n URL is required');
+    const payload = { prompt, imageBase64: selfieBase64, mimeType: selfieMimeType, model, styleId: 'growth-sim', nameKo: 'growth', name: 'Hair Growth Simulation' };
+    const res = await fetch(`${n8nUrl}/webhook/hair-test-generate`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), signal });
+    if (!res.ok) { const t = await res.text(); throw new Error(`n8n ${res.status}: ${t.substring(0, 150)}`); }
+    const data = await res.json();
+    if (data.success && data.image) return data.image;
+    throw new Error(data.error || 'No image from n8n');
+  }
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+  const parts = [
+    { inline_data: { mime_type: selfieMimeType, data: selfieBase64 } },
+    { text: prompt }
+  ];
+  const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ contents: [{ parts }], generationConfig: { responseModalities: ['IMAGE', 'TEXT'], temperature: 0.1 } }), signal });
+  if (!res.ok) { const t = await res.text(); throw new Error(`API ${res.status}: ${t.substring(0, 150)}`); }
+  const data = await res.json();
+  if (data.candidates?.[0]?.content?.parts) {
+    for (const p of data.candidates[0].content.parts) { if (p.inlineData) return `data:${p.inlineData.mimeType};base64,${p.inlineData.data}`; }
+  }
+  throw new Error('No image in response');
+}
+
+// ============ Run ============
+async function runGeneration() {
+  if (!selfieBase64) { alert('Upload a selfie first!'); return; }
+  const backend = $('backendMode').value, apiKey = $('apiKey').value.trim();
+  if (backend === 'direct' && !apiKey) { alert('Enter your Gemini API key!'); return; }
+  if (backend === 'n8n' && !$('n8nUrl').value.trim()) { alert('Enter your n8n URL!'); return; }
+  const model = $('modelSelect').value;
+  const concurrency = parseInt($('concurrency').value) || 3;
+  const styles = getSelectedStyles().length > 0 ? getSelectedStyles() : getFilteredStyles();
+  if (!styles.length) { alert('No styles selected'); return; }
+
+  isRunning = true; abortController = new AbortController(); startTime = Date.now();
+  $('btnStart').style.display = 'none'; $('btnStop').style.display = 'inline-flex';
+  $('progressBar').classList.add('active');
+  styles.forEach(s => { results[s.styleId] = { status: 'pending' }; });
+  renderGrid(); updateStats();
+
+  let idx = 0; const retryCount = new Map();
+  const workers = Array.from({ length: concurrency }, async () => {
+    while (idx < styles.length && isRunning) {
+      const i = idx++; const style = styles[i]; if (!style) break;
+      results[style.styleId] = { status: 'processing' }; updateCard(style.styleId); updateStats();
+      const t0 = Date.now();
+      try {
+        const image = await callGemini(style, apiKey, model, abortController.signal);
+        results[style.styleId] = { status: 'success', image, time: Date.now() - t0 };
+        retryCount.delete(style.styleId);
+      } catch (err) {
+        if (err.name === 'AbortError') { results[style.styleId] = { status: 'error', error: 'Cancelled', time: Date.now() - t0 }; }
+        else if (err.message.includes('429')) {
+          const r = (retryCount.get(style.styleId) || 0) + 1; retryCount.set(style.styleId, r);
+          if (r <= 5) { const d = 10000 * Math.pow(2, r - 1); results[style.styleId] = { status: 'pending', error: `Rate limited, retry ${r}/5` }; updateCard(style.styleId); updateStats(); await new Promise(x => setTimeout(x, d)); idx--; continue; }
+          else results[style.styleId] = { status: 'error', error: 'Rate limited - max retries exceeded', time: Date.now() - t0 };
+        } else results[style.styleId] = { status: 'error', error: err.message, time: Date.now() - t0 };
+      }
+      updateCard(style.styleId); updateStats();
+    }
+  });
+  await Promise.all(workers);
+  isRunning = false; $('btnStart').style.display = 'inline-flex'; $('btnStop').style.display = 'none'; updateStats();
+  try { localStorage.setItem('testbed-meta', JSON.stringify({ date: new Date().toISOString(), model, total: styles.length, success: Object.values(results).filter(r => r.status === 'success').length, errors: Object.values(results).filter(r => r.status === 'error').length })); } catch {}
+}
+
+function stopGeneration() { isRunning = false; abortController?.abort(); $('btnStart').style.display = 'inline-flex'; $('btnStop').style.display = 'none'; }
+
+// ============ Export ============
+function exportResults() {
+  const data = { exportedAt: new Date().toISOString(), model: $('modelSelect').value,
+    results: Object.entries(results).filter(([,v]) => v.status === 'success').map(([id, v]) => { const s = testConfig.styles.find(x => x.styleId === id); return { styleId: id, name: s?.name, nameKo: s?.nameKo, gender: s?.gender, category: s?.category, timeMs: v.time }; }),
+    errors: Object.entries(results).filter(([,v]) => v.status === 'error').map(([id, v]) => ({ styleId: id, error: v.error })) };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `testbed-results-${Date.now()}.json`; a.click(); URL.revokeObjectURL(url);
+  const sr = Object.entries(results).filter(([,v]) => v.status === 'success');
+  if (sr.length > 0 && confirm(`Download ${sr.length} result images?`)) sr.forEach(([id, v], i) => { setTimeout(() => { const a = document.createElement('a'); a.href = v.image; a.download = `${id}.png`; a.click(); }, i * 200); });
+}
+
+// ============ Fullscreen ============
+function showFullscreen(src) { overlayImg.src = src; overlay.classList.add('active'); }
+overlay.addEventListener('click', () => overlay.classList.remove('active'));
+
+function toggleStyleCheck(cb) { const id = cb.dataset.style; if (cb.checked) checkedStyles.add(id); else checkedStyles.delete(id); updateSelectedCount(); }
+
+// ============================================================
+// ============ HAIR GROWTH SIMULATION ========================
+// ============================================================
+
+let currentGrowthMode = 'time'; // 'time' or 'length'
+
+function initGrowthSimulation() {
+  // Restore saved growth settings
+  try {
+    const saved = localStorage.getItem('testbed-growthSettings');
+    if (saved) {
+      const s = JSON.parse(saved);
+      if (s.gender) document.querySelector(`input[name="growthGender"][value="${s.gender}"]`).checked = true;
+      if (s.weeks) $('growthWeeksSlider').value = s.weeks;
+      else if (s.days) $('growthWeeksSlider').value = Math.max(1, Math.round(s.days / 7));
+      if (s.currentLength) $('currentHairLength').value = s.currentLength;
+      if (s.targetLength) $('targetLengthSlider').value = s.targetLength;
+    }
+  } catch {}
+  updateGrowthCalc();
+  updateGrowthGenderUI();
+}
+
+function toggleGrowthSection() {
+  $('growthSection').classList.toggle('open');
+}
+
+function getGrowthGender() {
+  return document.querySelector('input[name="growthGender"]:checked')?.value || 'male';
+}
+
+function setGrowthMode(mode) {
+  currentGrowthMode = mode;
+  $('growthModeToggle').querySelectorAll('button').forEach(b => b.classList.remove('active'));
+  $('growthModeToggle').querySelector(`button:${mode === 'time' ? 'first' : 'last'}-child`).classList.add('active');
+  $('growthTimeMode').style.display = mode === 'time' ? '' : 'none';
+  $('growthLengthMode').style.display = mode === 'length' ? '' : 'none';
+  updateGrowthCalc();
+}
+
+function setGrowthWeeks(weeks) {
+  $('growthWeeksSlider').value = weeks;
+  $('growthPresets').querySelectorAll('button').forEach(b => b.classList.remove('active'));
+  event?.target?.classList.add('active');
+  updateGrowthCalc();
+}
+
+function getGrowthDays() {
+  const weeks = parseInt($('growthWeeksSlider').value) || 4;
+  return weeks * 7;
+}
+
+function updateGrowthFromSlider() {
+  const weeks = parseInt($('growthWeeksSlider').value);
+  // Clear preset highlights
+  const presetWeeks = [1,2,4,8,13,26];
+  $('growthPresets').querySelectorAll('button').forEach((b, idx) => {
+    b.classList.toggle('active', presetWeeks[idx] === weeks);
+  });
+  updateGrowthCalc();
+}
+
+function setTargetLength(cm) {
+  $('targetLengthSlider').value = cm;
+  $('growthLengthMode').querySelectorAll('.female-length-presets button').forEach(b => b.classList.remove('active'));
+  event?.target?.classList.add('active');
+  updateTargetLength();
+}
+
+function updateTargetLength() {
+  const gender = getGrowthGender();
+  const rate = GROWTH_RATES[gender];
+  const currentLen = parseFloat($('currentHairLength').value) || 15;
+  const targetLen = parseFloat($('targetLengthSlider').value) || 30;
+  const diff = Math.max(0, targetLen - currentLen);
+  const daysNeeded = diff > 0 ? Math.round((diff * 10) / rate.avg) : 0;
+  const monthsNeeded = daysNeeded / 30;
+
+  $('tlCurrentLen').textContent = `${currentLen} cm`;
+  $('tlTargetLen').textContent = `${targetLen} cm`;
+  $('tlGrowthNeeded').textContent = `${diff.toFixed(1)} cm`;
+  $('tlEstTime').textContent = monthsNeeded < 1 ? `~${daysNeeded} days` :
+    monthsNeeded < 12 ? `~${monthsNeeded.toFixed(1)} months` : `~${(monthsNeeded/12).toFixed(1)} years`;
+
+  // Also update the main info box
+  const growthMm = diff * 10;
+  $('giRate').textContent = rate.label;
+  $('giPeriod').textContent = `${daysNeeded} days (~${monthsNeeded.toFixed(1)} months)`;
+  $('giMin').textContent = formatMm(rate.min * daysNeeded);
+  $('giAvg').textContent = formatMm(growthMm);
+  $('giMax').textContent = formatMm(rate.max * daysNeeded);
+
+  const maxGrowth = rate.avg * 182;
+  const pct = Math.min(100, (growthMm / maxGrowth) * 100);
+  $('growthVisualFill').style.width = pct + '%';
+
+  saveGrowthSettings();
+  updateGrowthPromptPreview();
+}
+
+function updateGrowthCalc() {
+  const gender = getGrowthGender();
+  const rate = GROWTH_RATES[gender];
+
+  if (currentGrowthMode === 'length') {
+    updateTargetLength();
+    return;
+  }
+
+  const days = getGrowthDays();
+  const minMm = rate.min * days;
+  const avgMm = rate.avg * days;
+  const maxMm = rate.max * days;
+
+  const weeks = parseInt($('growthWeeksSlider').value) || 4;
+  // Update labels
+  $('growthDaysLabel').textContent = formatWeeks(weeks);
+  $('giRate').textContent = rate.label;
+  $('giPeriod').textContent = formatDays(days);
+  $('giMin').textContent = formatMm(minMm);
+  $('giAvg').textContent = formatMm(avgMm);
+  $('giMax').textContent = formatMm(maxMm);
+
+  // Visual bar (max = 6 months = 182 days)
+  const maxGrowth = rate.avg * 182;
+  const pct = Math.min(100, (avgMm / maxGrowth) * 100);
+  $('growthVisualFill').style.width = pct + '%';
+  $('growthVisualMax').textContent = `~${Math.round(maxGrowth)} mm (6 months)`;
+
+  // After label
+  $('growthAfterLabel').textContent = `After (${formatWeeks(weeks)})`;
+
+  saveGrowthSettings();
+  updateGrowthPromptPreview();
+}
+
+function updateGrowthGenderUI() {
+  const gender = getGrowthGender();
+  const isFemale = gender === 'female';
+  $('femaleExtraControls').classList.toggle('visible', isFemale);
+  // Show length mode toggle only for female
+  $('growthModeToggle').style.display = isFemale ? '' : 'none';
+  if (!isFemale && currentGrowthMode === 'length') {
+    setGrowthMode('time');
+  }
+  updateGrowthCalc();
+}
+
+// Attach gender change listeners
+document.querySelectorAll('input[name="growthGender"]').forEach(r => {
+  r.addEventListener('change', updateGrowthGenderUI);
+});
+$('currentHairLength')?.addEventListener('input', updateTargetLength);
+
+function formatWeeks(w) {
+  if (w <= 1) return '1 week';
+  if (w < 4) return `${w} weeks`;
+  const months = w / 4.33;
+  if (w === 4) return '1 month (~4 weeks)';
+  if (w === 8) return '2 months (~8 weeks)';
+  if (w === 13) return '3 months (~13 weeks)';
+  if (w === 26) return '6 months (~26 weeks)';
+  return `${w} weeks (~${months.toFixed(1)} months)`;
+}
+
+function formatDays(d) {
+  if (d < 7) return `${d} day${d>1?'s':''}`;
+  if (d < 30) return d % 7 === 0 ? `${d/7} week${d/7>1?'s':''}` : `${d} days`;
+  if (d < 182) {
+    const m = d / 30;
+    return m === Math.floor(m) ? `${m} month${m>1?'s':''}` : `${d} days (~${m.toFixed(1)} months)`;
+  }
+  const m = d / 30;
+  return `${m.toFixed(1)} months`;
+}
+
+function formatMm(mm) {
+  if (mm < 10) return `${mm.toFixed(1)} mm`;
+  return `${(mm/10).toFixed(1)} cm (${mm.toFixed(0)} mm)`;
+}
+
+function saveGrowthSettings() {
+  try {
+    localStorage.setItem('testbed-growthSettings', JSON.stringify({
+      gender: getGrowthGender(),
+      weeks: $('growthWeeksSlider').value,
+      currentLength: $('currentHairLength').value,
+      targetLength: $('targetLengthSlider').value,
+    }));
+  } catch {}
+}
+
+function updateGrowthBeforePreview() {
+  if (selfieDataUrl) {
+    $('growthBefore').innerHTML = `<img src="${selfieDataUrl}" alt="current" onclick="showFullscreen(this.src)" style="cursor:zoom-in">`;
+    $('growthResultArea').classList.add('visible');
+  }
+}
+
+function updateGrowthPromptPreview() {
+  if ($('growthShowPrompt').checked) {
+    $('growthPromptPreview').classList.add('visible');
+    $('growthPromptText').value = buildGrowthPrompt();
+  }
+}
+
+$('growthShowPrompt').addEventListener('change', function() {
+  if (this.checked) {
+    $('growthPromptPreview').classList.add('visible');
+    $('growthPromptText').value = buildGrowthPrompt();
+  } else {
+    $('growthPromptPreview').classList.remove('visible');
+  }
+});
+
+function buildGrowthPrompt(overrideDays, overrideGrowthCm) {
+  const gender = getGrowthGender();
+  const rate = GROWTH_RATES[gender];
+  let growthMm, days, growthCm;
+
+  if (overrideGrowthCm !== undefined) {
+    growthCm = overrideGrowthCm;
+    growthMm = growthCm * 10;
+    days = overrideDays || Math.round(growthMm / rate.avg);
+  } else if (currentGrowthMode === 'length' && gender === 'female') {
+    const currentLen = parseFloat($('currentHairLength').value) || 15;
+    const targetLen = parseFloat($('targetLengthSlider').value) || 30;
+    growthCm = Math.max(0, targetLen - currentLen);
+    growthMm = growthCm * 10;
+    days = Math.round(growthMm / rate.avg);
+  } else {
+    days = getGrowthDays();
+    growthMm = rate.avg * days;
+    growthCm = growthMm / 10;
+  }
+
+  const genderKo = gender === 'male' ? '남성' : '여성';
+  const timeDesc = formatDays(days);
+
+  // Description of how hair looks at different growth stages
+  let growthDescription = '';
+  if (growthCm < 0.3) {
+    growthDescription = 'The hair should look almost identical but very slightly longer. The growth is barely perceptible.';
+  } else if (growthCm < 1) {
+    growthDescription = `The hair should be slightly longer (about ${growthCm.toFixed(1)}cm growth). Hair around ears and neck will be slightly more overgrown. The hairstyle still holds its basic shape.`;
+  } else if (growthCm < 3) {
+    growthDescription = `The hair should be noticeably longer (about ${growthCm.toFixed(1)}cm growth). The hairstyle is starting to grow out of its original shape. ${gender === 'male' ? 'Hair around the ears and at the neckline is visibly longer. Bangs/fringe are touching or past the forehead more.' : 'The overall length is visibly increased. Layers may have grown out slightly.'}`;
+  } else if (growthCm < 6) {
+    growthDescription = `The hair should be significantly longer (about ${growthCm.toFixed(1)}cm growth). ${gender === 'male' ? 'This is clearly an overgrown hairstyle that needs a trim. Hair covers more of the ears and neck. The top is heavier and may flop over.' : 'The hair is notably longer, falling further down. Any layers are more grown out. The weight of the hair may change how it sits.'}`;
+  } else if (growthCm < 12) {
+    growthDescription = `The hair should be much longer (about ${growthCm.toFixed(1)}cm growth). ${gender === 'male' ? 'This is very overgrown hair. If it was a short cut, it is now a medium-length style. Hair may be falling into the eyes and covering the ears completely.' : 'The hair has grown significantly. It should fall several inches lower than the original length.'}`;
+  } else {
+    growthDescription = `The hair should be dramatically longer (about ${growthCm.toFixed(1)}cm growth, approximately ${(growthCm/2.54).toFixed(1)} inches). This represents ${timeDesc} of uncut growth. ${gender === 'male' ? 'A originally short haircut would now be medium-to-long length. A medium cut would be quite long.' : 'The hair should fall substantially lower than original length.'}`;
+  }
+
+  // Female-specific additions
+  let femaleExtras = '';
+  if (gender === 'female') {
+    const texture = $('growthHairTexture')?.value || 'natural';
+    const volume = $('growthHairVolume')?.value || 'medium';
+    const layering = $('growthHairLayering')?.value || 'light';
+    const bangs = $('growthBangsStyle')?.value || 'keep';
+
+    const textureMap = { natural: 'natural texture', straight: 'straight and sleek', wavy: 'soft waves', curly: 'defined curls' };
+    const volumeMap = { natural: 'natural volume', thin: 'thinner/flatter volume', medium: 'medium volume', thick: 'thick, full volume' };
+    const layerMap = { none: 'no visible layering, blunt ends', light: 'subtle light layers', heavy: 'heavily layered with lots of movement' };
+    const bangsMap = { keep: 'keep bangs as they currently are (just slightly longer)', 'grown-out': 'bangs that have grown out and are falling past the original length', curtain: 'grown into curtain bangs framing the face', 'side-swept': 'grown out and swept to the side' };
+
+    femaleExtras = `
+HAIR STYLE DETAILS (for female simulation):
+- Hair texture: ${textureMap[texture]}
+- Hair volume: ${volumeMap[volume]}
+- Layering: ${layerMap[layering]}
+- Bangs: ${bangsMap[bangs]}`;
+
+    if (currentGrowthMode === 'length') {
+      const currentLen = parseFloat($('currentHairLength').value) || 15;
+      const targetLen = parseFloat($('targetLengthSlider').value) || 30;
+      femaleExtras += `
+- Current estimated hair length: ~${currentLen}cm
+- Target hair length: ~${targetLen}cm (the hair should reach this length in the result)`;
+    }
+  }
+
+  return `You are a hair growth simulation AI. Show how this person's current hair will look after ${timeDesc} of natural growth with NO haircut.
+
+SCIENTIFIC DATA:
+- Korean ${genderKo} (${gender}) average hair growth rate: ${rate.avg.toFixed(3)} mm/day (range: ${rate.min}~${rate.max} mm/day)
+- Simulation period: ${days} days (${timeDesc})
+- Expected total growth: approximately ${growthCm.toFixed(1)} cm (${growthMm.toFixed(0)} mm)
+
+HAIR GROWTH SIMULATION INSTRUCTIONS:
+${growthDescription}
+${femaleExtras}
+
+NATURAL GROWTH RULES:
+- Hair grows from the roots, so the entire hair length shifts outward/downward
+- The natural hair color stays exactly the same
+- The overall hair type (straight, wavy, curly) stays the same unless specified otherwise
+- Hair grows in all directions simultaneously (top, sides, back, bangs)
+- No styling products or salon treatments have been applied
+- This is natural, unstyled, grown-out hair
+
+FACE PRESERVATION - CRITICAL (pixel-perfect copy):
+- Face shape, all features (eyes, nose, mouth, jawline, ears)
+- Skin tone, texture, complexion
+- Facial expression and gaze direction
+- Eyebrows (do NOT change)
+- Neck, body, clothes
+- Background, lighting, camera angle
+
+OUTPUT: A photorealistic image of the EXACT SAME PERSON with their hair naturally grown out by approximately ${growthCm.toFixed(1)}cm. Only the hair should change.`;
+}
+
+async function runGrowthSimulation() {
+  if (!selfieBase64) { alert('Upload a selfie first!'); return; }
+  const backend = $('backendMode').value, apiKey = $('apiKey').value.trim();
+  if (backend === 'direct' && !apiKey) { alert('Enter your Gemini API key!'); return; }
+  if (backend === 'n8n' && !$('n8nUrl').value.trim()) { alert('Enter your n8n URL!'); return; }
+  const model = $('modelSelect').value;
+  const simType = $('growthSimType').value;
+
+  isGrowthRunning = true;
+  growthAbortController = new AbortController();
+  $('btnGrowthSim').disabled = true;
+  $('btnGrowthStop').style.display = 'inline-flex';
+
+  updateGrowthBeforePreview();
+
+  if (simType === 'multi') {
+    await runMultiStepGrowth(apiKey, model);
+  } else {
+    await runSingleGrowth(apiKey, model);
+  }
+
+  isGrowthRunning = false;
+  $('btnGrowthSim').disabled = false;
+  $('btnGrowthStop').style.display = 'none';
+}
+
+async function runSingleGrowth(apiKey, model) {
+  const prompt = $('growthShowPrompt').checked ? $('growthPromptText').value : buildGrowthPrompt();
+  $('growthAfter').innerHTML = '<div class="spinner-big"></div>';
+  $('growthResultSummary').style.display = 'none';
+  $('growthMultiResult').classList.remove('visible');
+
+  const t0 = Date.now();
+  try {
+    const image = await callGeminiGeneric(prompt, apiKey, model, growthAbortController.signal);
+    const elapsed = Date.now() - t0;
+    $('growthAfter').innerHTML = `<img src="${image}" alt="growth simulation" onclick="showFullscreen(this.src)" style="cursor:zoom-in">`;
+    $('growthResultSummary').style.display = 'flex';
+    const gender = getGrowthGender();
+    const days = getGrowthDays();
+    const growthMm = GROWTH_RATES[gender].avg * days;
+    $('growthResultInfo').textContent = `${gender === 'male' ? 'Male' : 'Female'} | ${formatDays(days)} | +${formatMm(growthMm)} growth`;
+    $('growthResultTime').textContent = `${(elapsed/1000).toFixed(1)}s`;
+  } catch (err) {
+    $('growthAfter').innerHTML = `<div class="placeholder-inner" style="color:var(--error)">${err.message.substring(0,80)}</div>`;
+  }
+}
+
+async function runMultiStepGrowth(apiKey, model) {
+  $('growthResultArea').classList.remove('visible');
+  $('growthMultiResult').classList.add('visible');
+  const multiGrid = $('growthMultiGrid');
+
+  const gender = getGrowthGender();
+  const rate = GROWTH_RATES[gender];
+  let totalDays;
+
+  if (currentGrowthMode === 'length' && gender === 'female') {
+    const currentLen = parseFloat($('currentHairLength').value) || 15;
+    const targetLen = parseFloat($('targetLengthSlider').value) || 30;
+    const diff = Math.max(0, targetLen - currentLen);
+    totalDays = Math.round((diff * 10) / rate.avg);
+  } else {
+    totalDays = getGrowthDays();
+  }
+
+  // Create 3 stages: 1/3, 2/3, and full
+  const stages = [
+    { days: Math.round(totalDays / 3), label: 'Stage 1' },
+    { days: Math.round(totalDays * 2 / 3), label: 'Stage 2' },
+    { days: totalDays, label: 'Stage 3 (Final)' },
+  ];
+
+  // Add original photo + 3 stages
+  multiGrid.innerHTML = `
+    <div class="growth-multi-card">
+      <div class="card-label">Original (Now)</div>
+      <img src="${selfieDataUrl}" alt="current" onclick="showFullscreen(this.src)" style="cursor:zoom-in">
+      <div class="card-info"><span>Current</span><span>0 mm growth</span></div>
+    </div>
+    ${stages.map((s, i) => `
+      <div class="growth-multi-card" id="growthStage${i}">
+        <div class="card-label">${s.label} (${formatDays(s.days)})</div>
+        <div class="placeholder-inner" id="growthStageContent${i}"><div class="spinner-big"></div></div>
+        <div class="card-info"><span>${formatDays(s.days)}</span><span>+${formatMm(rate.avg * s.days)}</span></div>
+      </div>
+    `).join('')}`;
+
+  for (let i = 0; i < stages.length; i++) {
+    if (!isGrowthRunning) break;
+    const s = stages[i];
+    const growthCm = (rate.avg * s.days) / 10;
+    const prompt = buildGrowthPrompt(s.days, growthCm);
+    const t0 = Date.now();
+    try {
+      const image = await callGeminiGeneric(prompt, apiKey, model, growthAbortController.signal);
+      const el = $(`growthStageContent${i}`);
+      el.outerHTML = `<img src="${image}" alt="${s.label}" onclick="showFullscreen(this.src)" style="cursor:zoom-in;width:100%;display:block;">`;
+    } catch (err) {
+      const el = $(`growthStageContent${i}`);
+      el.innerHTML = `<div style="color:var(--error);font-size:11px;padding:10px;">${err.message.substring(0,60)}</div>`;
+    }
+  }
+}
+
+function stopGrowthSimulation() {
+  isGrowthRunning = false;
+  growthAbortController?.abort();
+  $('btnGrowthSim').disabled = false;
+  $('btnGrowthStop').style.display = 'none';
+}
+
+// ============ Events ============
+$('btnStart').addEventListener('click', runGeneration);
+$('btnStop').addEventListener('click', stopGeneration);
+$('btnExport').addEventListener('click', exportResults);
+$('genderFilter').addEventListener('change', () => { renderGrid(); updateSelectedCount(); });
+$('categoryFilter').addEventListener('change', () => { renderGrid(); updateSelectedCount(); });
+$('selectAll').addEventListener('change', e => {
+  getFilteredStyles().forEach(s => { if (e.target.checked) checkedStyles.add(s.styleId); else checkedStyles.delete(s.styleId); });
+  document.querySelectorAll('.card input[type="checkbox"]').forEach(cb => cb.checked = e.target.checked);
+  updateSelectedCount();
+});
+
+function updateBackendUI() {
+  const m = $('backendMode').value;
+  $('apiKeyGroup').style.display = m === 'direct' ? '' : 'none';
+  $('n8nUrlGroup').style.display = m === 'n8n' ? '' : 'none';
+  localStorage.setItem('testbed-backendMode', m);
+}
+$('backendMode').addEventListener('change', updateBackendUI);
+$('backendMode').value = localStorage.getItem('testbed-backendMode') || 'direct';
+updateBackendUI();
+$('apiKey').value = localStorage.getItem('testbed-apiKey') || GEMINI_API_KEY_DEFAULT;
+$('apiKey').addEventListener('change', () => { const k = $('apiKey').value.trim(); if (k) localStorage.setItem('testbed-apiKey', k); });
+$('n8nUrl').value = localStorage.getItem('testbed-n8nUrl') || 'http://192.168.50.88:5678';
+$('n8nUrl').addEventListener('change', () => { const u = $('n8nUrl').value.trim(); if (u) localStorage.setItem('testbed-n8nUrl', u); });
+
+loadConfig();
+</script>
+</body>
+</html>

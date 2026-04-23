@@ -35,7 +35,7 @@ export default function SplashScreen({
 
   return (
     <div
-      className={`fixed inset-0 z-[9999] bg-gradient-to-br from-[#6366f1] via-[#8b5cf6] to-[#ec4899] flex flex-col items-center justify-center transition-opacity duration-300 ${
+      className={`fixed inset-0 z-[9999] bg-gradient-to-br from-[#6366f1] via-[#8b5cf6] to-[#E91E63] flex flex-col items-center justify-center transition-opacity duration-300 ${
         isAnimating ? 'opacity-100' : 'opacity-0'
       }`}
     >
@@ -75,7 +75,7 @@ export default function SplashScreen({
 
       {/* 앱 이름 */}
       <h1 className="mt-8 text-white text-3xl font-bold tracking-tight">
-        LookSim
+        BeforeCut
       </h1>
       <p className="mt-2 text-white/70 text-sm font-medium">
         AI Hairstyle Simulation
@@ -171,7 +171,7 @@ export const LogoSVG = () => (
       <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stopColor="#6366f1" />
         <stop offset="50%" stopColor="#8b5cf6" />
-        <stop offset="100%" stopColor="#ec4899" />
+        <stop offset="100%" stopColor="#E91E63" />
       </linearGradient>
     </defs>
     {/* 배경 */}

@@ -1,4 +1,5 @@
 import { Component, type ReactNode } from 'react';
+import { captureError } from '../services/sentry';
 
 interface Props {
   children: ReactNode;
@@ -21,9 +22,10 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    // 프로덕션에서는 에러 로깅 서비스로 전송
-    if (process.env.NODE_ENV === 'production') {
-      // TODO: 에러 로깅 서비스 연동 (예: Sentry)
+    if (import.meta.env.PROD) {
+      captureError(error, {
+        errorInfo,
+      });
     } else {
       console.error('ErrorBoundary caught an error:', error, errorInfo);
     }
@@ -42,14 +44,12 @@ class ErrorBoundary extends Component<Props, State> {
       return (
         <div className="min-h-screen bg-gradient-to-b from-[#0F0F1A] to-[#1a1a2e] flex items-center justify-center p-6">
           <div className="text-center max-w-md">
-            <div className="text-6xl mb-6">😢</div>
-            <h1 className="text-2xl font-bold text-white mb-4">
-              문제가 발생했습니다
-            </h1>
+            <div className="text-6xl mb-6">⚠️</div>
+            <h1 className="text-2xl font-bold text-white mb-4">문제가 발생했습니다</h1>
             <p className="text-gray-400 mb-6">
-              예상치 못한 오류가 발생했습니다.
+              일시적인 오류가 발생했습니다.
               <br />
-              잠시 후 다시 시도해주세요.
+              잠시 후 다시 시도하거나, 앱을 재시작해 주세요.
             </p>
             <div className="space-y-3">
               <button
@@ -59,17 +59,15 @@ class ErrorBoundary extends Component<Props, State> {
                 다시 시도
               </button>
               <button
-                onClick={() => window.location.href = '/'}
+                onClick={() => (window.location.href = '/')}
                 className="w-full py-3 px-6 bg-white/10 text-white rounded-xl font-semibold hover:bg-white/20 transition-colors"
               >
                 홈으로 이동
               </button>
             </div>
-            {process.env.NODE_ENV !== 'production' && this.state.error && (
-              <details className="mt-6 text-left">
-                <summary className="text-sm text-gray-500 cursor-pointer hover:text-gray-400">
-                  오류 상세 정보
-                </summary>
+            {this.state.error && (
+              <details className="mt-6 text-left" open>
+                <summary className="text-sm text-gray-500 cursor-pointer hover:text-gray-400">오류 상세</summary>
                 <pre className="mt-2 p-4 bg-black/50 rounded-lg text-xs text-red-400 overflow-auto max-h-40">
                   {this.state.error.toString()}
                   {'\n'}

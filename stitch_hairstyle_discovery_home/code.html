@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>beforecut - AR Hair Fitting</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ee2bad",
+                        "background-light": "#f8f6f7",
+                        "background-dark": "#22101c",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        body {
+            min-height: 100dvh;
+            background-color: black;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-display overflow-hidden text-white">
+<div class="relative h-screen w-full overflow-hidden">
+<div class="absolute inset-0 z-0 bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBmtXQdmdniCESQkdJf3kL2u1mv80b25jRV-uq_DDfgN47H-Prrmi0P-EDT26N4We6_vqMXhpqTMigRe7dwpjj82sz7-NGdJPplo9YYP0x7ozD7Phb6OYSlNMsjw8PE8viESL4F2u2PeLd3CZphof6IjQRPcQPvtM2KRrT-OdtCmDJtxPI61AUF9U2JUyquMMyZmuZ2U443tyqz7onFTrqCub1-4fOl6BJ6be6b5LSI5dSwX69jNLk8g0GyaCBipMF23ruGMWfYSUIG");'>
+<div class="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/40"></div>
+</div>
+<div class="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-4 pt-12 pb-4">
+<button class="flex size-9 items-center justify-center rounded-full bg-black/30 backdrop-blur-md text-white border border-white/10 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+</button>
+<div class="bg-black/30 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/10">
+<span class="text-white font-black tracking-[0.15em] text-sm uppercase">beforecut</span>
+</div>
+<button class="flex size-9 items-center justify-center rounded-full bg-black/30 backdrop-blur-md text-white border border-white/10 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[20px]">cameraswitch</span>
+</button>
+</div>
+<div class="absolute bottom-0 left-0 right-0 z-20 w-full flex flex-col pt-20 bg-gradient-to-t from-black/80 to-transparent">
+<div class="flex justify-center mb-4">
+<div class="flex items-center gap-4 text-sm font-medium">
+<button class="text-white border-b-2 border-white pb-0.5">남성</button>
+<button class="text-white/50">여성</button>
+</div>
+</div>
+<div class="w-full overflow-x-auto no-scrollbar px-4 mb-8">
+<div class="flex items-start gap-2 min-w-max pb-2">
+<div class="flex flex-col items-center gap-2 group cursor-pointer">
+<div class="relative w-[85px] h-[110px] rounded-[20px] bg-black/40 backdrop-blur-md border border-white/10 flex flex-col items-center justify-center">
+<span class="material-symbols-outlined text-3xl mb-1">add</span>
+<span class="text-[10px] font-medium">직접 설정</span>
+</div>
+<span class="text-[10px] font-medium text-white/70">직접 설정</span>
+</div>
+<div class="flex flex-col items-center gap-2 group cursor-pointer">
+<div class="relative w-[85px] h-[110px] rounded-[20px] border-2 border-primary overflow-hidden shadow-[0_0_15px_rgba(238,43,173,0.3)]">
+<div class="w-full h-full bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDnLAAR10GIOlxH5CaVhPqvFwmCry9Fi33ARnAsBwzB5qtkaVC5y0YcCz3DkrR0ZCbSWM5T_19K0ip3VAZCGY0GsJ6z926TVBtl-8jjtaR6n7Bfk9BtHPlUG43U-MXpVOwNqEahc1glbAwiQl9JgrbdE8tccUCPI3SLVSx6BXIyhG2HxKmAvVuLLHc12n9k15QE60jy1NSuVT3piin2S0ioZrwp2LB917T30_ifLMOyfTi-olcsmnK5lMZxFaCuPsHc0R7wZxoRnj5O");'></div>
+<div class="absolute top-1.5 left-1.5 bg-black/40 backdrop-blur-sm rounded px-1.5 py-0.5 border border-white/10">
+<span class="text-[8px] font-bold">360°</span>
+</div>
+</div>
+<span class="text-[10px] font-medium text-primary">360 웨이브</span>
+</div>
+<div class="flex flex-col items-center gap-2 group cursor-pointer">
+<div class="relative w-[85px] h-[110px] rounded-[20px] border border-white/10 overflow-hidden bg-white/5 backdrop-blur-sm">
+<div class="w-full h-full bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuC7wldEqITjElETwbIH_a5mmzBA9B-L3XnWkKQRj4nQauytw6RYC8X-2R3ewI2-egOk5Hb4QHNjs7tflDPkPcfnYzDoiT9qeZ3yzHYJA1srCfiB6vR_QePYXnTZn3XU2d_6X_WQ-MIxkj-GPbDVFJFAEGVINycmGSqdB9-eszrbGfRYQLXr7lpOSn4MZulmQa9PKpTB5zcCvHKpjEtwyzw5hghqV2g3R_LMIcmMPnrZabjKm9lmqFLAaourvZweAUyMLMNZEN6GZd06");'></div>
+<div class="absolute top-1.5 left-1.5 bg-black/40 backdrop-blur-sm rounded px-1.5 py-0.5 border border-white/10">
+<span class="text-[8px] font-bold">360°</span>
+</div>
+</div>
+<span class="text-[10px] font-medium text-white/70">jpop visual</span>
+</div>
+<div class="flex flex-col items-center gap-2 group cursor-pointer">
+<div class="relative w-[85px] h-[110px] rounded-[20px] border border-white/10 overflow-hidden bg-white/5 backdrop-blur-sm">
+<div class="w-full h-full bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBViyF9fPCCjCtsgFZSL9k1dNPMieDVs7UKxSCqJ6nLID-ars3WvPIKuaSCxWVPzkii4XRMb-JuFJuLJT3NpqPTeJVPKA36aK8OyLa6t_Ap7hoYM0vinMQVmirBoBR4NAMtf95hQYsKjAbn3Qeol-hcwoJWFahMFTkHmEcTwoSGcn0AIlbN457jEgwsjJx72j3EGduordZ9ZtCWC8vm4eXLZx7pEdFQHPbDtM6pLRwhKpYpKxDcmvmq5WRQXFVfWBvCp9wVjNyReiIg");'></div>
+<div class="absolute top-1.5 left-1.5 bg-black/40 backdrop-blur-sm rounded px-1.5 py-0.5 border border-white/10">
+<span class="text-[8px] font-bold">360°</span>
+</div>
+</div>
+<span class="text-[10px] font-medium text-white/70">kpop 쉼표머리</span>
+</div>
+<div class="flex flex-col items-center gap-2 group cursor-pointer">
+<div class="relative w-[85px] h-[110px] rounded-[20px] border border-white/10 overflow-hidden bg-white/5 backdrop-blur-sm">
+<div class="w-full h-full bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA6IGqXzQ-CiZyzFvEWBYnRrCOwTtrOKWP1kWcsokfJvGI4E12Zpwnk3R_gKGY7u6frQyombJJVQ-V-Pyg8-17szPR6wFc7LRXxeMJWgV24twbkr3p41NQGC_pCBJfOXfE2ar1C4wxDEX30PwhNJEGMRQ6BxgSf6hXoOXsSNalyz9DvwCdx-lS6otzFIO-3mlltlbc1oPFY1r2rBlyj2Vtudj1SQ7wIHGAbaUS4c2vYpw_llKs6kAPQ0jfvpR7Lq6lP_Lixhb_p3VW8");'></div>
+</div>
+<span class="text-[10px] font-medium text-white/70">Dandy Cut</span>
+</div>
+</div>
+</div>
+<div class="relative flex items-center justify-between px-8 pb-10 h-[100px]">
+<div class="flex flex-col items-center gap-1.5 cursor-pointer group">
+<button class="flex size-[44px] items-center justify-center rounded-full bg-white/10 backdrop-blur-md border border-white/20 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[22px]">photo_library</span>
+</button>
+<span class="text-white text-[10px] font-medium">갤러리</span>
+</div>
+<div class="absolute left-1/2 -translate-x-1/2 bottom-10">
+<button class="relative flex items-center justify-center size-[76px] rounded-full border-[3px] border-white/30 bg-white/5 backdrop-blur-sm active:scale-90 transition-all">
+<div class="size-[64px] rounded-full bg-white border-2 border-black/10"></div>
+</button>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex flex-col items-center gap-1.5 cursor-pointer group">
+<button class="flex size-[44px] items-center justify-center rounded-full bg-white/10 backdrop-blur-md border border-white/20 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[22px] text-pink-400">opacity</span>
+</button>
+<span class="text-white text-[10px] font-medium">염색</span>
+</div>
+<div class="flex flex-col items-center gap-1.5 cursor-pointer group">
+<button class="flex size-[44px] items-center justify-center rounded-full bg-white/10 backdrop-blur-md border border-white/20 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[22px]">add_box</span>
+</button>
+<span class="text-white text-[10px] font-medium">참고</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+</body></html>

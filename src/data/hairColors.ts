@@ -47,10 +47,10 @@ export const hairColors: HairColor[] = [
 ];
 
 export const colorCategories = [
-  { id: 'natural', nameKo: '내추럴' },
-  { id: 'fashion', nameKo: '패션컬러' },
-  { id: 'highlight', nameKo: '하이라이트' },
-  { id: 'ombre', nameKo: '옴브레' },
+  { id: 'natural', name: 'Natural', nameKo: '내추럴' },
+  { id: 'fashion', name: 'Fashion', nameKo: '패션컬러' },
+  { id: 'highlight', name: 'Highlight', nameKo: '하이라이트' },
+  { id: 'ombre', name: 'Ombre', nameKo: '옴브레' },
 ];
 
 export const getColorsByCategory = (category: string) => {

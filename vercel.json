@@ -49,6 +49,7 @@
   ],
   "rewrites": [
     { "source": "/api/:path*", "destination": "/api/:path*" },
+    { "source": "/testbed/:path*", "destination": "/testbed/:path*" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

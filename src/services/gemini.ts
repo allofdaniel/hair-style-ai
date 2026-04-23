@@ -1,11 +1,32 @@
 import type { HairStyle, HairSettings, HairTexture } from '../stores/useAppStore';
 import { hairColors, hairTextures } from '../data/hairStyles';
+import { resilientFetch } from './networkResilience';
+import { logger } from './logger';
+
+const isDebug = import.meta.env.DEV || import.meta.env.MODE === 'test';
+
+const debugLog = (...args: unknown[]): void => {
+  if (isDebug) {
+    logger.log(...args);
+  }
+};
 
 // OpenAI GPT-Image-1.5 - best for face preservation and image editing
 const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 
 // Gemini for text analysis only
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+
+const GEMINI_RETRY_CONFIG = {
+  maxRetries: 2,
+  baseDelay: 1200,
+  maxDelay: 12000,
+  retryableStatuses: [408, 429, 500, 502, 503, 504],
+};
+
+const fetchWithRetry = (url: string, options: RequestInit): Promise<Response> => {
+  return resilientFetch(url, options, GEMINI_RETRY_CONFIG);
+};
 
 interface GenerateHairStyleParams {
   userPhoto: string;
@@ -87,8 +108,7 @@ export const generateHairStyle = async (
       ? userPhoto.split('base64,')[1]
       : userPhoto;
 
-    console.log('Calling OpenAI GPT-Image-1.5 API...');
-    console.log('Image size (base64 length):', base64Data.length);
+    // API call started
 
     // Get color information for explicit mention in prompt
     const colorOption = hairColors.find((c) => c.id === settings.color);
@@ -128,7 +148,7 @@ The output must show the EXACT same person with only the hairstyle changed.`;
     formData.append('n', '1');
     formData.append('size', '1024x1024');
 
-    const response = await fetch('https://api.openai.com/v1/images/edits', {
+    const response = await fetchWithRetry('https://api.openai.com/v1/images/edits', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${OPENAI_API_KEY}`,
@@ -138,7 +158,7 @@ The output must show the EXACT same person with only the hairstyle changed.`;
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('OpenAI API error:', response.status, errorText);
+      logger.error('OpenAI API error:', response.status, errorText);
 
       try {
         const errorJson = JSON.parse(errorText);
@@ -161,7 +181,7 @@ The output must show the EXACT same person with only the hairstyle changed.`;
     }
 
     const data = await response.json();
-    console.log('OpenAI GPT-Image-1.5 response received');
+    debugLog('[OpenAI] GPT-Image-1.5 response received');
 
     // Extract the generated image from response
     if (data.data && data.data.length > 0) {
@@ -176,7 +196,9 @@ The output must show the EXACT same person with only the hairstyle changed.`;
         };
       } else if (imageData.url) {
         // Fetch the image from URL and convert to base64
-        const imageResponse = await fetch(imageData.url);
+        const imageResponse = await fetchWithRetry(imageData.url, {
+          method: 'GET',
+        });
         const imageBlob = await imageResponse.blob();
         const reader = new FileReader();
 
@@ -198,7 +220,7 @@ The output must show the EXACT same person with only the hairstyle changed.`;
     };
 
   } catch (error) {
-    console.error('Error generating hair style:', error);
+    logger.error('Error generating hair style:', error);
 
     if (error instanceof TypeError && error.message.includes('fetch')) {
       return { success: false, error: 'Network error. Please check your internet connection.' };
@@ -260,7 +282,7 @@ export const analyzeReferencePhoto = async (referencePhoto: string): Promise<Hai
 
 {
   "styleName": "English name of the hairstyle (e.g., 'Two Block Cut', 'Layered Bob')",
-  "styleNameKo": "Korean name (e.g., '투블럭컷', '레이어드 밥')",
+  "styleNameKo": "Korean name (e.g., '?�블??��', '?�이?�드 �?)",
   "description": "Brief description of this hairstyle in Korean",
   "characteristics": ["List", "of", "key", "features"],
   "length": "short/medium/long",
@@ -272,9 +294,12 @@ export const analyzeReferencePhoto = async (referencePhoto: string): Promise<Hai
 IMPORTANT: Return ONLY the JSON, no additional text.`;
 
   try {
-    const response = await fetch(`${GEMINI_TEXT_URL}?key=${GEMINI_API_KEY}`, {
+    const response = await fetchWithRetry(GEMINI_TEXT_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-goog-api-key': GEMINI_API_KEY,
+      },
       body: JSON.stringify({
         contents: [{
           role: 'user',
@@ -304,7 +329,7 @@ IMPORTANT: Return ONLY the JSON, no additional text.`;
 
     return { success: false, error: 'Could not analyze the photo' };
   } catch (error) {
-    console.error('Analysis error:', error);
+    logger.error('Analysis error:', error);
     return { success: false, error: error instanceof Error ? error.message : 'Analysis failed' };
   }
 };
@@ -335,7 +360,7 @@ export const generateFromReference = async (
   const colorInstruction = hasCustomColor ? ` Change hair color to ${colorOption.prompt}.` : '';
 
   try {
-    console.log('Generating from reference with GPT-Image-1.5...');
+    debugLog('Generating from reference with GPT-Image-1.5...');
 
     const prompt = `Edit this photo: Apply a new hairstyle to this person.${colorInstruction}
 
@@ -364,7 +389,7 @@ The output must show the EXACT same person with only the hairstyle changed.`;
     formData.append('n', '1');
     formData.append('size', '1024x1024');
 
-    const response = await fetch('https://api.openai.com/v1/images/edits', {
+    const response = await fetchWithRetry('https://api.openai.com/v1/images/edits', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${OPENAI_API_KEY}`,
@@ -374,7 +399,7 @@ The output must show the EXACT same person with only the hairstyle changed.`;
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('OpenAI reference generation error:', response.status, errorText);
+      logger.error('OpenAI reference generation error:', response.status, errorText);
 
       try {
         const errorJson = JSON.parse(errorText);
@@ -392,7 +417,7 @@ The output must show the EXACT same person with only the hairstyle changed.`;
     }
 
     const data = await response.json();
-    console.log('OpenAI GPT-Image-1.5 reference response received');
+    debugLog('OpenAI GPT-Image-1.5 reference response received');
 
     if (data.data && data.data.length > 0) {
       const imageData = data.data[0];
@@ -401,7 +426,9 @@ The output must show the EXACT same person with only the hairstyle changed.`;
         const resultImage = `data:image/png;base64,${imageData.b64_json}`;
         return { success: true, resultImage };
       } else if (imageData.url) {
-        const imageResponse = await fetch(imageData.url);
+        const imageResponse = await fetchWithRetry(imageData.url, {
+          method: 'GET',
+        });
         const imageBlob = await imageResponse.blob();
         const reader = new FileReader();
 
@@ -416,7 +443,7 @@ The output must show the EXACT same person with only the hairstyle changed.`;
 
     return { success: false, error: 'AI could not generate image. Please try again.' };
   } catch (error) {
-    console.error('Error generating from reference:', error);
+    logger.error('Error generating from reference:', error);
 
     if (error instanceof TypeError && error.message.includes('fetch')) {
       return { success: false, error: 'Network error. Please check your connection.' };

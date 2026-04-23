@@ -39,5 +39,38 @@ test-hairfastgan.js
 test-openai-api.js
 *.keystore
 keystore_base64.txt
+android/keystore.properties
 .playwright-mcp/
 temp-*/
+
+# Playwright E2E test results
+test-results/
+playwright-report/
+playwright/.cache/
+
+.vercel
+.env*.local
+
+# Build outputs / backups / binaries (too large / contain secrets)
+dist.backup-*/
+release/
+android/app/build/
+android/build/
+android/app/google-services.json
+android/app/src/main/assets/public/
+*.apk
+*.aab
+credentials.md
+app_icon.png
+
+# Screenshots from dev
+*.png
+!src/**/*.png
+!public/**/*.png
+!android/app/src/main/res/**/*.png
+
+# Playwright temp downloads
+*.crdownload
+14.apk
+android/nul
+**/nul

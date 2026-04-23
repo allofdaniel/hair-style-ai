@@ -1,4 +1,4 @@
-/**
+﻿/**
  * AdMob 광고 서비스
  * - 배너 광고, 전면 광고, 보상형 광고 지원
  * - 테스트 모드 및 실제 광고 ID 관리
@@ -8,6 +8,7 @@ import { AdMob, BannerAdSize, BannerAdPosition } from '@capacitor-community/admo
 import type { BannerAdOptions, AdOptions, RewardAdOptions, AdMobRewardItem } from '@capacitor-community/admob';
 import { Capacitor } from '@capacitor/core';
 
+import { logger } from './logger';
 // 광고 단위 ID (테스트 ID - 프로덕션 시 실제 ID로 교체)
 const AD_UNITS = {
   // 테스트 광고 ID
@@ -38,7 +39,7 @@ class AdMobService {
   async initialize(): Promise<void> {
     if (this.initialized) return;
     if (!Capacitor.isNativePlatform()) {
-      console.log('[AdMob] 웹에서는 AdMob을 사용할 수 없습니다.');
+      logger.log('[AdMob] 웹에서는 AdMob을 사용할 수 없습니다.');
       return;
     }
 
@@ -48,13 +49,13 @@ class AdMobService {
         initializeForTesting: IS_DEV,
       });
       this.initialized = true;
-      console.log('[AdMob] 초기화 완료');
+      logger.log('[AdMob] 초기화 완료');
 
       // 전면 광고 및 보상형 광고 사전 로드
       this.preloadInterstitial();
       this.preloadRewarded();
     } catch (error) {
-      console.error('[AdMob] 초기화 실패:', error);
+      logger.error('[AdMob] 초기화 실패:', error);
     }
   }
 
@@ -82,9 +83,9 @@ class AdMobService {
       };
 
       await AdMob.showBanner(options);
-      console.log('[AdMob] 배너 광고 표시');
+      logger.log('[AdMob] 배너 광고 표시');
     } catch (error) {
-      console.error('[AdMob] 배너 광고 표시 실패:', error);
+      logger.error('[AdMob] 배너 광고 표시 실패:', error);
     }
   }
 
@@ -96,9 +97,9 @@ class AdMobService {
 
     try {
       await AdMob.hideBanner();
-      console.log('[AdMob] 배너 광고 숨김');
+      logger.log('[AdMob] 배너 광고 숨김');
     } catch (error) {
-      console.error('[AdMob] 배너 광고 숨기기 실패:', error);
+      logger.error('[AdMob] 배너 광고 숨기기 실패:', error);
     }
   }
 
@@ -110,9 +111,9 @@ class AdMobService {
 
     try {
       await AdMob.removeBanner();
-      console.log('[AdMob] 배너 광고 제거');
+      logger.log('[AdMob] 배너 광고 제거');
     } catch (error) {
-      console.error('[AdMob] 배너 광고 제거 실패:', error);
+      logger.error('[AdMob] 배너 광고 제거 실패:', error);
     }
   }
 
@@ -130,9 +131,9 @@ class AdMobService {
 
       await AdMob.prepareInterstitial(options);
       this.interstitialLoaded = true;
-      console.log('[AdMob] 전면 광고 로드 완료');
+      logger.log('[AdMob] 전면 광고 로드 완료');
     } catch (error) {
-      console.error('[AdMob] 전면 광고 로드 실패:', error);
+      logger.error('[AdMob] 전면 광고 로드 실패:', error);
       this.interstitialLoaded = false;
     }
   }
@@ -151,13 +152,13 @@ class AdMobService {
     try {
       await AdMob.showInterstitial();
       this.interstitialLoaded = false;
-      console.log('[AdMob] 전면 광고 표시');
+      logger.log('[AdMob] 전면 광고 표시');
 
       // 다음 광고 사전 로드
       setTimeout(() => this.preloadInterstitial(), 1000);
       return true;
     } catch (error) {
-      console.error('[AdMob] 전면 광고 표시 실패:', error);
+      logger.error('[AdMob] 전면 광고 표시 실패:', error);
       this.interstitialLoaded = false;
       return false;
     }
@@ -177,9 +178,9 @@ class AdMobService {
 
       await AdMob.prepareRewardVideoAd(options);
       this.rewardedLoaded = true;
-      console.log('[AdMob] 보상형 광고 로드 완료');
+      logger.log('[AdMob] 보상형 광고 로드 완료');
     } catch (error) {
-      console.error('[AdMob] 보상형 광고 로드 실패:', error);
+      logger.error('[AdMob] 보상형 광고 로드 실패:', error);
       this.rewardedLoaded = false;
     }
   }
@@ -202,7 +203,7 @@ class AdMobService {
     try {
       const result = await AdMob.showRewardVideoAd();
       this.rewardedLoaded = false;
-      console.log('[AdMob] 보상형 광고 완료:', result);
+      logger.log('[AdMob] 보상형 광고 완료:', result);
 
       // 다음 광고 사전 로드
       setTimeout(() => this.preloadRewarded(), 1000);
@@ -210,7 +211,7 @@ class AdMobService {
       // result 자체가 reward item
       return result || { type: 'credit', amount: 1 };
     } catch (error) {
-      console.error('[AdMob] 보상형 광고 표시 실패:', error);
+      logger.error('[AdMob] 보상형 광고 표시 실패:', error);
       this.rewardedLoaded = false;
       return null;
     }
@@ -247,3 +248,4 @@ export function useAdMob() {
     isRewardedReady: () => admobService.isRewardedReady(),
   };
 }
+

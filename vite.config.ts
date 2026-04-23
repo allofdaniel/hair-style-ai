@@ -2,9 +2,15 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
+import path from 'path'
 
 // https://vite.dev/config/
 export default defineConfig({
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
   plugins: [
     react(),
     tailwindcss(),
@@ -12,8 +18,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['icon-192.svg', 'icon-512.svg', 'apple-touch-icon.svg', 'og-image.svg'],
       manifest: {
-        name: 'LookSim - AI 외모 시뮬레이션',
-        short_name: 'LookSim',
+        name: 'BeforeCut - AI 헤어스타일 시뮬레이션',
+        short_name: 'BeforeCut',
         description: 'AI로 헤어스타일, 체중 변화, 피부 시술 등 외모 변화를 미리 시뮬레이션해보세요.',
         start_url: '/',
         display: 'standalone',
