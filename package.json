@@ -1,7 +1,7 @@
 {
   "name": "beforecut",
   "private": true,
-  "version": "1.1.12",
+  "version": "1.1.13",
   "description": "AI 헤어스타일 시뮬레이션 - 미용실 가기 전 헤어스타일 미리보기",
   "author": "BeforeCut Team",
   "license": "UNLICENSED",

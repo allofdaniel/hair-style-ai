@@ -1,10 +1,10 @@
-﻿/**
- * OpenAI GPT-Image-1.5 Service
+/**
+ * Gemini 2.5 Flash Image Service (file kept named openai.ts for import-compat)
  *
- * 최신 OpenAI 이미지 생성/편집 API
- * - 얼굴 보존 우수
- * - 4배 빠른 생성 속도
- * - 정확한 지시 따름
+ * Internal implementation switched from OpenAI gpt-image-1.5 to
+ * Google's Gemini 2.5 Flash Image after a security audit found the
+ * OpenAI key was being shipped inside the APK. Public function
+ * signatures are unchanged so existing imports continue to work.
  */
 
 import type { HairStyle, HairSettings, HairTexture, CustomHairSettings } from '../stores/useAppStore';
@@ -13,9 +13,11 @@ import { hairColors, hairTextures } from '../data/hairStyles';
 import { logger } from './logger';
 import { resilientFetch } from './networkResilience';
 
-const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
-const OPENAI_EDIT_URL = 'https://api.openai.com/v1/images/edits';
-const OPENAI_CHAT_URL = 'https://api.openai.com/v1/chat/completions';
+const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+const GEMINI_IMAGE_MODEL = 'gemini-2.5-flash-image';
+const GEMINI_TEXT_MODEL = 'gemini-2.5-flash';
+const GEMINI_IMAGE_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_IMAGE_MODEL}:generateContent`;
+const GEMINI_TEXT_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_TEXT_MODEL}:generateContent`;
 
 interface GenerateHairStyleParams {
   userPhoto: string;
@@ -32,14 +34,12 @@ interface GenerateHairStyleResponse {
 
 // Clean hairstyle prompt - remove mannequin references and use directly
 const cleanHairStylePrompt = (prompt: string): string => {
-  // If prompt is already clean and detailed (no mannequin), use it directly
   if (!prompt.toLowerCase().includes('mannequin') &&
       !prompt.toLowerCase().includes('bust') &&
       prompt.length > 30) {
     return prompt;
   }
 
-  // Remove mannequin-related content
   let cleaned = prompt
     .replace(/A (high-quality |vertical |premium |portrait )*\d*:?\d* ?(portrait|photograph)? of a (single )?white plastic (male |female )?mannequin bust[^.]*\./gi, '')
     .replace(/The mannequin[^.]*\./gi, '')
@@ -53,58 +53,16 @@ const cleanHairStylePrompt = (prompt: string): string => {
     .replace(/\s+/g, ' ')
     .trim();
 
-  // Try to extract Hair Style section
   const hairStyleMatch = cleaned.match(/Hair Style:\s*([^.]+(?:\.[^.]+)*)/i);
   if (hairStyleMatch) {
     return hairStyleMatch[1].trim();
   }
 
-  // If we have a reasonable description, use it
   if (cleaned.length > 20 && cleaned.length < 500) {
     return cleaned;
   }
 
   return '';
-};
-
-const readBlobAsDataUrl = (blob: Blob): Promise<string> => {
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onloadend = () => resolve(reader.result as string);
-    reader.onerror = () => resolve('');
-    reader.readAsDataURL(blob);
-  });
-};
-
-const toOpenAIErrorMessage = async (response: Response): Promise<string> => {
-  try {
-    const errorData = await response.json();
-    return errorData?.error?.message || `API Error: ${response.status}`;
-  } catch {
-    return `API Error: ${response.status}`;
-  }
-};
-
-const extractOpenAIImageDataUrl = async (imageData: {
-  b64_json?: string;
-  url?: string;
-}): Promise<string | null> => {
-  if (imageData.b64_json) {
-    return `data:image/png;base64,${imageData.b64_json}`;
-  }
-
-  if (!imageData.url) {
-    return null;
-  }
-
-  const imgResponse = await resilientFetch(imageData.url, { method: 'GET' });
-  if (!imgResponse.ok) {
-    logger.warn('Failed to fetch generated OpenAI image URL:', imgResponse.status);
-    return null;
-  }
-
-  const imgBlob = await imgResponse.blob();
-  return readBlobAsDataUrl(imgBlob);
 };
 
 // Build the AI prompt based on selected options
@@ -115,24 +73,19 @@ export const buildPrompt = (
 ): string => {
   const parts: string[] = [];
 
-  // Use the clean hairstyle description from the prompt
   const cleanedStylePrompt = cleanHairStylePrompt(style.prompt);
 
-  // If we have a good description, use it
   if (cleanedStylePrompt && cleanedStylePrompt.length > 20) {
     parts.push(cleanedStylePrompt);
   } else {
-    // Fallback: generate description from style name
     parts.push(`${style.name} hairstyle (Korean: ${style.nameKo})`);
   }
 
-  // Hair color
   const colorOption = hairColors.find((c) => c.id === settings.color);
   if (colorOption && colorOption.id !== 'natural') {
     parts.push(colorOption.prompt);
   }
 
-  // Volume
   const volumePrompts: Record<string, string> = {
     flat: 'with flat sleek low volume',
     natural: 'with natural medium volume',
@@ -140,7 +93,6 @@ export const buildPrompt = (
   };
   parts.push(volumePrompts[settings.volume]);
 
-  // Parting
   const partingPrompts: Record<string, string> = {
     left: 'parted on the left side',
     center: 'parted in the center',
@@ -149,7 +101,6 @@ export const buildPrompt = (
   };
   parts.push(partingPrompts[settings.parting]);
 
-  // Hair texture consideration
   if (texture) {
     const textureOption = hairTextures.find((t) => t.id === texture);
     if (textureOption) {
@@ -160,10 +111,25 @@ export const buildPrompt = (
   return parts.join(', ');
 };
 
+// Extract base64 + mime type from a data URL or raw base64
+const splitDataUrl = (src: string): { mimeType: string; data: string } => {
+  let mime = 'image/png';
+  let b64 = src;
+  if (src.startsWith('data:')) {
+    const m = src.match(/^data:([^;]+);base64,(.+)$/);
+    if (m) {
+      mime = m[1];
+      b64 = m[2];
+    } else {
+      b64 = src.split(',')[1] || src;
+    }
+  }
+  return { mimeType: mime, data: b64 };
+};
+
 // Fetch reference image and convert to base64
 const fetchReferenceImageAsBase64 = async (thumbnailUrl: string): Promise<string | null> => {
   try {
-    // Handle relative URLs
     const fullUrl = thumbnailUrl.startsWith('/')
       ? `${window.location.origin}${thumbnailUrl}`
       : thumbnailUrl;
@@ -184,24 +150,11 @@ const fetchReferenceImageAsBase64 = async (thumbnailUrl: string): Promise<string
   }
 };
 
-// Analyze reference image using GPT-4o Vision to get detailed hairstyle description
+// Analyze reference image using Gemini 2.5 Flash to get detailed hairstyle description
 const analyzeReferenceImage = async (referenceBase64: string, styleName: string): Promise<string | null> => {
   try {
-    const response = await resilientFetch(OPENAI_CHAT_URL, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${OPENAI_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'user',
-            content: [
-              {
-                type: 'text',
-                text: `Analyze this hairstyle reference image (${styleName}) and describe it in EXTREME detail for a hair stylist to recreate. Include:
+    const { mimeType, data } = splitDataUrl(referenceBase64);
+    const prompt = `Analyze this hairstyle reference image (${styleName}) and describe it in EXTREME detail for a hair stylist to recreate. Include:
 1. Exact hair length (in cm) for bangs, sides, top, back
 2. Hair texture and wave pattern (straight, wavy, curly, S-curl, etc.)
 3. Hair volume and body (flat, natural, voluminous)
@@ -211,63 +164,137 @@ const analyzeReferenceImage = async (referenceBase64: string, styleName: string)
 7. Overall silhouette and shape
 
 Be VERY specific with measurements and styling details. This will be used to generate the exact same hairstyle on another person's photo.
-Respond in 2-3 sentences, focusing on the most distinctive and important features.`
-              },
-              {
-                type: 'image_url',
-                image_url: {
-                  url: referenceBase64,
-                  detail: 'high'
-                }
-              }
-            ]
-          }
+Respond in 2-3 sentences, focusing on the most distinctive and important features.`;
+
+    const response = await resilientFetch(`${GEMINI_TEXT_URL}?key=${GEMINI_API_KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [
+          {
+            role: 'user',
+            parts: [
+              { inlineData: { mimeType, data } },
+              { text: prompt },
+            ],
+          },
         ],
-        max_tokens: 300,
       }),
     });
 
     if (!response.ok) {
-      logger.error('GPT-4o Vision analysis failed:', response.status);
+      logger.error('Gemini Vision analysis failed:', response.status);
       return null;
     }
 
-    const data = await response.json();
-    return data.choices?.[0]?.message?.content || null;
+    const payload = await response.json();
+    const parts = payload?.candidates?.[0]?.content?.parts || [];
+    const textPart = parts.find((p: { text?: string }) => p.text);
+    return textPart?.text || null;
   } catch (error) {
     logger.error('Error analyzing reference image:', error);
     return null;
   }
 };
 
-// Convert base64 to Blob for API upload
-const base64ToBlob = (base64: string, mimeType: string): Blob => {
-  const base64Data = base64.includes('base64,') ? base64.split('base64,')[1] : base64;
-  const byteCharacters = atob(base64Data);
-  const byteNumbers = new Array(byteCharacters.length);
-  for (let i = 0; i < byteCharacters.length; i++) {
-    byteNumbers[i] = byteCharacters.charCodeAt(i);
+// Common Gemini image-edit call
+interface GeminiCallResult {
+  success: boolean;
+  resultImage?: string;
+  error?: string;
+}
+
+const callGeminiImageEdit = async (
+  imageDataUrl: string,
+  promptText: string,
+  logLabel: string
+): Promise<GeminiCallResult> => {
+  if (!GEMINI_API_KEY) {
+    return { success: false, error: 'Gemini API key not configured' };
   }
-  const byteArray = new Uint8Array(byteNumbers);
-  return new Blob([byteArray], { type: mimeType });
+
+  const { mimeType, data } = splitDataUrl(imageDataUrl);
+
+  try {
+    logger.log(`Calling Gemini ${GEMINI_IMAGE_MODEL} for ${logLabel}...`);
+    logger.log('Prompt preview:', promptText.substring(0, 200) + '...');
+
+    const response = await resilientFetch(`${GEMINI_IMAGE_URL}?key=${GEMINI_API_KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [
+          {
+            role: 'user',
+            parts: [
+              { inlineData: { mimeType, data } },
+              { text: promptText },
+            ],
+          },
+        ],
+        generationConfig: {
+          responseModalities: ['image'],
+        },
+      }),
+    });
+
+    if (!response.ok) {
+      let errMsg = `Gemini error ${response.status}`;
+      try {
+        const body = await response.json();
+        errMsg = body?.error?.message || errMsg;
+      } catch (_) {
+        // ignore
+      }
+      logger.error('Gemini API error:', response.status, errMsg);
+      if (response.status === 400) return { success: false, error: 'Invalid image format. Please try a different photo.' };
+      if (response.status === 401 || response.status === 403) return { success: false, error: 'API key invalid or unauthorized.' };
+      if (response.status === 429) return { success: false, error: 'Rate limit exceeded. Please wait and try again.' };
+      return { success: false, error: errMsg };
+    }
+
+    const payload = await response.json();
+    const candidates = payload?.candidates;
+    if (!candidates || candidates.length === 0) {
+      return { success: false, error: 'No image generated. Please try again.' };
+    }
+
+    const finishReason = candidates[0]?.finishReason;
+    const partsOut = candidates[0]?.content?.parts || [];
+    const imgPart = partsOut.find((p: { inlineData?: { data?: string; mimeType?: string } }) => p.inlineData?.data);
+    if (imgPart) {
+      const mt = imgPart.inlineData!.mimeType || 'image/png';
+      return { success: true, resultImage: `data:${mt};base64,${imgPart.inlineData!.data}` };
+    }
+
+    if (finishReason === 'PROHIBITED_CONTENT' || finishReason === 'SAFETY' || finishReason === 'IMAGE_SAFETY') {
+      return { success: false, error: 'Image blocked by safety filter. Please try a different photo.' };
+    }
+
+    const textPart = partsOut.find((p: { text?: string }) => p.text);
+    if (textPart) {
+      logger.warn('Gemini returned text instead of image:', textPart.text?.substring(0, 200));
+      return { success: false, error: 'Model returned text instead of image. Please try again.' };
+    }
+
+    return { success: false, error: 'No image generated. Please try again.' };
+  } catch (error) {
+    logger.error('Gemini call failed:', error);
+    if (error instanceof TypeError && (error.message || '').includes('fetch')) {
+      return { success: false, error: 'Network error. Please check your internet connection.' };
+    }
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error occurred' };
+  }
 };
 
-// Generate hair style using OpenAI GPT-Image-1.5 API
+// Generate hair style using Gemini 2.5 Flash Image
 export const generateHairStyle = async (
   params: GenerateHairStyleParams
 ): Promise<GenerateHairStyleResponse> => {
   const { userPhoto, style, settings, texture } = params;
 
-  if (!OPENAI_API_KEY) {
-    return {
-      success: false,
-      error: 'OpenAI API key not configured',
-    };
-  }
-
   let stylePrompt = buildPrompt(style, settings, texture);
 
-  // Build color prompt separately to ensure it's always included
   const colorOption = hairColors.find((c) => c.id === settings.color);
   const colorPrompt = colorOption && colorOption.id !== 'natural'
     ? `HAIR COLOR: ${colorOption.prompt}`
@@ -277,44 +304,26 @@ export const generateHairStyle = async (
     logger.log('Color prompt will be added:', colorPrompt);
   }
 
-  try {
-    // Step 1: Use pre-analyzed prompt if available, otherwise analyze reference image
-    // Pre-analyzed prompts are stored in style.prompt by the analysis script
-    const preAnalyzedPrompt = cleanHairStylePrompt(style.prompt);
-
-    if (preAnalyzedPrompt && preAnalyzedPrompt.length > 50) {
-      // Use the pre-analyzed prompt directly (no API call needed)
-      logger.log('Using pre-analyzed prompt:', preAnalyzedPrompt.substring(0, 100) + '...');
-      stylePrompt = preAnalyzedPrompt;
-    } else if (style.thumbnail) {
-      // Fallback: Analyze reference image in real-time (costs API call)
-      logger.log('No pre-analyzed prompt, fetching reference image:', style.thumbnail);
-      const referenceBase64 = await fetchReferenceImageAsBase64(style.thumbnail);
-      if (referenceBase64) {
-        logger.log('Analyzing reference image with GPT-4o Vision...');
-        const referenceAnalysis = await analyzeReferenceImage(referenceBase64, style.nameKo);
-        if (referenceAnalysis) {
-          logger.log('Reference analysis:', referenceAnalysis);
-          stylePrompt = referenceAnalysis;
-        }
+  // Step 1: pre-analyzed prompt or reference-image analysis (Gemini Vision)
+  const preAnalyzedPrompt = cleanHairStylePrompt(style.prompt);
+  if (preAnalyzedPrompt && preAnalyzedPrompt.length > 50) {
+    logger.log('Using pre-analyzed prompt:', preAnalyzedPrompt.substring(0, 100) + '...');
+    stylePrompt = preAnalyzedPrompt;
+  } else if (style.thumbnail) {
+    logger.log('No pre-analyzed prompt, fetching reference image:', style.thumbnail);
+    const referenceBase64 = await fetchReferenceImageAsBase64(style.thumbnail);
+    if (referenceBase64) {
+      logger.log('Analyzing reference image with Gemini Vision...');
+      const referenceAnalysis = await analyzeReferenceImage(referenceBase64, style.nameKo);
+      if (referenceAnalysis) {
+        logger.log('Reference analysis:', referenceAnalysis);
+        stylePrompt = referenceAnalysis;
       }
     }
+  }
 
-    // Determine mime type
-    let mimeType = 'image/png';
-    if (userPhoto.includes('data:image/jpeg')) {
-      mimeType = 'image/jpeg';
-    } else if (userPhoto.includes('data:image/webp')) {
-      mimeType = 'image/webp';
-    }
-
-    logger.log('Calling OpenAI GPT-Image-1.5 API...');
-    logger.log('Final style prompt:', stylePrompt.substring(0, 200) + '...');
-
-    // PIXEL-PERFECT face preservation prompt - ZERO face modifications allowed
-    // This is an inpainting task where ONLY the hair region should change
-    const editPrompt = colorPrompt
-      ? `INPAINTING TASK - HAIR REGION ONLY
+  const editPrompt = colorPrompt
+    ? `INPAINTING TASK - HAIR REGION ONLY
 
 ⚠️ CRITICAL: THIS IS A FACE-LOCKED INPAINTING OPERATION ⚠️
 
@@ -323,7 +332,6 @@ The face region is LOCKED and must be copied PIXEL-BY-PIXEL from input to output
 - DO NOT touch, modify, enhance, or regenerate ANY facial pixels
 - DO NOT add realism, details, or "improvements" to the face
 - DO NOT change skin tone, texture, or color even slightly
-- If the face looks artificial, plastic, or mannequin-like - KEEP IT THAT WAY
 - The face must be an EXACT PIXEL-LEVEL COPY, not a "similar recreation"
 
 WHAT TO CHANGE (HAIR ONLY):
@@ -339,7 +347,7 @@ WHAT MUST NOT CHANGE:
 - Lighting on face - FROZEN
 
 Think of this as: mask the hair area, edit ONLY that masked region, paste the original face back.`
-      : `INPAINTING TASK - HAIR REGION ONLY
+    : `INPAINTING TASK - HAIR REGION ONLY
 
 ⚠️ CRITICAL: THIS IS A FACE-LOCKED INPAINTING OPERATION ⚠️
 
@@ -348,7 +356,6 @@ The face region is LOCKED and must be copied PIXEL-BY-PIXEL from input to output
 - DO NOT touch, modify, enhance, or regenerate ANY facial pixels
 - DO NOT add realism, details, or "improvements" to the face
 - DO NOT change skin tone, texture, or color even slightly
-- If the face looks artificial, plastic, or mannequin-like - KEEP IT THAT WAY
 - The face must be an EXACT PIXEL-LEVEL COPY, not a "similar recreation"
 
 WHAT TO CHANGE (HAIR ONLY):
@@ -364,77 +371,7 @@ WHAT MUST NOT CHANGE:
 
 Think of this as: mask the hair area, edit ONLY that masked region, paste the original face back.`;
 
-    // Use image edit API with the user's photo
-    const imageBlob = base64ToBlob(userPhoto, mimeType);
-
-    // Create form data for the edit endpoint
-    const formData = new FormData();
-    formData.append('image', imageBlob, 'photo.png');
-    formData.append('prompt', editPrompt);
-    formData.append('model', 'gpt-image-1.5');
-    formData.append('n', '1');
-    formData.append('size', '1024x1024');
-
-    const response = await resilientFetch(OPENAI_EDIT_URL, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${OPENAI_API_KEY}`,
-      },
-      body: formData,
-    });
-
-    if (!response.ok) {
-      const errorMessage = await toOpenAIErrorMessage(response);
-      logger.error('OpenAI API error:', response.status, errorMessage);
-
-      if (response.status === 400) {
-        return { success: false, error: 'Invalid image format. Please try a different photo.' };
-      } else if (response.status === 401) {
-        return { success: false, error: 'API key invalid. Please check configuration.' };
-      } else if (response.status === 403) {
-        return { success: false, error: 'API access denied. Organization verification required.' };
-      } else if (response.status === 429) {
-        return { success: false, error: 'Rate limit exceeded. Please wait and try again.' };
-      }
-
-      return { success: false, error: errorMessage };
-    }
-
-    const data = await response.json();
-    logger.log('OpenAI response received');
-
-    // Extract the generated image
-    if (data.data && data.data.length > 0) {
-      const imageData = data.data[0];
-
-      let resultImage = await extractOpenAIImageDataUrl(imageData);
-      if (!resultImage) {
-        return { success: false, error: 'No image data in response' };
-      }
-
-      return {
-        success: true,
-        resultImage,
-      };
-    }
-
-    return {
-      success: false,
-      error: 'No image generated. Please try again.',
-    };
-
-  } catch (error) {
-    logger.error('Error generating hair style:', error);
-
-    if (error instanceof TypeError && error.message.includes('fetch')) {
-      return { success: false, error: 'Network error. Please check your internet connection.' };
-    }
-
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Unknown error occurred',
-    };
-  }
+  return callGeminiImageEdit(userPhoto, editPrompt, 'front hair generation');
 };
 
 // Generate from reference photo
@@ -447,84 +384,54 @@ interface GenerateFromReferenceParams {
 export const generateFromReference = async (
   params: GenerateFromReferenceParams
 ): Promise<GenerateHairStyleResponse> => {
-  const { userPhoto, settings } = params;
+  const { userPhoto, referencePhoto, settings } = params;
 
-  if (!OPENAI_API_KEY) {
-    return { success: false, error: 'OpenAI API key not configured' };
+  if (!GEMINI_API_KEY) {
+    return { success: false, error: 'Gemini API key not configured' };
   }
 
-  // Build color modification if not natural
   const colorOption = hairColors.find((c) => c.id === settings.color);
-  const colorPrompt = colorOption && colorOption.id !== 'natural' ? `Apply hair color: ${colorOption.prompt}.` : '';
+  const colorPrompt = colorOption && colorOption.id !== 'natural'
+    ? `Hair color: ${colorOption.nameKo} (${colorOption.prompt}).`
+    : '';
 
+  // 1) Use Gemini Vision to describe the reference image's hairstyle
+  let referenceDescription = '';
   try {
-    logger.log('Generating from reference with OpenAI...');
-
-    // For reference-based generation, we need to describe the reference hairstyle
-    // OpenAI doesn't support multiple input images in edit, so we use generation with detailed prompt
-    const refPrompt = `Copy the EXACT hairstyle from the reference image and apply it to this person's photo.
-
-RULES:
-1. The person's face must remain 100% IDENTICAL
-2. ONLY change the hair to match the reference hairstyle
-3. Keep body, clothing, background unchanged
-${colorPrompt ? `4. ${colorPrompt}` : ''}
-
-This is a virtual hairstyle try-on - same person, different hair only.`;
-
-    const imageBlob = base64ToBlob(userPhoto, 'image/png');
-
-    const formData = new FormData();
-    formData.append('image', imageBlob, 'photo.png');
-    formData.append('prompt', refPrompt);
-    formData.append('model', 'gpt-image-1.5');
-    formData.append('n', '1');
-    formData.append('size', '1024x1024');
-
-    const response = await resilientFetch(OPENAI_EDIT_URL, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${OPENAI_API_KEY}`,
-      },
-      body: formData,
-    });
-
-    if (!response.ok) {
-      const errorMessage = await toOpenAIErrorMessage(response);
-      logger.error('OpenAI reference generation error:', response.status, errorMessage);
-      return { success: false, error: errorMessage };
-    }
-
-    const data = await response.json();
-
-    if (data.data && data.data.length > 0) {
-      const imageData = data.data[0];
-
-      let resultImage = await extractOpenAIImageDataUrl(imageData);
-      if (!resultImage) {
-        return { success: false, error: 'No image data in response' };
-      }
-
-      return {
-        success: true,
-        resultImage,
-      };
-    }
-
-    return { success: false, error: 'No image generated. Please try again.' };
-
-  } catch (error) {
-    logger.error('Error generating from reference:', error);
-    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+    const description = await analyzeReferenceImage(referencePhoto, 'reference');
+    if (description) referenceDescription = description;
+  } catch (err) {
+    logger.warn('Reference vision analysis failed:', err);
   }
+
+  const promptText = `INPAINTING TASK - HAIR REGION ONLY
+
+Apply the hairstyle from the supplied reference description onto this person's photo.
+
+Reference hairstyle description:
+${referenceDescription || '(use the reference image as a visual guide)'}
+
+${colorPrompt}
+
+CRITICAL RULES:
+- Keep the face, eyes, nose, mouth, skin, jaw, ears, eyebrows 100% identical
+- Keep background, clothing, body, pose, camera angle unchanged
+- ONLY modify the hair region
+
+The output must be a photorealistic image of the SAME person with the NEW hairstyle.`;
+
+  // We pass userPhoto through callGeminiImageEdit (the reference is already
+  // captured into the description text above). This keeps a single image-edit
+  // request and avoids breaking the safety filter with multi-image inputs.
+  return callGeminiImageEdit(userPhoto, promptText, 'reference-based generation');
 };
 
-// Generate back view of hairstyle
+// Generate back view from a front result
 interface GenerateBackViewParams {
-  userPhoto: string;
   frontResultImage: string;
   style: HairStyle;
   settings: HairSettings;
+  userPhoto?: string;
 }
 
 export const generateBackView = async (
@@ -532,245 +439,122 @@ export const generateBackView = async (
 ): Promise<GenerateHairStyleResponse> => {
   const { frontResultImage, style, settings } = params;
 
-  if (!OPENAI_API_KEY) {
-    return { success: false, error: 'OpenAI API key not configured' };
+  if (!GEMINI_API_KEY) {
+    return { success: false, error: 'Gemini API key not configured' };
   }
 
   const stylePrompt = buildPrompt(style, settings);
-
-  // Build color prompt separately to ensure it's always included
   const colorOption = hairColors.find((c) => c.id === settings.color);
-  const colorPrompt = colorOption && colorOption.id !== 'natural'
-    ? `HAIR COLOR: ${colorOption.prompt}`
-    : '';
 
-  try {
-    logger.log('Generating back view with OpenAI...');
-    if (colorPrompt) {
-      logger.log('Back view color prompt:', colorPrompt);
-    }
+  const promptText = colorOption && colorOption.id !== 'natural'
+    ? `Create a BACK VIEW of this same ${colorOption.nameKo} colored ${style.nameKo} hairstyle.
 
-    // Generate back view based on the front view result
-    const backViewPrompt = colorOption && colorOption.id !== 'natural'
-      ? `Create a BACK VIEW of this ${colorOption.nameKo} colored ${style.nameKo} hairstyle.
+MANDATORY: The hair color MUST remain ${colorOption.nameKo}. ${colorOption.prompt}
 
-**MANDATORY: The hair color MUST be ${colorOption.nameKo}. ${colorOption.prompt}**
+Hairstyle details: ${stylePrompt}
 
-HAIRSTYLE: ${stylePrompt}
+Requirements:
+1. Show the BACK of the head (nape, back layers, overall shape from behind)
+2. Hair color must be ${colorOption.nameKo}
+3. Keep the same texture and styling
+4. Maintain realistic proportions and lighting`
+    : `Create a BACK VIEW of this same hairstyle: ${style.nameKo} (${style.name}).
 
-REQUIREMENTS:
-1. Show the BACK of the head with ${style.nameKo} hairstyle
-2. Hair color MUST be ${colorOption.nameKo} - this is mandatory
-3. Show nape, back layers, and overall shape from behind
-4. Keep the same ${colorOption.nameKo} hair color as specified`
-      : `Create a BACK VIEW of this same hairstyle: ${style.nameKo} (${style.name})
+Hairstyle details: ${stylePrompt}
 
-HAIRSTYLE DETAILS: ${stylePrompt}
-
-TASK:
+Requirements:
 1. Show the back of this person's head with the SAME hairstyle
-2. Transform this front view to a back view
+2. Transform this front view into a back view
 3. Keep the same hair color, texture, and styling
-4. Show how the hairstyle looks from behind - nape, back layers, overall shape
-5. Maintain realistic proportions and lighting
+4. Show nape, back layers, and overall shape from behind
+5. Maintain realistic proportions and lighting`;
 
-This should look like a "back view" photo of the same person with this hairstyle at a hair salon.`;
-
-    const imageBlob = base64ToBlob(frontResultImage, 'image/png');
-
-    const formData = new FormData();
-    formData.append('image', imageBlob, 'photo.png');
-    formData.append('prompt', backViewPrompt);
-    formData.append('model', 'gpt-image-1.5');
-    formData.append('n', '1');
-    formData.append('size', '1024x1024');
-
-    const response = await resilientFetch(OPENAI_EDIT_URL, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${OPENAI_API_KEY}`,
-      },
-      body: formData,
-    });
-
-    if (!response.ok) {
-      const errorMessage = await toOpenAIErrorMessage(response);
-      logger.error('OpenAI back view error:', response.status, errorMessage);
-      return { success: false, error: errorMessage };
-    }
-
-    const data = await response.json();
-
-    if (data.data && data.data.length > 0) {
-      const imageData = data.data[0];
-
-      let resultImage = await extractOpenAIImageDataUrl(imageData);
-      if (!resultImage) {
-        return { success: false, error: 'No image data in response' };
-      }
-
-      return {
-        success: true,
-        resultImage,
-      };
-    }
-
-    return { success: false, error: 'No back view generated. Please try again.' };
-
-  } catch (error) {
-    logger.error('Error generating back view:', error);
-    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
-  }
+  return callGeminiImageEdit(frontResultImage, promptText, 'back view');
 };
 
-// Build custom hairstyle prompt from settings
-const buildCustomPrompt = (settings: CustomHairSettings): string => {
+// Build custom haircut spec
+const buildCustomHaircutSpec = (cs: CustomHairSettings): string => {
   const parts: string[] = [];
+  parts.push(`Hair length specifications: front bangs ${cs.frontLength}cm, sides ${cs.sideLength}cm, top ${cs.topLength}cm, back ${cs.backLength}cm`);
 
-  // 길이 설명
-  parts.push(`Hair length specifications: front bangs ${settings.frontLength}cm, sides ${settings.sideLength}cm, top ${settings.topLength}cm, back ${settings.backLength}cm`);
-
-  // 숱치기
-  if (settings.thinning.top || settings.thinning.sides || settings.thinning.back) {
-    const thinningAreas: string[] = [];
-    if (settings.thinning.top) thinningAreas.push('top');
-    if (settings.thinning.sides) thinningAreas.push('sides');
-    if (settings.thinning.back) thinningAreas.push('back');
-
-    const amountMap = {
+  if (cs.thinning.top || cs.thinning.sides || cs.thinning.back) {
+    const areas: string[] = [];
+    if (cs.thinning.top) areas.push('top');
+    if (cs.thinning.sides) areas.push('sides');
+    if (cs.thinning.back) areas.push('back');
+    const amt: Record<string, string> = {
       light: 'lightly thinned',
       medium: 'moderately thinned',
       heavy: 'heavily thinned',
     };
-    parts.push(`${thinningAreas.join(' and ')} hair is ${amountMap[settings.thinning.amount]}`);
+    parts.push(`${areas.join(' and ')} hair is ${amt[cs.thinning.amount]}`);
   }
 
-  // 펌
-  if (settings.perm.type !== 'none') {
-    const permTypes = {
+  if (cs.perm.type !== 'none') {
+    const map: Record<string, string> = {
       down: 'down perm (hair falling naturally downward)',
       volume: 'volume perm (added body and lift)',
       wave: 'wave perm (soft S-curves)',
     };
-    parts.push(permTypes[settings.perm.type]);
+    parts.push(map[cs.perm.type]);
 
     const permAreas: string[] = [];
-    if (settings.perm.areas.sideBack) permAreas.push('sides and back');
-    if (settings.perm.areas.sideOnly) permAreas.push('sides only');
-    if (settings.perm.areas.top) permAreas.push('top');
-    if (settings.perm.areas.bangs) permAreas.push('bangs');
-
-    if (permAreas.length > 0) {
-      parts.push(`perm applied to: ${permAreas.join(', ')}`);
-    }
+    if (cs.perm.areas.sideBack) permAreas.push('sides and back');
+    if (cs.perm.areas.sideOnly) permAreas.push('sides only');
+    if (cs.perm.areas.top) permAreas.push('top');
+    if (cs.perm.areas.bangs) permAreas.push('bangs');
+    if (permAreas.length > 0) parts.push(`perm applied to: ${permAreas.join(', ')}`);
   }
 
-  // 투블럭/페이드
-  if (settings.undercut.enabled) {
-    parts.push(`two-block undercut with sides buzzed up ${settings.undercut.height}mm`);
-
-    if (settings.undercut.fadeType !== 'none') {
-      const fadeTypes = {
+  if (cs.undercut.enabled) {
+    parts.push(`two-block undercut with sides buzzed up ${cs.undercut.height}mm`);
+    if (cs.undercut.fadeType !== 'none') {
+      const fades: Record<string, string> = {
         low: 'low fade starting below the ear',
         mid: 'mid fade at temple level',
         high: 'high fade near the crown',
         skin: 'skin fade blending to bare skin',
       };
-      parts.push(fadeTypes[settings.undercut.fadeType]);
+      parts.push(fades[cs.undercut.fadeType]);
     }
   }
 
-  // 기타 옵션
-  if (settings.layering) {
-    parts.push('with layered cut for movement');
-  }
-  if (settings.texturizing) {
-    parts.push('with textured choppy ends');
-  }
+  if (cs.layering) parts.push('with layered cut for movement');
+  if (cs.texturizing) parts.push('with textured choppy ends');
 
   return parts.join(', ');
 };
 
-// Generate custom hairstyle based on detailed settings
-interface GenerateCustomParams {
+// Generate custom haircut
+interface GenerateCustomHairStyleParams {
   userPhoto: string;
   customSettings: CustomHairSettings;
 }
 
 export const generateCustomHairStyle = async (
-  params: GenerateCustomParams
+  params: GenerateCustomHairStyleParams
 ): Promise<GenerateHairStyleResponse> => {
   const { userPhoto, customSettings } = params;
 
-  if (!OPENAI_API_KEY) {
-    return { success: false, error: 'OpenAI API key not configured' };
+  if (!GEMINI_API_KEY) {
+    return { success: false, error: 'Gemini API key not configured' };
   }
 
-  const customPrompt = buildCustomPrompt(customSettings);
+  const spec = buildCustomHaircutSpec(customSettings);
+  const promptText = `Apply this EXACT custom haircut specification to this person's photo:
 
-  try {
-    logger.log('Generating custom hairstyle with OpenAI...');
-    logger.log('Custom settings prompt:', customPrompt);
+Haircut specifications:
+${spec}
 
-    const editPrompt = `TASK: Apply this EXACT custom haircut specification to this person's photo:
-
-HAIRCUT SPECIFICATIONS:
-${customPrompt}
-
-CRITICAL RULES:
-1. Keep the person's face 100% IDENTICAL - same eyes, nose, mouth, skin, face shape
-2. Keep the same person's identity - must be recognizable as the EXACT same person
+Critical rules:
+1. Keep the person's face 100% identical (eyes, nose, mouth, skin, face shape)
+2. The person must be recognizable as the EXACT same person
 3. Keep body, clothing, background, lighting, and pose unchanged
 4. ONLY modify the hair according to the specifications above
-5. Pay attention to the exact centimeter measurements provided
+5. Respect the exact centimeter measurements provided
 6. This is a professional salon haircut preview
 
-Apply these haircut specifications as if a professional barber/stylist just finished cutting.`;
+Render as if a professional barber just finished this cut on the person.`;
 
-    const imageBlob = base64ToBlob(userPhoto, 'image/png');
-
-    const formData = new FormData();
-    formData.append('image', imageBlob, 'photo.png');
-    formData.append('prompt', editPrompt);
-    formData.append('model', 'gpt-image-1.5');
-    formData.append('n', '1');
-    formData.append('size', '1024x1024');
-
-    const response = await resilientFetch(OPENAI_EDIT_URL, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${OPENAI_API_KEY}`,
-      },
-      body: formData,
-    });
-
-    if (!response.ok) {
-      const errorMessage = await toOpenAIErrorMessage(response);
-      logger.error('OpenAI custom generation error:', response.status, errorMessage);
-      return { success: false, error: errorMessage };
-    }
-
-    const data = await response.json();
-
-    if (data.data && data.data.length > 0) {
-      const imageData = data.data[0];
-
-      let resultImage = await extractOpenAIImageDataUrl(imageData);
-      if (!resultImage) {
-        return { success: false, error: 'No image data in response' };
-      }
-
-      return {
-        success: true,
-        resultImage,
-      };
-    }
-
-    return { success: false, error: 'No image generated. Please try again.' };
-
-  } catch (error) {
-    logger.error('Error generating custom hairstyle:', error);
-    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
-  }
+  return callGeminiImageEdit(userPhoto, promptText, 'custom haircut');
 };
-
